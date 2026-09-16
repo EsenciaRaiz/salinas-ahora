@@ -132,16 +132,16 @@ export default function Home() {
   }, [businesses, category, filter, query]);
 
   const nightCount = businesses.filter((business) => yes(business.abierto_de_noche)).length;
-  const email = String(configuration.EMAIL_PUBLICAR || 'publicar@salinasahora.uy');
+  const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
   const currency = String(configuration.MONEDA || 'UYU');
   const basicPrice = String(configuration.PRECIO_BASICA || 190);
   const featuredPrice = String(configuration.PRECIO_DESTACADA || 490);
-  const footerText = String(configuration.TEXTO_PIE || 'Guía independiente de comercios, servicios e historias de Salinas.');
+  const footerText = String(configuration.TEXTO_PIE || 'Guía independiente de comercios, servicios e historias locales.');
 
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#inicio" aria-label="Salinas Ahora, inicio"><span className="brand-dot" /><span>SALINAS</span><strong>AHORA</strong></a>
+        <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-dot" /><span>VITRINA</span><strong>CERCA</strong></a>
         <nav aria-label="Navegación principal"><a href="#guia">Guía local</a><a href="#historias">Historias</a><a href="#publicar">Publicar</a></nav>
         <a className="header-cta" href="#publicar">Sumá tu negocio</a>
       </header>
@@ -149,7 +149,7 @@ export default function Home() {
       <section className="hero" id="inicio">
         <img src="/salinas-atardecer.png" alt="Comercios de una zona costera al atardecer" />
         <div className="hero-overlay" />
-        <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Salinas · Canelones</span><h1>Tu barrio,<br />a mano.</h1><p>Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.</p></div>
+        <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>Tu zona,<br />a mano.</h1><p>Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.</p></div>
         <div className="hero-status"><span><MoonStar size={18} /> Edición nocturna</span><strong>{nightCount} lugares abiertos hasta tarde</strong></div>
       </section>
 
@@ -174,7 +174,7 @@ export default function Home() {
                   <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{yes(business.destacado) && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
                   <span className="card-category">{business.categoria}</span><h3>{business.nombre}</h3><p>{business.descripcion}</p>
                   <div className="hours"><span className={open ? 'open' : 'later'}>{business.abierto_ahora ? (open ? 'Abierto ahora' : 'Cerrado ahora') : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
-                  <div className="address"><MapPin size={15} /> {business.direccion || business.zona || 'Salinas'}</div>
+                  <div className="address"><MapPin size={15} /> {business.direccion || business.zona || 'Tu zona'}</div>
                   {href ? <a className="details" href={href} target="_blank" rel="noreferrer">Ver datos <ArrowRight size={16} /></a> : <span className="details">Próximamente</span>}
                 </article>
               );
@@ -184,12 +184,12 @@ export default function Home() {
 
           <aside className="ad-column" aria-label="Espacios patrocinados">
             {advertisements.length > 0 ? advertisements.map((ad) => <div className="ad-card" key={ad.id || ad.anunciante}><span>ESPACIO LOCAL</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '#publicar'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="#publicar">Conocer opciones <ArrowRight size={15} /></a></div>}
-            <div className="night-note"><MoonStar size={24} /><strong>Salinas de noche</strong><p>Una selección útil de gastronomía, farmacias y servicios con horario extendido.</p></div>
+            <div className="night-note"><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Una selección útil de gastronomía, farmacias y servicios con horario extendido.</p></div>
           </aside>
         </div>
       </section>
 
-      <section className="editorial" id="historias"><div className="editorial-number">01</div><div><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2>Los comercios que hacen barrio.</h2></div><p>Retratos breves de emprendedores, oficios y rincones que construyen la identidad de Salinas.</p><a href="#guia">Leer la edición <ArrowRight size={18} /></a></section>
+      <section className="editorial" id="historias"><div className="editorial-number">01</div><div><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2>Los comercios que hacen barrio.</h2></div><p>Retratos breves de emprendedores, oficios y rincones que construyen la identidad de cada comunidad.</p><a href="#guia">Leer la edición <ArrowRight size={18} /></a></section>
 
       <section className="pricing" id="publicar">
         <div className="pricing-intro"><span className="section-kicker">PUBLICÁ SIN GASTAR DE MÁS</span><h2>Más visibilidad.<br />Un precio de barrio.</h2><p>Empezá con una ficha clara y sumá promoción solamente cuando la necesites.</p></div>
@@ -199,7 +199,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer><div className="brand footer-brand"><span className="brand-dot" /><span>SALINAS</span><strong>AHORA</strong></div><p>{footerText}</p><span>© {new Date().getFullYear()} Salinas Ahora</span></footer>
+      <footer><div className="brand footer-brand"><span className="brand-dot" /><span>VITRINA</span><strong>CERCA</strong></div><p>{footerText}</p><span>© {new Date().getFullYear()} Vitrina Cerca</span></footer>
     </main>
   );
 }
