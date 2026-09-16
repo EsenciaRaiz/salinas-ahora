@@ -49,6 +49,10 @@ const fallbackBusinesses: Business[] = [
   { id: 'SAL004', destacado: 'Sí', plan: 'Destacada', nombre: 'Brasa Costera', categoria: 'Gastronomía', descripcion: 'Parrilla y cocina abierta de noche', direccion: 'Rambla Costanera 612', zona: 'Salinas', telefono: '', whatsapp: '', sitio_web: '', horario_lunes_a_viernes: '19:00–01:30', horario_sabado: '19:00–01:30', horario_domingo: '19:00–01:30', abierto_ahora: 'No', abierto_de_noche: 'Sí' },
 ];
 
+const fallbackAdvertisements: Advertisement[] = [
+  { id: 'UYPROP001', anunciante: 'Ver propiedades en UYProp', titulo: 'Tu próximo hogar puede estar más cerca', texto: 'Explorá casas, apartamentos y oportunidades inmobiliarias en la costa y distintos puntos de Uruguay.', imagen_url: 'https://drive.google.com/thumbnail?id=1v6yBiX6XpKAzdE9NOKMWRo0o1eoX7dY-&sz=w900', enlace: 'https://uyprop.com/#propiedades' },
+];
+
 const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());
 
 function businessStyle(category: string, index: number) {
@@ -80,7 +84,7 @@ export default function Home() {
   const [category, setCategory] = useState('Todos');
   const [query, setQuery] = useState('');
   const [businesses, setBusinesses] = useState<Business[]>(fallbackBusinesses);
-  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
+  const [advertisements, setAdvertisements] = useState<Advertisement[]>(fallbackAdvertisements);
   const [configuration, setConfiguration] = useState<Record<string, string | number>>({});
 
   useEffect(() => {
@@ -93,7 +97,7 @@ export default function Home() {
       .then((data) => {
         if (!data.correcto || !Array.isArray(data.negocios)) return;
         setBusinesses(data.negocios);
-        setAdvertisements(Array.isArray(data.publicidad) ? data.publicidad : []);
+        setAdvertisements(Array.isArray(data.publicidad) && data.publicidad.length > 0 ? data.publicidad : fallbackAdvertisements);
         setConfiguration(data.configuracion || {});
       })
       .catch(() => undefined);
@@ -183,7 +187,7 @@ export default function Home() {
           </div>
 
           <aside className="ad-column" aria-label="Espacios patrocinados">
-            {advertisements.length > 0 ? advertisements.map((ad) => <div className="ad-card" key={ad.id || ad.anunciante}><span>ESPACIO LOCAL</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '#publicar'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="#publicar">Conocer opciones <ArrowRight size={15} /></a></div>}
+            {advertisements.length > 0 ? advertisements.map((ad) => <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={ad.imagen_url} alt={ad.titulo || ad.anunciante} loading="lazy" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '#publicar'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div></article>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="#publicar">Conocer opciones <ArrowRight size={15} /></a></div>}
             <div className="night-note"><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Una selección útil de gastronomía, farmacias y servicios con horario extendido.</p></div>
           </aside>
         </div>
