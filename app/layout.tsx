@@ -4,15 +4,15 @@ import './globals.css';
 
 const archivo = Archivo({ variable: '--font-sans', subsets: ['latin'] });
 const fraunces = Fraunces({ variable: '--font-editorial', subsets: ['latin'] });
-const siteUrl = 'https://salinas-ahora.uruguayrealtors.chatgpt.site';
+const siteUrl = 'https://vitrinacerca.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   verification: {
     google: 'tIeiA1knpPluYMgEngNMk-H2CxSnB-Z3v9jZn7W_KM0',
   },
-  title: 'Salinas Ahora | Guía local y revista de barrio',
-  description: 'Comercios, horarios, servicios e historias de Salinas, Canelones.',
+  title: 'Vitrina Cerca | Comercios, servicios e historias locales',
+  description: 'Encontrá comercios, servicios, horarios e historias locales cerca de vos.',
   alternates: {
     canonical: '/',
   },
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_UY',
     url: siteUrl,
-    siteName: 'Salinas Ahora',
-    title: 'Salinas Ahora | Guía local y revista de barrio',
-    description: 'Comercios, horarios, servicios e historias de Salinas, Canelones.',
+    siteName: 'Vitrina Cerca',
+    title: 'Vitrina Cerca | Comercios, servicios e historias locales',
+    description: 'Encontrá comercios, servicios, horarios e historias locales cerca de vos.',
   },
   twitter: {
     card: 'summary',
-    title: 'Salinas Ahora | Guía local y revista de barrio',
-    description: 'Comercios, horarios, servicios e historias de Salinas, Canelones.',
+    title: 'Vitrina Cerca | Comercios, servicios e historias locales',
+    description: 'Encontrá comercios, servicios, horarios e historias locales cerca de vos.',
   },
 };
 
@@ -46,10 +46,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Salinas Ahora',
+    name: 'Vitrina Cerca',
     url: siteUrl,
     inLanguage: 'es-UY',
-    description: 'Guía local de comercios, horarios, servicios e historias de Salinas, Canelones.',
+    description: 'Guía local de comercios, horarios, servicios e historias cerca de vos.',
     areaServed: {
       '@type': 'City',
       name: 'Salinas',
