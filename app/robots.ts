@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://salinas-ahora.uruguayrealtors.chatgpt.site/sitemap.xml',
+    sitemap: 'https://vitrinacerca.com/sitemap.xml',
   };
 }
