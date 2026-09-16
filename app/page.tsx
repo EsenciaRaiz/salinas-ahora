@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MoonStar, Search, ShoppingBag, Sparkles, Star, Store, Utensils } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, Clock3, Facebook, HeartPulse, Instagram, Linkedin, MapPin, MessageCircle, MoonStar, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils, Youtube } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 type Filter = 'todos' | 'ahora' | 'noche';
@@ -22,6 +22,14 @@ type Business = {
   horario_domingo: string;
   abierto_ahora: string;
   abierto_de_noche: string;
+  imagen_url?: string;
+  mapa_url?: string;
+  texto_destacado?: string;
+  orden?: string | number;
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  estilo_tarjeta?: string;
+  boton_texto?: string;
 };
 
 type Advertisement = {
@@ -31,6 +39,10 @@ type Advertisement = {
   texto: string;
   imagen_url: string;
   enlace: string;
+  tipo_publicidad?: string;
+  orden?: string | number;
+  fecha_inicio?: string;
+  fecha_fin?: string;
 };
 
 type PublicData = {
@@ -79,6 +91,12 @@ function businessLink(business: Business) {
   return phone ? `tel:${phone}` : '';
 }
 
+function driveImage(value?: string) { const source=String(value||'').trim(); if(!source) return ''; const match=source.match(/(?:\/d\/|[?&]id=)([-\w]{20,})/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200` : source; }
+function businessMapLink(business: Business) { const custom=String(business.mapa_url||'').trim(); if(custom) return custom; const query=[business.direccion,business.zona,'Uruguay'].filter(Boolean).join(', '); return query ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}` : ''; }
+function activeByDate(item:{fecha_inicio?:string;fecha_fin?:string}) { const today=new Date().toISOString().slice(0,10); return (!item.fecha_inicio||item.fecha_inicio<=today)&&(!item.fecha_fin||item.fecha_fin>=today); }
+function orderOf(item:{orden?:string|number}) { const value=Number(item.orden); return Number.isFinite(value)&&value>0?value:9999; }
+function featuredBusiness(business:Business) { return yes(business.destacado)||String(business.plan||'').toLowerCase().includes('destac'); }
+
 export default function Home() {
   const [filter, setFilter] = useState<Filter>('todos');
   const [category, setCategory] = useState('Todos');
@@ -86,6 +104,7 @@ export default function Home() {
   const [businesses, setBusinesses] = useState<Business[]>(fallbackBusinesses);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(fallbackAdvertisements);
   const [configuration, setConfiguration] = useState<Record<string, string | number>>({});
+  const [isNight, setIsNight] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -103,6 +122,8 @@ export default function Home() {
       .catch(() => undefined);
     return () => controller.abort();
   }, []);
+
+  useEffect(() => { const updateEdition=()=>{ const hour=Number(new Intl.DateTimeFormat('en-GB',{hour:'2-digit',hour12:false,timeZone:'America/Montevideo'}).format(new Date())); setIsNight(hour>=19||hour<7); }; updateEdition(); const timer=window.setInterval(updateEdition,60000); return()=>window.clearInterval(timer); }, []);
 
   useEffect(() => {
     const context = (document as Document & { modelContext?: { registerTool: (tool: object, options?: { signal?: AbortSignal }) => void | Promise<void> } }).modelContext;
@@ -128,6 +149,7 @@ export default function Home() {
   const visible = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return businesses.filter((business) => {
+      if (!activeByDate(business)) return false;
       const matchesFilter = filter === 'todos' || (filter === 'ahora' && yes(business.abierto_ahora)) || (filter === 'noche' && yes(business.abierto_de_noche));
       const matchesCategory = category === 'Todos' || business.categoria === category;
       const matchesQuery = !normalized || `${business.nombre} ${business.categoria} ${business.descripcion} ${business.zona}`.toLowerCase().includes(normalized);
@@ -135,17 +157,29 @@ export default function Home() {
     });
   }, [businesses, category, filter, query]);
 
+  const featuredVisible=useMemo(()=>visible.filter(featuredBusiness).sort((a,b)=>orderOf(a)-orderOf(b)),[visible]);
+  const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort((a,b)=>orderOf(a)-orderOf(b)),[visible]);
+  const activeAdvertisements=useMemo(()=>advertisements.filter(activeByDate).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const nightCount = businesses.filter((business) => yes(business.abierto_de_noche)).length;
   const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
   const currency = String(configuration.MONEDA || 'UYU');
   const basicPrice = String(configuration.PRECIO_BASICA || 190);
   const featuredPrice = String(configuration.PRECIO_DESTACADA || 490);
   const footerText = String(configuration.TEXTO_PIE || 'Guía independiente de comercios, servicios e historias locales.');
+  const premiumPrice=String(configuration.PRECIO_PREMIUM||990);
+  const basicDetail=String(configuration.DETALLE_BASICA||'Ficha en la guía, foto, datos, horarios, contacto y mapa.');
+  const featuredDetail=String(configuration.DETALLE_DESTACADA||'Prioridad, mayor tamaño, sello destacado y presencia en selecciones.');
+  const premiumDetail=String(configuration.DETALLE_PREMIUM||'Portada editorial, campaña visual y ubicación publicitaria preferente.');
+  const heroTitle=String(configuration.HERO_TITULO||'Tu zona, a mano.');
+  const heroText=String(configuration.HERO_TEXTO||'Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.');
+  const whatsappPublicar=String(configuration.WHATSAPP_PUBLICAR||'').replace(/\D/g,'');
+  const socialLinks=[{key:'instagram',label:'Instagram',url:String(configuration.INSTAGRAM_URL||''),icon:Instagram},{key:'facebook',label:'Facebook',url:String(configuration.FACEBOOK_URL||''),icon:Facebook},{key:'linkedin',label:'LinkedIn',url:String(configuration.LINKEDIN_URL||''),icon:Linkedin},{key:'youtube',label:'YouTube',url:String(configuration.YOUTUBE_URL||''),icon:Youtube},{key:'whatsapp',label:'WhatsApp',url:whatsappPublicar?`https://wa.me/${whatsappPublicar}`:'',icon:MessageCircle}].filter((item)=>item.url);
+  const renderBusinessCard=(business:Business,index:number,featured=false)=>{ const style=businessStyle(business.categoria,index); const Icon=style.icon; const href=businessLink(business); const mapHref=businessMapLink(business); const image=driveImage(business.imagen_url); const open=yes(business.abierto_ahora); return <article className={`business-card ${style.color} ${featured?'featured-business':''} ${String(business.estilo_tarjeta||'').toLowerCase()}`} key={business.id||business.nombre}>{image&&<img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy"/>}<div className="card-top"><span className="business-icon"><Icon size={22}/></span>{featured&&<span className="sponsored"><Star size={13}/> Destacado</span>}</div><span className="card-category">{business.categoria}</span><h3>{business.nombre}</h3><p>{featured&&business.texto_destacado?business.texto_destacado:business.descripcion}</p><div className="hours"><span className={open?'open':'later'}>{business.abierto_ahora?(open?'Abierto ahora':'Cerrado ahora'):'Horario a consultar'}</span><strong><Clock3 size={15}/> {businessHours(business)}</strong></div><div className="address"><MapPin size={15}/> {business.direccion||business.zona||'Tu zona'}</div><div className="card-actions">{href?<a className="details" href={href} target="_blank" rel="noreferrer">{business.boton_texto||'Ver más'} <ArrowRight size={16}/></a>:<span className="details">Ver más</span>}{mapHref&&<a className="map-link" href={mapHref} target="_blank" rel="noreferrer"><MapPin size={15}/> Cómo llegar</a>}</div></article>; };
 
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-dot" /><span>VITRINA</span><strong>CERCA</strong></a>
+        <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a>
         <nav aria-label="Navegación principal"><a href="#guia">Guía local</a><a href="#historias">Historias</a><a href="#publicar">Publicar</a></nav>
         <a className="header-cta" href="#publicar">Sumá tu negocio</a>
       </header>
@@ -153,8 +187,8 @@ export default function Home() {
       <section className="hero" id="inicio">
         <img src="/salinas-atardecer.png" alt="Comercios de una zona costera al atardecer" />
         <div className="hero-overlay" />
-        <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>Tu zona,<br />a mano.</h1><p>Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.</p></div>
-        <div className="hero-status"><span><MoonStar size={18} /> Edición nocturna</span><strong>{nightCount} lugares abiertos hasta tarde</strong></div>
+        <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
+        <div className={`hero-status ${isNight ? 'night' : 'day'}`}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares abiertos hasta tarde` : 'Descubrí lo mejor de tu zona'}</strong></div>
       </section>
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
@@ -166,28 +200,13 @@ export default function Home() {
         </div>
         <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
 
+        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">SELECCIÓN EDITORIAL</span><h2 id="featured-title">Destacados de la semana</h2><p>Negocios con mayor visibilidad y propuestas elegidas para descubrir primero.</p></div><div className="featured-grid">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
+
         <div className="guide-layout">
-          <div className="business-grid">
-            {visible.map((business, index) => {
-              const style = businessStyle(business.categoria, index);
-              const Icon = style.icon;
-              const href = businessLink(business);
-              const open = yes(business.abierto_ahora);
-              return (
-                <article className={`business-card ${style.color}`} key={business.id || business.nombre}>
-                  <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{yes(business.destacado) && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
-                  <span className="card-category">{business.categoria}</span><h3>{business.nombre}</h3><p>{business.descripcion}</p>
-                  <div className="hours"><span className={open ? 'open' : 'later'}>{business.abierto_ahora ? (open ? 'Abierto ahora' : 'Cerrado ahora') : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
-                  <div className="address"><MapPin size={15} /> {business.direccion || business.zona || 'Tu zona'}</div>
-                  {href ? <a className="details" href={href} target="_blank" rel="noreferrer">Ver datos <ArrowRight size={16} /></a> : <span className="details">Próximamente</span>}
-                </article>
-              );
-            })}
-            {visible.length === 0 && <div className="empty-state"><Search size={28} /><h3>No encontramos coincidencias</h3><p>Probá otra categoría o buscá con menos palabras.</p></div>}
-          </div>
+          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{basicVisible.map((business,index)=>renderBusinessCard(business,index,false))}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>No encontramos coincidencias</h3><p>Probá otra categoría o buscá con menos palabras.</p></div>}</div></div>
 
           <aside className="ad-column" aria-label="Espacios patrocinados">
-            {advertisements.length > 0 ? advertisements.map((ad) => <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={ad.imagen_url} alt={ad.titulo || ad.anunciante} loading="lazy" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '#publicar'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div></article>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="#publicar">Conocer opciones <ArrowRight size={15} /></a></div>}
+            {activeAdvertisements.length > 0 ? activeAdvertisements.map((ad) => <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={ad.imagen_url} alt={ad.titulo || ad.anunciante} loading="lazy" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '#publicar'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div></article>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="#publicar">Conocer opciones <ArrowRight size={15} /></a></div>}
             <div className="night-note"><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Una selección útil de gastronomía, farmacias y servicios con horario extendido.</p></div>
           </aside>
         </div>
@@ -195,15 +214,9 @@ export default function Home() {
 
       <section className="editorial" id="historias"><div className="editorial-number">01</div><div><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2>Los comercios que hacen barrio.</h2></div><p>Retratos breves de emprendedores, oficios y rincones que construyen la identidad de cada comunidad.</p><a href="#guia">Leer la edición <ArrowRight size={18} /></a></section>
 
-      <section className="pricing" id="publicar">
-        <div className="pricing-intro"><span className="section-kicker">PUBLICÁ SIN GASTAR DE MÁS</span><h2>Más visibilidad.<br />Un precio de barrio.</h2><p>Empezá con una ficha clara y sumá promoción solamente cuando la necesites.</p></div>
-        <div className="plans">
-          <article><span>FICHA BÁSICA</span><h3>{currency} {basicPrice} <small>/ mes</small></h3><p>Datos, horarios, ubicación, WhatsApp y una fotografía.</p><a href={`mailto:${email}?subject=Quiero publicar mi negocio`}>Elegir básica</a></article>
-          <article className="featured-plan"><span><Sparkles size={15} /> DESTACADO</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>Mejor posición, galería, sello destacado y aparición en selecciones.</p><a href={`mailto:${email}?subject=Quiero destacar mi negocio`}>Quiero destacar</a></article>
-        </div>
-      </section>
+      <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PLANES DE PUBLICACIÓN</span><h2>{String(configuration.TITULO_PLANES||'Elegí cómo mostrar tu negocio')}</h2><p>{String(configuration.SUBTITULO_PLANES||'Opciones claras para cada etapa, sin ocupar la portada.')}</p></div><div className="plans three-plans"><article><span>FICHA BÁSICA</span><h3>{currency} {basicPrice} <small>/ mes</small></h3><p>{basicDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicar%20una%20ficha%20básica`:`mailto:${email}?subject=Quiero publicar mi negocio`}>Elegir básica</a></article><article className="featured-plan"><span><Sparkles size={15}/> DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>Consultar premium</a></article></div></section>
 
-      <footer><div className="brand footer-brand"><span className="brand-dot" /><span>VITRINA</span><strong>CERCA</strong></div><p>{footerText}</p><span>© {new Date().getFullYear()} Vitrina Cerca</span></footer>
+      <footer><div className="footer-main"><div className="brand footer-brand"><span className="brand-dot"/><span>VITRINA</span><strong>CERCA</strong></div><p>{footerText}</p>{socialLinks.length>0&&<nav className="social-links" aria-label="Redes sociales">{socialLinks.map(({key,label,url,icon:SocialIcon})=><a key={key} href={url} target="_blank" rel="noreferrer" aria-label={label} title={label}><SocialIcon size={19}/></a>)}</nav>}</div><div className="footer-strip"><span>Apoyá lo local, hacemos un mejor Uruguay ♡</span><strong>Negocios reales · Comunidad que crece · Un Uruguay más cerca</strong><span>© {new Date().getFullYear()} Vitrina Cerca</span></div></footer>
     </main>
   );
 }
