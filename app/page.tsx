@@ -86,6 +86,26 @@ function businessMapLink(business: Business) {
 function activeByDate(item:{fecha_inicio?:string;fecha_fin?:string}) { const today=new Date().toISOString().slice(0,10); return (!item.fecha_inicio||item.fecha_inicio<=today)&&(!item.fecha_fin||item.fecha_fin>=today); }
 function orderOf(item:{orden?:string|number}) { const value=Number(item.orden); return Number.isFinite(value)&&value>0?value:9999; }
 function featuredBusiness(business:Business) { return yes(business.destacado)||String(business.plan||'').toLowerCase().includes('destac'); }
+type Coordinates = { latitude: number; longitude: number };
+function businessCoordinates(business: Business): Coordinates | null {
+  const map = businessMapLink(business);
+  if (!map) return null;
+  try {
+    const url = new URL(map);
+    const value = url.searchParams.get('query') || url.searchParams.get('q') || url.searchParams.get('ll') || '';
+    const match = value.match(/^(-?\d{1,2}(?:\.\d+)?),\s*(-?\d{1,3}(?:\.\d+)?)$/)
+      || url.pathname.match(/@(-?\d{1,2}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/);
+    if (!match) return null;
+    const latitude = Number(match[1]), longitude = Number(match[2]);
+    return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180 ? { latitude, longitude } : null;
+  } catch { return null; }
+}
+function distanceKm(a: Coordinates, b: Coordinates) {
+  const radians = Math.PI / 180;
+  const angle = (b.latitude-a.latitude)*radians, sideways = (b.longitude-a.longitude)*radians;
+  const arc = Math.sin(angle/2)**2 + Math.cos(a.latitude*radians)*Math.cos(b.latitude*radians)*Math.sin(sideways/2)**2;
+  return 12742*Math.asin(Math.sqrt(arc));
+}
 
 export default function Home() {
   const [filter, setFilter] = useState<TimeFilter>('todos');
@@ -98,6 +118,8 @@ export default function Home() {
   const [configuration, setConfiguration] = useState<Record<string, string | number>>({});
   const [isNight, setIsNight] = useState(false);
   const [clockTick, setClockTick] = useState(0);
+  const [visitorLocation, setVisitorLocation] = useState<Coordinates | null>(null);
+  const [locationMessage, setLocationMessage] = useState('');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -155,8 +177,15 @@ export default function Home() {
     });
   }, [businesses, category, department, filter, query, clock]);
 
-  const featuredVisible=useMemo(()=>visible.filter(featuredBusiness).sort((a,b)=>orderOf(a)-orderOf(b)),[visible]);
-  const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort((a,b)=>orderOf(a)-orderOf(b)),[visible]);
+  const byDistance = (a: Business, b: Business) => {
+    if (!visitorLocation) return orderOf(a)-orderOf(b);
+    const aCoords = businessCoordinates(a), bCoords = businessCoordinates(b);
+    const aDistance = aCoords ? distanceKm(visitorLocation,aCoords) : Infinity;
+    const bDistance = bCoords ? distanceKm(visitorLocation,bCoords) : Infinity;
+    return aDistance-bDistance || orderOf(a)-orderOf(b);
+  };
+  const featuredVisible=useMemo(()=>visible.filter(featuredBusiness).sort(byDistance),[visible,visitorLocation]);
+  const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort(byDistance),[visible,visitorLocation]);
   const activeAdvertisements=useMemo(()=>advertisements.filter(activeByDate).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const nightCount = businesses.filter((business) => openInPeriod(business, clock, 'noche')).length;
   const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
@@ -172,6 +201,15 @@ export default function Home() {
   const heroText=String(configuration.HERO_TEXTO||'Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.');
   const whatsappPublicar=String(configuration.WHATSAPP_PUBLICAR||'').replace(/\D/g,'');
   const socialLinks=[{key:'instagram',label:'Instagram',url:String(configuration.INSTAGRAM_URL||''),mark:'IG'},{key:'facebook',label:'Facebook',url:String(configuration.FACEBOOK_URL||''),mark:'f'},{key:'linkedin',label:'LinkedIn',url:String(configuration.LINKEDIN_URL||''),mark:'in'},{key:'youtube',label:'YouTube',url:String(configuration.YOUTUBE_URL||''),mark:'▶'},{key:'whatsapp',label:'WhatsApp',url:whatsappPublicar?`https://wa.me/${whatsappPublicar}`:'',mark:'WA'}].filter((item)=>item.url);
+  const locateVisitor = () => {
+    if (!navigator.geolocation) { setLocationMessage('Tu dispositivo no permite usar la ubicación.'); return; }
+    setLocationMessage('Buscando tu ubicación…');
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => { setVisitorLocation({ latitude: coords.latitude, longitude: coords.longitude }); setLocationMessage('Mostramos primero los negocios con ubicación precisa más cercanos a vos.'); },
+      () => setLocationMessage('No pudimos acceder a tu ubicación. Podés seguir buscando por departamento.'),
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+    );
+  };
   const renderBusinessCard = (business: Business, index: number, featured = false) => {
     const style = businessStyle(business.categoria, index);
     const Icon = style.icon;
@@ -224,6 +262,7 @@ export default function Home() {
         </form>
         <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, lugar y horario. Los destacados aparecen primero.</p></div></div>
         <p className="finder-note">Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.</p>
+        <div className="proximity"><button type="button" onClick={locateVisitor}><MapPin size={17}/> {visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí'}</button><span role="status">{locationMessage || 'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.'}</span></div>
         <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
 
         <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? 'Cargando negocios…' : `${visible.length} ${visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados'}`}</div>

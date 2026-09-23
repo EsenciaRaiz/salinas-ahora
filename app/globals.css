@@ -127,6 +127,9 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .finder-form button{height:54px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 24px;border:0;border-radius:5px;background:var(--coral);color:white;font-weight:800;font-size:16px;cursor:pointer}
 .finder-form button:hover{background:#d95749}
 .finder-note{margin:0 0 20px;color:#526578;font-size:14px;line-height:1.5}
+.proximity{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 20px;color:#526578;font-size:14px}
+.proximity button{display:inline-flex;align-items:center;gap:8px;padding:11px 15px;border:1px solid #99b1bd;border-radius:5px;background:#fff;color:#102a43;font:inherit;font-weight:800;cursor:pointer}
+.proximity button:hover{border-color:#0f5f78;background:#f0f8f8}
 .result-count{padding:14px 0;font-weight:800;color:var(--ocean)}
 .card-actions .details,.card-actions .map-link{min-height:40px;padding:8px 11px;border:1px solid #c8d5d8;border-radius:5px;font-size:13px;white-space:nowrap}
 .card-actions .details:hover,.card-actions .map-link:hover{background:#eaf4f5;text-decoration:none}
