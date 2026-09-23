@@ -190,7 +190,7 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .profile-wrap{max-width:1040px;padding-top:28px}
 .profile-card{grid-template-columns:minmax(0,46%) minmax(0,54%);box-shadow:0 16px 35px rgba(16,42,67,.08)}
 .profile-gallery{min-height:0}
-.profile-gallery .profile-image,.profile-image{height:380px;min-height:380px;max-height:380px}
+.profile-gallery .profile-image,.profile-image{height:100%;min-height:380px;max-height:none}
 .profile-content{padding:clamp(25px,3vw,42px)}
 .profile-content h1{font-size:clamp(38px,4vw,54px);margin:10px 0}
 .profile-description{font-size:17px;line-height:1.48;margin:0}
@@ -211,6 +211,6 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .location-help div{display:flex;gap:10px;flex-wrap:wrap}
 .location-help button{padding:10px 13px;background:var(--ink);border:0;color:white;border-radius:4px;font:inherit;font-weight:800;cursor:pointer}
 .location-help button+button{background:#e6ecef;color:var(--ink)}
+.location-help ul{margin:0 0 16px;padding-left:20px;color:#29485c}.location-help li{margin:6px 0}.location-help button:disabled{opacity:.7;cursor:wait}
+.location-permission-guide{position:fixed;z-index:1000;right:18px;bottom:18px;max-width:min(430px,calc(100vw - 36px));display:grid;gap:8px;padding:18px 20px;background:#102a43;color:#fff;border:2px solid #f6c445;box-shadow:0 12px 35px #102a4366;font-size:15px;line-height:1.4}.location-permission-guide strong{font-size:17px}.location-permission-guide b{color:#f6c445}
 @media(max-width:760px){.profile-card{grid-template-columns:1fr}.profile-gallery .profile-image,.profile-image{height:250px;min-height:250px;max-height:250px}.profile-content{padding:25px}.profile-content h1{font-size:40px}.featured-business .business-photo-frame{height:220px}}
-
-@media(min-width:761px){.profile-gallery .profile-image{height:100%;max-height:none}}
