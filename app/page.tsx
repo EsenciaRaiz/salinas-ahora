@@ -243,8 +243,10 @@ export default function Home() {
   const footerText = String(configuration.TEXTO_PIE || 'Guía independiente de comercios, servicios e historias locales.');
   const premiumPrice=String(configuration.PRECIO_PREMIUM||990);
   const basicDetail=String(configuration.DETALLE_BASICA||'Ficha en la guía, foto, datos, horarios, contacto y mapa opcional.');
-  const featuredDetail=String(configuration.DETALLE_DESTACADA||'Prioridad, mayor tamaño, sello destacado y presencia en selecciones.');
-  const premiumDetail=String(configuration.DETALLE_PREMIUM||'Portada editorial, campaña visual y ubicación publicitaria preferente.');
+  const featuredDetailRaw=String(configuration.DETALLE_DESTACADA||'');
+  const featuredDetail=featuredDetailRaw && featuredDetailRaw !== 'Prioridad, mayor tamaño, sello destacado y presencia en selecciones.' ? featuredDetailRaw : 'Aparece en Destacados, con sello y prioridad en la guía.';
+  const premiumDetailRaw=String(configuration.DETALLE_PREMIUM||'');
+  const premiumDetail=premiumDetailRaw && premiumDetailRaw !== 'Portada editorial, campaña visual y ubicación publicitaria preferente.' ? premiumDetailRaw : 'Propuesta visual personalizada con espacio publicitario junto a la guía. La ubicación y duración se confirman antes de contratar.';
   const heroTitle=String(configuration.HERO_TITULO||'Tu zona, a mano.');
   const heroText=String(configuration.HERO_TEXTO||'Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.');
   const whatsappPublicar=String(configuration.WHATSAPP_PUBLICAR||'').replace(/\D/g,'');
