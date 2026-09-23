@@ -270,3 +270,5 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 
 /* Los anuncios siguen a las fichas y no dejan un hueco lateral */
 @media(min-width:901px){.guide-layout{grid-template-columns:1fr;gap:22px}.ad-column{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px}.ad-card,.night-note{min-height:0}.ad-card-content{padding:20px}.ad-card h3{font-size:25px;margin:16px 0 8px}.ad-card-media img{height:125px}.night-note{padding:20px}.night-note strong{font-size:22px;margin-top:9px}}
+.footer-credit-brand{display:inline-flex;align-items:center;gap:10px;color:#fff;font-size:13px;font-weight:800;text-decoration:none}
+a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun);text-decoration:underline;text-underline-offset:3px}
