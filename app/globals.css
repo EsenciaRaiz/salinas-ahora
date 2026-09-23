@@ -218,3 +218,19 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .location-help ul{margin:0 0 16px;padding-left:20px;color:#29485c}.location-help li{margin:6px 0}.location-help button:disabled{opacity:.7;cursor:wait}
 .location-permission-guide{position:fixed;z-index:1000;right:18px;bottom:18px;max-width:min(430px,calc(100vw - 36px));display:grid;gap:8px;padding:18px 20px;background:#102a43;color:#fff;border:2px solid #f6c445;box-shadow:0 12px 35px #102a4366;font-size:15px;line-height:1.4}.location-permission-guide strong{font-size:17px}.location-permission-guide b{color:#f6c445}
 @media(max-width:760px){.profile-card{grid-template-columns:1fr}.profile-gallery .profile-image,.profile-image{height:250px;min-height:250px;max-height:250px}.profile-content{padding:25px}.profile-content h1{font-size:40px}.featured-business .business-photo-frame{height:220px}}
+
+/* Pie: redes opcionales y crédito de ROMANSI */
+.social-links a{border-radius:50%;font-size:17px;font-weight:800;line-height:1}
+.social-links .social-instagram:hover{background:#d94683;color:white}
+.social-links .social-facebook:hover{background:#1877f2;color:white}
+.social-links .social-tiktok:hover{background:#141414;color:white}
+.social-links .social-youtube:hover{background:#ff0033;color:white}
+.social-links .social-linkedin:hover{background:#0a66c2;color:white}
+.social-links .social-whatsapp:hover{background:#25d366;color:#102a43}
+.footer-main:has(.social-links){grid-template-columns:auto minmax(0,1fr) auto auto}
+.footer-credit{display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:0 clamp(20px,5vw,72px) 22px;color:#d6e1e9;font-size:12px}
+.footer-credit img{display:block;width:128px;height:auto;max-height:48px;object-fit:contain}
+.footer-credit-contact{color:white;text-decoration:underline;text-underline-offset:3px}
+.footer-credit-contact:hover{color:var(--sun)}
+@media(max-width:900px){.footer-main:has(.social-links){grid-template-columns:1fr}}
+@media(max-width:620px){.footer-credit{justify-content:flex-start;flex-wrap:wrap;gap:12px}.footer-credit img{width:112px}}
