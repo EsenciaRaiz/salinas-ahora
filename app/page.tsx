@@ -55,6 +55,13 @@ type PublicData = {
 
 const dataUrl = 'https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
 const businessFormUrl = 'https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
+const businessUrl = (business: Business) => `https://vitrinacerca.com/?negocio=${encodeURIComponent(business.id)}`;
+type ContactAction = 'whatsapp' | 'telefono' | 'sitio' | 'mapa';
+function recordContact(business: Business, action: ContactAction) {
+  if (!business.id) return;
+  const parameters = new URLSearchParams({ metric: 'contacto', id: business.id, action });
+  void fetch(`${businessFormUrl}?${parameters.toString()}`, { mode: 'no-cors', keepalive: true }).catch(() => undefined);
+}
 
 const demonstrationIds = new Set(['SAL001', 'SAL002', 'SAL003', 'SAL004']);
 
@@ -118,6 +125,8 @@ export default function Home() {
   const [configuration, setConfiguration] = useState<Record<string, string | number>>({});
   const [isNight, setIsNight] = useState(false);
   const [clockTick, setClockTick] = useState(0);
+  const [profileId] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('negocio') || '');
+  const [shareMessage, setShareMessage] = useState('');
   const [visitorLocation, setVisitorLocation] = useState<Coordinates | null>(null);
   const [locationMessage, setLocationMessage] = useState('');
 
@@ -162,6 +171,31 @@ export default function Home() {
   }, []);
 
   const categories = useMemo(() => ['Todos', ...Array.from(new Set(businesses.map((business) => business.categoria).filter(Boolean)))], [businesses]);
+  const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business)), [businesses,profileId]);
+  useEffect(() => {
+    if (!profile) return;
+    const oldTitle = document.title;
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    const oldDescription = description?.content || '';
+    const oldCanonical = canonical?.href || '';
+    document.title = `${profile.nombre} en Vitrina Cerca | ${profile.zona || 'Uruguay'}`;
+    description?.setAttribute('content', profile.descripcion);
+    canonical?.setAttribute('href', businessUrl(profile));
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'business-schema';
+    script.textContent = JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'LocalBusiness',
+      name: profile.nombre, description: profile.descripcion, url: businessUrl(profile),
+      ...(profile.imagen_url ? { image: driveImage(profile.imagen_url) } : {}),
+      ...(profile.telefono ? { telephone: profile.telefono } : {}),
+      address: { '@type': 'PostalAddress', addressLocality: profile.zona, addressRegion: profile.departamento || profile.departamento_region, addressCountry: 'UY',
+        ...(profile.mapa_url && profile.direccion ? { streetAddress: profile.direccion } : {}) },
+    });
+    document.head.appendChild(script);
+    return () => { document.title = oldTitle; description?.setAttribute('content', oldDescription); canonical?.setAttribute('href', oldCanonical); script.remove(); };
+  }, [profile]);
   const departments = ['Artigas','Canelones','Cerro Largo','Colonia','Durazno','Flores','Florida','Lavalleja','Maldonado','Montevideo','Paysandú','Río Negro','Rivera','Rocha','Salto','San José','Soriano','Tacuarembó','Treinta y Tres'];
   const clock = useMemo(() => montevideoClock(), [clockTick]);
   const visible = useMemo(() => {
@@ -230,13 +264,47 @@ export default function Home() {
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}</div>
       <div className="card-actions">
-        {whatsapp.length >= 8 && <a className="details" href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer">WhatsApp <ArrowRight size={16} /></a>}
-        {phone.length >= 8 && <a className="details" href={`tel:${phone}`}>Llamar <ArrowRight size={16} /></a>}
-        {site && <a className="details" href={site} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
-        {mapHref && <a className="map-link" href={mapHref} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
+        <a className="details" href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
+        {whatsapp.length >= 8 && <a className="details" href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(business,'whatsapp')} target="_blank" rel="noreferrer">WhatsApp <ArrowRight size={16} /></a>}
+        {phone.length >= 8 && <a className="details" href={`tel:${phone}`} onClick={() => recordContact(business,'telefono')}>Llamar <ArrowRight size={16} /></a>}
+        {site && <a className="details" href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
+        {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
       </div>
     </article>;
   };
+
+  if (profileId) {
+    const region = profile?.departamento || profile?.departamento_region || '';
+    const image = driveImage(profile?.imagen_url);
+    const mapHref = profile ? businessMapLink(profile) : '';
+    const whatsapp = String(profile?.whatsapp || '').replace(/\D/g, '');
+    const phone = String(profile?.telefono || '').replace(/\D/g, '');
+    const site = /^https?:\/\//i.test(profile?.sitio_web || '') ? profile?.sitio_web : '';
+    return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
+      <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
+      <section className="profile-wrap" aria-live="polite">
+        {!profile ? <div className="profile-empty"><h1>{dataStatus === 'loading' ? 'Cargando ficha…' : 'No encontramos esta ficha'}</h1><p>{dataStatus === 'loading' ? 'Un momento, por favor.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
+          <div className="profile-card">
+            {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
+            <div className="profile-content">
+              <span className="section-kicker">{profile.categoria}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
+              <h1>{profile.nombre}</h1>
+              <p className="profile-description">{profile.descripcion}</p>
+              <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
+              <div className="profile-actions">
+                {whatsapp.length >= 8 && <a href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(profile,'whatsapp')} target="_blank" rel="noreferrer"><MessageCircle size={19}/> Escribir por WhatsApp</a>}
+                {phone.length >= 8 && <a href={`tel:${phone}`} onClick={() => recordContact(profile,'telefono')}><ArrowRight size={19}/> Llamar</a>}
+                {site && <a href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
+                {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
+              </div>
+              <button className="share-business" onClick={() => { void navigator.clipboard.writeText(businessUrl(profile)).then(() => setShareMessage('Enlace copiado')).catch(() => setShareMessage('Copiá la dirección de esta página para compartirla.')); }}>Copiar enlace de la ficha</button><span className="share-message" role="status">{shareMessage}</span>
+            </div>
+          </div>
+        </>}
+      </section>
+      <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p></div></footer>
+    </main>;
+  }
 
   return (
     <main className={isNight ? 'night-mode' : 'day-mode'}>
