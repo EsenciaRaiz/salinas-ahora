@@ -267,3 +267,6 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 
 /* Reducir el espacio vacío de las fichas en escritorio */
 @media(min-width:701px){.business-card,.featured-business{grid-template-rows:repeat(7,max-content);align-content:start}.business-card .card-actions{align-self:start}.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{max-height:225px}}
+
+/* Los anuncios siguen a las fichas y no dejan un hueco lateral */
+@media(min-width:901px){.guide-layout{grid-template-columns:1fr;gap:22px}.ad-column{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px}.ad-card,.night-note{min-height:0}.ad-card-content{padding:20px}.ad-card h3{font-size:25px;margin:16px 0 8px}.ad-card-media img{height:125px}.night-note{padding:20px}.night-note strong{font-size:22px;margin-top:9px}}
