@@ -134,6 +134,19 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .card-actions .details,.card-actions .map-link{min-height:40px;padding:8px 11px;border:1px solid #c8d5d8;border-radius:5px;font-size:13px;white-space:nowrap}
 .card-actions .details:hover,.card-actions .map-link:hover{background:#eaf4f5;text-decoration:none}
 .business-card .address{line-height:1.35}
+.business-photo-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#fff;background:linear-gradient(135deg,#e68771,#bd5571);text-align:center}
+.business-photo-placeholder span{font-size:12px;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
+.business-card.blue .business-photo-placeholder{background:linear-gradient(135deg,#76c9cc,#175e81)}
+.business-card.yellow .business-photo-placeholder{background:linear-gradient(135deg,#edc65b,#da8d44)}
+.business-card.navy .business-photo-placeholder{background:linear-gradient(135deg,#6a86a0,#233c62)}
+.footer-publish{display:inline-flex;align-items:center;gap:8px;color:white;font-weight:800;white-space:nowrap}
+.footer-publish:hover{text-decoration:underline}
+.plans-page{min-height:100vh;background:var(--paper)}
+.plans-page .pricing{min-height:calc(100vh - 220px);display:block;max-width:1480px;margin:auto;padding-top:88px}
+.plans-page .pricing-intro{max-width:770px;margin-bottom:52px}
+.plans-page .pricing h1{font-family:var(--font-editorial),Georgia,serif;font-size:clamp(44px,6vw,78px);font-weight:500;line-height:1.06;letter-spacing:-.05em;margin:0}
+.plans-page .pricing-intro p{font-size:18px}
+.plans-direct{display:inline-flex;align-items:center;gap:8px;margin-top:10px;color:var(--ocean);font-weight:800;text-decoration:underline}
 @media(max-width:1060px){.finder-form{grid-template-columns:1fr 1fr}.finder-form button{grid-column:1/-1}}
 @media(max-width:620px){.finder-form{grid-template-columns:1fr;margin-top:24px;padding:16px}.finder-form button{grid-column:auto}.finder-heading p{font-size:16px}}
 .hero{min-height:520px}.finder{padding-top:0}.finder-form{position:relative;z-index:2;margin-top:-45px;margin-bottom:36px}.finder-heading{margin-bottom:20px}

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MessageCircle, MoonStar, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MessageCircle, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
 
@@ -127,6 +127,7 @@ export default function Home() {
   const [isNight, setIsNight] = useState(false);
   const [clockTick, setClockTick] = useState(0);
   const [profileId] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('negocio') || '');
+  const [showPlans] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('planes') === '1');
   const [shareMessage, setShareMessage] = useState('');
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [visitorLocation, setVisitorLocation] = useState<Coordinates | null>(null);
@@ -172,7 +173,15 @@ export default function Home() {
     return () => lifecycle.abort();
   }, []);
 
-  const categories = useMemo(() => ['Todos', ...Array.from(new Set(businesses.map((business) => business.categoria).filter(Boolean)))], [businesses]);
+  const matchingBusiness = (business: Business, options: { time?: boolean; category?: boolean; department?: boolean } = {}) => {
+    if (!activeByDate(business)) return false;
+    const normalized = query.trim().toLocaleLowerCase('es-UY');
+    const region = business.departamento || business.departamento_region || '';
+    return (!options.time || filter === 'todos' || (filter === 'ahora' ? isOpenNow(business, clock) : openInPeriod(business, clock, filter)))
+      && (!options.category || category === 'Todos' || business.categoria === category)
+      && (!options.department || !department || region.toLocaleLowerCase('es-UY') === department.toLocaleLowerCase('es-UY'))
+      && (!normalized || `${business.nombre} ${business.categoria} ${business.descripcion} ${business.zona} ${region}`.toLocaleLowerCase('es-UY').includes(normalized));
+  };
   const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business)), [businesses,profileId]);
   useEffect(() => {
     if (!profile) return;
@@ -200,18 +209,17 @@ export default function Home() {
   }, [profile]);
   const departments = ['Artigas','Canelones','Cerro Largo','Colonia','Durazno','Flores','Florida','Lavalleja','Maldonado','Montevideo','Paysandú','Río Negro','Rivera','Rocha','Salto','San José','Soriano','Tacuarembó','Treinta y Tres'];
   const clock = useMemo(() => montevideoClock(), [clockTick]);
-  const visible = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return businesses.filter((business) => {
-      if (!activeByDate(business)) return false;
-      const matchesFilter = filter === 'todos' || (filter === 'ahora' ? isOpenNow(business, clock) : openInPeriod(business, clock, filter));
-      const matchesCategory = category === 'Todos' || business.categoria === category;
-      const region = business.departamento || business.departamento_region || '';
-      const matchesDepartment = !department || region.toLocaleLowerCase('es-UY') === department.toLocaleLowerCase('es-UY');
-      const matchesQuery = !normalized || `${business.nombre} ${business.categoria} ${business.descripcion} ${business.zona} ${region}`.toLocaleLowerCase('es-UY').includes(normalized);
-      return matchesFilter && matchesCategory && matchesDepartment && matchesQuery;
-    });
-  }, [businesses, category, department, filter, query, clock]);
+  const categories = ['Todos', ...Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, department: true })).map((business) => business.categoria).filter(Boolean)))];
+  const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).map((business) => business.departamento || business.departamento_region || ''));
+  const availableTimes = new Set<TimeFilter>(['todos']);
+  for (const business of businesses.filter((item) => matchingBusiness(item, { category: true, department: true }))) {
+    if (isOpenNow(business, clock)) availableTimes.add('ahora');
+    for (const period of ['manana', 'tarde', 'noche'] as const) if (openInPeriod(business, clock, period)) availableTimes.add(period);
+  }
+  const visible = businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true }));
+  useEffect(() => { if (category !== 'Todos' && !categories.includes(category)) setCategory('Todos'); }, [category, categories.join('|')]);
+  useEffect(() => { if (filter !== 'todos' && !availableTimes.has(filter)) setFilter('todos'); }, [filter, [...availableTimes].join('|')]);
+  useEffect(() => { if (department && !availableDepartments.has(department)) setDepartment(''); }, [department, [...availableDepartments].join('|')]);
 
   const byDistance = (a: Business, b: Business) => {
     if (!visitorLocation) return orderOf(a)-orderOf(b);
@@ -258,7 +266,7 @@ export default function Home() {
     const region = business.departamento || business.departamento_region || '';
     const site = /^https?:\/\//i.test(business.sitio_web || '') ? business.sitio_web : '';
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
-      {image && <img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" />}
+      {image ? <img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" /> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}</span>
       <h3>{business.nombre}</h3>
@@ -268,7 +276,7 @@ export default function Home() {
       <div className="card-actions">
         <a className="details" href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
         {whatsapp.length >= 8 && <a className="details" href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(business,'whatsapp')} target="_blank" rel="noreferrer">WhatsApp <ArrowRight size={16} /></a>}
-        {phone.length >= 8 && <a className="details" href={`tel:${phone}`} onClick={() => recordContact(business,'telefono')}>Llamar <ArrowRight size={16} /></a>}
+        {phone.length >= 8 && <a className="details" href={`tel:${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
         {site && <a className="details" href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
         {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
       </div>
@@ -299,7 +307,7 @@ export default function Home() {
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
                 {whatsapp.length >= 8 && <a href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(profile,'whatsapp')} target="_blank" rel="noreferrer"><MessageCircle size={19}/> Escribir por WhatsApp</a>}
-                {phone.length >= 8 && <a href={`tel:${phone}`} onClick={() => recordContact(profile,'telefono')}><ArrowRight size={19}/> Llamar</a>}
+                {phone.length >= 8 && <a href={`tel:${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar</a>}
                 {site && <a href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
               </div>
@@ -312,11 +320,17 @@ export default function Home() {
     </main>;
   }
 
+  if (showPlans) return <main className={isNight ? 'night-mode plans-page' : 'day-mode plans-page'}>
+    <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/">Volver a la guía</a></header>
+    <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>{String(configuration.SUBTITULO_PLANES||'Elegí la presencia que mejor acompañe a tu negocio.')}</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA BÁSICA</span><h3>{currency} {basicPrice} <small>/ mes</small></h3><p>{basicDetail}</p><a href={businessFormUrl}>Completar ficha</a></article><article className="featured-plan"><span><Sparkles size={15}/> DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>Consultar premium</a></article></div></section>
+    <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p></div></footer>
+  </main>;
+
   return (
     <main className={isNight ? 'night-mode' : 'day-mode'}>
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a>
-        <nav aria-label="Navegación principal"><a href="#guia">Guía local</a><a href="#historias">Historias</a><a href="#publicar">Publicar</a></nav>
+        <nav aria-label="Navegación principal"><a href="#guia">Guía local</a><a href="#historias">Historias</a><a href="/?planes=1">Publicar</a></nav>
         <a className="header-cta" href={businessFormUrl}>Sumá tu negocio</a>
       </header>
 
@@ -330,8 +344,8 @@ export default function Home() {
       <section className="finder" id="guia" aria-labelledby="finder-title">
         <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
           <label>¿Qué estás buscando?<input type="search" placeholder="Ej.: farmacia, peluquería" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-          <label>¿En qué departamento?<select value={department} onChange={(event) => setDepartment(event.target.value)}><option value="">Todo Uruguay</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-          <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option><option value="ahora">Abiertos ahora</option><option value="manana">Hoy de mañana · 6 a 12</option><option value="tarde">Hoy de tarde · 12 a 20</option><option value="noche">Hoy de noche · 20 a 6</option></select></label>
+          <label>¿En qué departamento?<select value={department} onChange={(event) => setDepartment(event.target.value)}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{availableTimes.has('ahora') && <option value="ahora">Abiertos ahora</option>}{availableTimes.has('manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{availableTimes.has('tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{availableTimes.has('noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
           <button type="submit"><Search size={19} /> Buscar</button>
         </form>
         <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, lugar y horario. Los destacados aparecen primero.</p></div></div>
@@ -346,7 +360,7 @@ export default function Home() {
           <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{basicVisible.map((business,index)=>renderBusinessCard(business,index,false))}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : 'Probá otra categoría, horario o departamento.'}</p></div>}</div></div>
 
           <aside className="ad-column" aria-label="Espacios patrocinados">
-            {activeAdvertisements.length > 0 ? activeAdvertisements.map((ad) => <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={ad.imagen_url} alt={ad.titulo || ad.anunciante} loading="lazy" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '#publicar'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div></article>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="#publicar">Conocer opciones <ArrowRight size={15} /></a></div>}
+            {activeAdvertisements.length > 0 ? activeAdvertisements.map((ad) => <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={ad.imagen_url} alt={ad.titulo || ad.anunciante} loading="lazy" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '/?planes=1'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div></article>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15} /></a></div>}
             <div className="night-note"><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Una selección útil de gastronomía, farmacias y servicios con horario extendido.</p></div>
           </aside>
         </div>
@@ -354,9 +368,7 @@ export default function Home() {
 
       <section className="editorial" id="historias"><div className="editorial-number">01</div><div><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2>Los comercios que hacen barrio.</h2></div><p>Retratos breves de emprendedores, oficios y rincones que construyen la identidad de cada comunidad.</p><a href="#guia">Leer la edición <ArrowRight size={18} /></a></section>
 
-      <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PLANES DE PUBLICACIÓN</span><h2>{String(configuration.TITULO_PLANES||'Elegí cómo mostrar tu negocio')}</h2><p>{String(configuration.SUBTITULO_PLANES||'Opciones claras para cada etapa, sin ocupar la portada.')}</p></div><div className="plans three-plans"><article><span>FICHA BÁSICA</span><h3>{currency} {basicPrice} <small>/ mes</small></h3><p>{basicDetail}</p><a href={businessFormUrl}>Completar ficha</a></article><article className="featured-plan"><span><Sparkles size={15}/> DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>Consultar premium</a></article></div></section>
-
-      <footer><div className="footer-main"><div className="brand footer-brand"><span className="brand-dot"/><span>VITRINA</span><strong>CERCA</strong></div><p>{footerText}</p>{socialLinks.length>0&&<nav className="social-links" aria-label="Redes sociales">{socialLinks.map(({key,label,url,mark})=><a key={key} href={url} target="_blank" rel="noreferrer" aria-label={label} title={label}><span aria-hidden="true">{mark}</span></a>)}</nav>}</div><div className="footer-strip"><span>Apoyá lo local, hacemos un mejor Uruguay ♡</span><strong>Negocios reales · Comunidad que crece · Un Uruguay más cerca</strong><span>© {new Date().getFullYear()} Vitrina Cerca</span></div></footer>
+      <footer><div className="footer-main"><div className="brand footer-brand"><span className="brand-dot"/><span>VITRINA</span><strong>CERCA</strong></div><p>{footerText}</p><a className="footer-publish" href="/?planes=1">Opciones para publicar <ArrowRight size={16}/></a>{socialLinks.length>0&&<nav className="social-links" aria-label="Redes sociales">{socialLinks.map(({key,label,url,mark})=><a key={key} href={url} target="_blank" rel="noreferrer" aria-label={label} title={label}><span aria-hidden="true">{mark}</span></a>)}</nav>}</div><div className="footer-strip"><span>Apoyá lo local, hacemos un mejor Uruguay ♡</span><strong>Negocios reales · Comunidad que crece · Un Uruguay más cerca</strong><span>© {new Date().getFullYear()} Vitrina Cerca</span></div></footer>
     </main>
   );
 }
