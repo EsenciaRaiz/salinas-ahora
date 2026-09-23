@@ -262,3 +262,5 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 
 .business-card .card-top{height:21px;align-items:flex-start}.business-card .sponsored{margin-top:11px}.business-card .card-category,.featured-business .card-category{margin-top:5px}
 @media(max-width:700px){.business-card .card-category,.featured-business .card-category{margin-top:4px}}
+
+.business-card .card-actions .details,.business-card .card-actions .map-link{min-height:38px;padding:7px 10px;font-size:13px}
