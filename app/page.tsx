@@ -80,7 +80,8 @@ function businessHours(business: Business) {
   return hoursLabel(business, montevideoClock().day);
 }
 
-function driveImage(value?: string) { const source=String(value||'').trim(); if(!source) return ''; const match=source.match(/(?:\/d\/|[?&]id=)([-\w]{20,})/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200` : source; }
+function driveImage(value?: string) { const source=String(value||'').split('|')[0].trim(); if(!source) return ''; const match=source.match(/(?:\/d\/|[?&]id=)([-\w]{20,})/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200` : source; }
+function businessImages(value?: string) { return String(value||'').split('|').map((item)=>driveImage(item)).filter(Boolean).slice(0,4); }
 function businessMapLink(business: Business) {
   const custom = String(business.mapa_url || '').trim();
   if (!custom) return '';
@@ -127,6 +128,7 @@ export default function Home() {
   const [clockTick, setClockTick] = useState(0);
   const [profileId] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('negocio') || '');
   const [shareMessage, setShareMessage] = useState('');
+  const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [visitorLocation, setVisitorLocation] = useState<Coordinates | null>(null);
   const [locationMessage, setLocationMessage] = useState('');
 
@@ -275,7 +277,8 @@ export default function Home() {
 
   if (profileId) {
     const region = profile?.departamento || profile?.departamento_region || '';
-    const image = driveImage(profile?.imagen_url);
+    const images = businessImages(profile?.imagen_url);
+    const image = images[selectedPhoto] || images[0];
     const mapHref = profile ? businessMapLink(profile) : '';
     const whatsapp = String(profile?.whatsapp || '').replace(/\D/g, '');
     const phone = String(profile?.telefono || '').replace(/\D/g, '');
@@ -285,7 +288,10 @@ export default function Home() {
       <section className="profile-wrap" aria-live="polite">
         {!profile ? <div className="profile-empty"><h1>{dataStatus === 'loading' ? 'Cargando ficha…' : 'No encontramos esta ficha'}</h1><p>{dataStatus === 'loading' ? 'Un momento, por favor.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
           <div className="profile-card">
-            {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
+            <div className="profile-gallery">
+              {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
+              {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{images.map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt=""/></button>)}</div>}
+            </div>
             <div className="profile-content">
               <span className="section-kicker">{profile.categoria}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
               <h1>{profile.nombre}</h1>
