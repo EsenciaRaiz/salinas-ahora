@@ -264,3 +264,6 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 @media(max-width:700px){.business-card .card-category,.featured-business .card-category{margin-top:4px}}
 
 .business-card .card-actions .details,.business-card .card-actions .map-link{min-height:38px;padding:7px 10px;font-size:13px}
+
+/* Reducir el espacio vacío de las fichas en escritorio */
+@media(min-width:701px){.business-card,.featured-business{grid-template-rows:repeat(7,max-content);align-content:start}.business-card .card-actions{align-self:start}.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{max-height:225px}}
