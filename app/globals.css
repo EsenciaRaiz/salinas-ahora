@@ -212,3 +212,5 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .location-help button{padding:10px 13px;background:var(--ink);border:0;color:white;border-radius:4px;font:inherit;font-weight:800;cursor:pointer}
 .location-help button+button{background:#e6ecef;color:var(--ink)}
 @media(max-width:760px){.profile-card{grid-template-columns:1fr}.profile-gallery .profile-image,.profile-image{height:250px;min-height:250px;max-height:250px}.profile-content{padding:25px}.profile-content h1{font-size:40px}.featured-business .business-photo-frame{height:220px}}
+
+@media(min-width:761px){.profile-gallery .profile-image{height:100%;max-height:none}}
