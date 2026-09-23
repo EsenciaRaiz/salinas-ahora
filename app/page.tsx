@@ -80,8 +80,8 @@ function businessHours(business: Business) {
   return hoursLabel(business, montevideoClock().day);
 }
 
-function driveImage(value?: string) { const source=String(value||'').split('|')[0].trim(); if(!source) return ''; const match=source.match(/(?:\/d\/|[?&]id=)([-\w]{20,})/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200` : source; }
-function businessImages(value?: string) { return String(value||'').split('|').map((item)=>driveImage(item)).filter(Boolean).slice(0,4); }
+function driveImage(value?: string, width=1200) { const source=String(value||'').split('|')[0].trim(); if(!source) return ''; const match=source.match(/(?:\/d\/|[?&]id=)([-\w]{20,})/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w${width}` : source; }
+function businessImages(value?: string, width=1200) { return String(value||'').split('|').map((item)=>driveImage(item,width)).filter(Boolean).slice(0,4); }
 function businessMapLink(business: Business) {
   const custom = String(business.mapa_url || '').trim();
   if (!custom) return '';
@@ -263,7 +263,7 @@ export default function Home() {
     const style = businessStyle(business.categoria, index);
     const Icon = style.icon;
     const mapHref = businessMapLink(business);
-    const image = driveImage(business.imagen_url);
+    const image = driveImage(business.imagen_url, 640);
     const open = isOpenNow(business, clock);
     const known = hasKnownHours(business, clock.day);
     const phone = String(business.telefono || '').replace(/\D/g, '');
@@ -271,7 +271,7 @@ export default function Home() {
     const region = business.departamento || business.departamento_region || '';
     const site = /^https?:\/\//i.test(business.sitio_web || '') ? business.sitio_web : '';
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
-      {image ? <div className={`business-photo-frame ${image.endsWith('.svg') ? 'logo-frame' : ''}`}><img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" /></div> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
+      {image ? <div className={`business-photo-frame ${image.endsWith('.svg') ? 'logo-frame' : ''}`}><img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" decoding="async" width="640" height="420" /></div> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}</span>
       <h3>{business.nombre}</h3>
@@ -302,8 +302,8 @@ export default function Home() {
         {!profile ? <div className="profile-empty"><h1>{dataStatus === 'loading' ? 'Cargando ficha…' : 'No encontramos esta ficha'}</h1><p>{dataStatus === 'loading' ? 'Un momento, por favor.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
           <div className="profile-card">
             <div className={`profile-gallery ${image?.endsWith('.svg') ? 'logo-gallery' : ''}`}>
-              {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
-              {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{images.map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt=""/></button>)}</div>}
+              {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`} decoding="async" fetchPriority="high" width="1200" height="800"/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
+              {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{businessImages(profile?.imagen_url, 160).map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt="" loading="lazy" decoding="async" width="160" height="110"/></button>)}</div>}
             </div>
             <div className="profile-content">
               <span className="section-kicker">{profile.categoria}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
@@ -340,7 +340,7 @@ export default function Home() {
       </header>
 
       <section className="hero" id="inicio">
-        <img src="/salinas-atardecer.png" alt="Comercios de una zona costera al atardecer" />
+        <img src="/salinas-atardecer.webp" alt="Comercios de una zona costera al atardecer" fetchPriority="high" decoding="async" width="1600" height="900" />
         <div className="hero-overlay" />
         <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
         <div className={`hero-status ${isNight ? 'night' : 'day'}`}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares abiertos hasta tarde` : 'Descubrí lo mejor de tu zona'}</strong></div>
