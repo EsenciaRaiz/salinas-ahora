@@ -222,7 +222,6 @@ export default function Home() {
   }
   const visible = businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true }));
   useEffect(() => { if (category !== 'Todos' && !categories.includes(category)) setCategory('Todos'); }, [category, categories.join('|')]);
-  useEffect(() => { if (filter !== 'todos' && !availableTimes.has(filter)) setFilter('todos'); }, [filter, [...availableTimes].join('|')]);
   useEffect(() => { if (department && !availableDepartments.has(department)) setDepartment(''); }, [department, [...availableDepartments].join('|')]);
   useEffect(() => { if (locality && !availableLocalities.some((item) => item.toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))) setLocality(''); }, [locality, availableLocalities.join('|')]);
 
@@ -236,7 +235,7 @@ export default function Home() {
   const featuredVisible=useMemo(()=>visible.filter(featuredBusiness).sort(byDistance),[visible,visitorLocation]);
   const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort(byDistance),[visible,visitorLocation]);
   const activeAdvertisements=useMemo(()=>advertisements.filter(activeByDate).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
-  const nightCount = businesses.filter((business) => openInPeriod(business, clock, 'noche')).length;
+  const nightCount = businesses.filter((business) => activeByDate(business) && openInPeriod(business, clock, 'noche')).length;
   const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
   const currency = String(configuration.MONEDA || 'UYU');
   const basicPrice = String(configuration.PRECIO_BASICA || 190);
@@ -259,6 +258,14 @@ export default function Home() {
       () => { setLocationMessage('No pudimos acceder a tu ubicación. Podés seguir buscando por departamento y localidad.'); setLocationPromptPending(false); setShowLocationHelp(false); },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
     ), 100);
+  };
+  const showPeriod = (period: TimeFilter) => {
+    setFilter(period);
+    setCategory('Todos');
+    setDepartment('');
+    setLocality('');
+    setQuery('');
+    document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   const renderBusinessCard = (business: Business, index: number, featured = false) => {
     const style = businessStyle(business.categoria, index);
@@ -337,14 +344,14 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a>
         <nav aria-label="Navegación principal"><a href="#guia">Guía local</a><a href="#historias">Historias</a><a href="/?planes=1">Publicar</a></nav>
-        <a className="header-cta" href={businessFormUrl}>Sumá tu negocio</a>
+        <a className="header-cta" href={businessFormUrl} target="_blank" rel="noopener noreferrer" aria-label="Sumá tu negocio: abrir formulario en otra pestaña" title="Abre el formulario en otra pestaña">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
       </header>
 
       <section className="hero" id="inicio">
         <img src="/salinas-atardecer.webp" alt="Comercios de una zona costera al atardecer" fetchPriority="high" decoding="async" width="1600" height="900" />
         <div className="hero-overlay" />
         <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
-        <div className={`hero-status ${isNight ? 'night' : 'day'}`}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares abiertos hasta tarde` : 'Descubrí lo mejor de tu zona'}</strong></div>
+        <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares con horario nocturno` : 'Descubrí lo mejor de tu zona'}</strong><small>{isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora'} <ArrowRight size={14} /></small></button>
       </section>
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
@@ -352,7 +359,7 @@ export default function Home() {
           <label>¿Qué estás buscando?<input type="search" placeholder="Ej.: farmacia, peluquería" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
           <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || availableLocalities.length === 0}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && availableLocalities.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-          <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{availableTimes.has('ahora') && <option value="ahora">Abiertos ahora</option>}{availableTimes.has('manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{availableTimes.has('tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{availableTimes.has('noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
+          <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
           <button type="submit"><Search size={19} /> Buscar</button>
         </form>
         <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, lugar y horario.</p></div></div>
@@ -366,11 +373,11 @@ export default function Home() {
         {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><div className="featured-grid">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
 
         <div className="guide-layout">
-          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{basicVisible.map((business,index)=>renderBusinessCard(business,index,false))}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
+          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{basicVisible.map((business,index)=>renderBusinessCard(business,index,false))}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
 
           <aside className="ad-column" aria-label="Espacios patrocinados">
             {activeAdvertisements.length > 0 ? activeAdvertisements.map((ad) => <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={ad.imagen_url} alt={ad.titulo || ad.anunciante} loading="lazy" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '/?planes=1'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{ad.anunciante} <ArrowRight size={15} /></a></div></article>) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15} /></a></div>}
-            <div className="night-note"><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Una selección útil de gastronomía, farmacias y servicios con horario extendido.</p></div>
+            <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>Ver negocios de noche <ArrowRight size={15} /></span></button>
           </aside>
         </div>
       </section>
