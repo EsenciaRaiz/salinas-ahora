@@ -102,7 +102,12 @@ export default function BusinessMap({ businesses }: { businesses: Business[] }) 
       link.href = 'https://vitrinacerca.com/?negocio=' + encodeURIComponent(business.id);
       link.textContent = 'Ver ficha';
       popup.append(title, location, link);
-      L.marker(position, { icon }).bindPopup(popup).addTo(markers.current);
+      const label = document.createElement('span');
+      label.textContent = business.nombre;
+      L.marker(position, { icon, title: business.nombre, alt: business.nombre })
+        .bindTooltip(label, { permanent: true, direction: 'top', offset: [0, -32], className: 'vitrina-map-label' })
+        .bindPopup(popup)
+        .addTo(markers.current);
     }
     if (bounds.length) map.current.fitBounds(L.latLngBounds(bounds), { padding: [42, 42], maxZoom: 14 });
     else map.current.setView([-32.8, -55.8], 7);
@@ -110,7 +115,7 @@ export default function BusinessMap({ businesses }: { businesses: Business[] }) 
   }, [ready, pointKey]);
 
   return <div className="business-map-panel" aria-label="Mapa de negocios publicados">
-    <div className="business-map-heading"><div><strong>Negocios en el mapa</strong><span>{points.length ? points.length + ' ubicaciones visibles en esta búsqueda' : 'Sin ubicaciones visibles en esta búsqueda'}</span></div><p>Solo aparecen los negocios que eligieron mostrar su ubicación.</p></div>
+    <div className="business-map-heading"><div><strong>Negocios en el mapa</strong><span>{points.length ? points.length + ' ubicaciones visibles en esta búsqueda' : 'Sin ubicaciones visibles en esta búsqueda'}</span></div><p>Los pines muestran el nombre de cada negocio que eligió publicar su ubicación. Podés ocultar el mapa cuando quieras.</p></div>
     <div ref={element} className="business-map-canvas" role="region" aria-label="Mapa interactivo de negocios"/>
     {error && <p className="business-map-message" role="status">{error}</p>}
   </div>;
