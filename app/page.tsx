@@ -362,7 +362,6 @@ export default function Home() {
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
               </div>
-              {phone.length >= 8 && <p className="profile-phone">Teléfono: +{phone}</p>}
             </div>
           </div>
         </>}
