@@ -61,13 +61,14 @@ type PublicData = {
 };
 
 const dataUrl = 'https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
-const businessFormUrl = 'https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
+const submissionsEndpoint = 'https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
+const businessFormUrl = '/publicar/';
 const businessUrl = (business: Business) => `https://vitrinacerca.com/?negocio=${encodeURIComponent(business.id)}`;
 type ContactAction = 'whatsapp' | 'telefono' | 'sitio' | 'mapa';
 function recordContact(business: Business, action: ContactAction) {
   if (!business.id) return;
   const parameters = new URLSearchParams({ metric: 'contacto', id: business.id, action });
-  void fetch(`${businessFormUrl}?${parameters.toString()}`, { mode: 'no-cors', keepalive: true }).catch(() => undefined);
+  void fetch(`${submissionsEndpoint}?${parameters.toString()}`, { mode: 'no-cors', keepalive: true }).catch(() => undefined);
 }
 
 const demonstrationIds = new Set(['SAL001', 'SAL002', 'SAL003', 'SAL004']);
@@ -383,7 +384,7 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a>
         <nav aria-label="Navegación principal"><a href="#guia">Guía local</a><a href="#historias">Historias</a><a href="/?planes=1">Publicar</a></nav>
-        <a className="header-cta" href={businessFormUrl} target="_blank" rel="noopener noreferrer" aria-label="Sumá tu negocio: abrir formulario en otra pestaña" title="Abre el formulario en otra pestaña">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
+        <a className="header-cta" href={businessFormUrl} aria-label="Sumá tu negocio: abrir formulario">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
       </header>
 
       <section className="hero" id="inicio">
