@@ -78,14 +78,26 @@ function readCachedData(): PublicData | null {
   if (typeof window === 'undefined') return null;
   try {
     const cached = JSON.parse(window.localStorage.getItem(publicCacheKey) || 'null') as { savedAt?: number; data?: PublicData } | null;
-    if (!cached?.savedAt || Date.now() - cached.savedAt > 5 * 60 * 1000) return null;
+    if (!cached?.savedAt || Date.now() - cached.savedAt > 60 * 60 * 1000) return null;
     return cached.data?.correcto && Array.isArray(cached.data.negocios) ? cached.data : null;
   } catch { return null; }
 }
 
 
 const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());
-function contactNumber(value?: string) { const digits=String(value||'').replace(/\D/g,''); return digits.length===8 ? `598${digits}` : digits.length===9 && digits.startsWith('0') ? `598${digits.slice(1)}` : digits; }
+function contactNumber(value?: string) {
+  const digits = String(value || '').replace(/\D/g, '');
+  const local = digits.startsWith('598') ? digits.slice(3).replace(/^0/, '') : digits.replace(/^0/, '');
+  return /^\d{8}$/.test(local) ? `598${local}` : '';
+}
+function websiteUrl(value?: string) {
+  const source = String(value || '').trim();
+  if (!source) return '';
+  try {
+    const url = new URL(/^https?:\/\//i.test(source) ? source : `https://${source}`);
+    return ['https:', 'http:'].includes(url.protocol) && /\./.test(url.hostname) ? url.href : '';
+  } catch { return ''; }
+}
 
 function businessStyle(category: string, index: number) {
   const normalized = category.toLowerCase();
@@ -317,7 +329,7 @@ export default function Home() {
     const phone = contactNumber(business.telefono);
     const whatsapp = contactNumber(business.whatsapp);
     const region = business.departamento || business.departamento_region || '';
-    const site = /^https?:\/\//i.test(business.sitio_web || '') ? business.sitio_web : '';
+    const site = websiteUrl(business.sitio_web);
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
       {image ? <div className={`business-photo-frame ${image.endsWith('.svg') ? 'logo-frame' : ''}`}><img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" decoding="async" width="640" height="420" /></div> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
@@ -343,7 +355,7 @@ export default function Home() {
     const mapHref = profile ? businessMapLink(profile) : '';
     const whatsapp = contactNumber(profile?.whatsapp);
     const phone = contactNumber(profile?.telefono);
-    const site = /^https?:\/\//i.test(profile?.sitio_web || '') ? profile?.sitio_web : '';
+    const site = websiteUrl(profile?.sitio_web);
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
       <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
       <section className="profile-wrap" aria-live="polite">
