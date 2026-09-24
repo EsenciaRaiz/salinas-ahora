@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Sumá tu negocio | Vitrina Cerca</title>
+  <meta name="robots" content="noindex,follow">
   <style>
     :root{font-family:Arial,sans-serif;color:#102a43;background:#f7f5ef}*{box-sizing:border-box}body{margin:0}main{max-width:820px;margin:auto;padding:32px 20px 70px}a{color:#116078}.brand{font-weight:900;text-decoration:none}.brand strong{color:#ef6a5b}h1{font:500 clamp(38px,6vw,58px)/1.05 Georgia,serif;margin:32px 0 12px}p{color:#526578;line-height:1.5}.intro{font-size:18px;max-width:640px}form{display:grid;grid-template-columns:1fr 1fr;gap:20px;background:white;border:1px solid #d9e1e3;padding:30px;margin-top:28px;box-shadow:0 18px 42px #102a4315}label{display:block;font-weight:800;margin-bottom:8px}input,select,textarea{width:100%;padding:13px;border:1px solid #9bafba;border-radius:5px;font:inherit;font-size:16px;color:#102a43}textarea{min-height:100px}.full{grid-column:1/-1}.small{font-size:13px;margin:6px 0 0}.check{display:flex;align-items:flex-start;gap:10px;line-height:1.4}.check input{width:auto;margin-top:3px}button{border:0;border-radius:5px;background:#ef6a5b;color:white;padding:16px 26px;font:inherit;font-weight:800;cursor:pointer}button:disabled{opacity:.5}#status{font-weight:800}#preview{display:none;width:190px;height:125px;object-fit:cover;margin-top:12px}[hidden]{display:none!important}@media(max-width:620px){form{grid-template-columns:1fr;padding:20px}.full{grid-column:auto}}
   </style>
@@ -31,7 +32,8 @@
     <div><label for="domingo">Domingo</label><input id="domingo" name="horario_domingo" placeholder="Cerrado o 24 horas"></div>
     <div><label for="contacto">Tu correo de contacto *</label><input id="contacto" name="contacto" type="email" required><p class="small">No se mostrará en la web.</p></div>
     <div class="full"><label for="photo">Fotos del negocio *</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp" multiple required><p class="small">Elegí de 1 a 4 fotos. Las reduciremos para que la página cargue rápido.</p><img id="preview" alt="Vista previa de la foto"></div>
-    <div class="full"><label class="check"><input name="consentimiento" type="checkbox" value="si" required>Confirmo que tengo permiso para publicar estos datos y estas fotos.</label></div>
+    <div class="full"><label class="check"><input name="consentimiento" type="checkbox" value="si" required>Confirmo que tengo permiso para publicar estos datos y estas fotos.</label><p class="small">Revisamos la ficha antes de mostrarla. Podés pedir correcciones o el retiro de fotos.</p></div>
+    <div class="full"><label class="check"><input name="consentimiento_privacidad" type="checkbox" value="si" required>Leí el <a href="/privacidad/" target="_blank" rel="noopener noreferrer">aviso de privacidad</a> y autorizo el uso de mis datos para revisar y gestionar esta solicitud.</label></div>
     <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
     <div class="full"><button id="send" type="submit">Enviar para revisión</button><p id="status" role="status" aria-live="polite"></p></div>
   </form>
