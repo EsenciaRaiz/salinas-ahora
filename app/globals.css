@@ -300,3 +300,8 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .vitrina-map-popup span{font-size:12px}
 .vitrina-map-popup a{font-size:13px;font-weight:800;color:#0f5f78}
 @media(max-width:760px){.business-map-canvas{height:310px}.business-map-heading strong{font-size:21px}}
+/* Estilo de tarjeta elegido por el negocio; no altera el plan ni el orden. */
+.business-card.editorial{background:#fff8ed;border-left-color:#c98a36}
+.business-card.editorial h3{color:#613d35;font-size:clamp(25px,2.7vw,33px)}
+.business-card.editorial .card-category{color:#8e571e}
+@media(max-width:700px){.business-card.editorial{border-top-color:#c98a36}}
