@@ -72,6 +72,17 @@ function recordContact(business: Business, action: ContactAction) {
 
 const demonstrationIds = new Set(['SAL001', 'SAL002', 'SAL003', 'SAL004']);
 
+const publicCacheKey = 'vitrina-public-data-v2';
+function readCachedData(): PublicData | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const cached = JSON.parse(window.localStorage.getItem(publicCacheKey) || 'null') as { savedAt?: number; data?: PublicData } | null;
+    if (!cached?.savedAt || Date.now() - cached.savedAt > 5 * 60 * 1000) return null;
+    return cached.data?.correcto && Array.isArray(cached.data.negocios) ? cached.data : null;
+  } catch { return null; }
+}
+
+
 const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());
 
 function businessStyle(category: string, index: number) {
@@ -138,10 +149,11 @@ export default function Home() {
   const [department, setDepartment] = useState('');
   const [locality, setLocality] = useState('');
   const [query, setQuery] = useState('');
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
-  const [dataStatus, setDataStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [configuration, setConfiguration] = useState<Record<string, string | number>>({});
+  const [cachedData] = useState<PublicData | null>(() => readCachedData());
+  const [businesses, setBusinesses] = useState<Business[]>(() => cachedData?.negocios.filter((business) => !demonstrationIds.has(business.id)) || []);
+  const [advertisements, setAdvertisements] = useState<Advertisement[]>(() => cachedData?.publicidad || []);
+  const [dataStatus, setDataStatus] = useState<'loading' | 'ready' | 'error'>(cachedData ? 'ready' : 'loading');
+  const [configuration, setConfiguration] = useState<Record<string, string | number>>(() => cachedData?.configuracion || {});
   const [isNight, setIsNight] = useState(false);
   const [clockTick, setClockTick] = useState(0);
   const [profileId] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('negocio') || '');
@@ -166,8 +178,9 @@ export default function Home() {
         setAdvertisements(Array.isArray(data.publicidad) ? data.publicidad : []);
         setConfiguration(data.configuracion || {});
         setDataStatus('ready');
+        try { window.localStorage.setItem(publicCacheKey, JSON.stringify({ savedAt: Date.now(), data })); } catch { /* Storage may be unavailable. */ }
       })
-      .catch(() => setDataStatus('error'));
+      .catch(() => { if (!cachedData) setDataStatus('error'); });
     return () => controller.abort();
   }, []);
 
