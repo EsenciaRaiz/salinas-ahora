@@ -84,6 +84,7 @@ function readCachedData(): PublicData | null {
 
 
 const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());
+function contactNumber(value?: string) { const digits=String(value||'').replace(/\D/g,''); return digits.length===8 ? `598${digits}` : digits.length===9 && digits.startsWith('0') ? `598${digits.slice(1)}` : digits; }
 
 function businessStyle(category: string, index: number) {
   const normalized = category.toLowerCase();
@@ -312,8 +313,8 @@ export default function Home() {
     const image = driveImage(business.imagen_url, 640);
     const open = isOpenNow(business, clock);
     const known = hasKnownHours(business, clock.day);
-    const phone = String(business.telefono || '').replace(/\D/g, '');
-    const whatsapp = String(business.whatsapp || '').replace(/\D/g, '');
+    const phone = contactNumber(business.telefono);
+    const whatsapp = contactNumber(business.whatsapp);
     const region = business.departamento || business.departamento_region || '';
     const site = /^https?:\/\//i.test(business.sitio_web || '') ? business.sitio_web : '';
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
@@ -327,7 +328,7 @@ export default function Home() {
       <div className="card-actions">
         <a className="details" href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
         {whatsapp.length >= 8 && <a className="details" href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(business,'whatsapp')} target="_blank" rel="noreferrer">WhatsApp <ArrowRight size={16} /></a>}
-        {phone.length >= 8 && <a className="details" href={`tel:${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
+        {phone.length >= 8 && <a className="details" href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
         {site && <a className="details" href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
         {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
       </div>
@@ -339,8 +340,8 @@ export default function Home() {
     const images = businessImages(profile?.imagen_url);
     const image = images[selectedPhoto] || images[0];
     const mapHref = profile ? businessMapLink(profile) : '';
-    const whatsapp = String(profile?.whatsapp || '').replace(/\D/g, '');
-    const phone = String(profile?.telefono || '').replace(/\D/g, '');
+    const whatsapp = contactNumber(profile?.whatsapp);
+    const phone = contactNumber(profile?.telefono);
     const site = /^https?:\/\//i.test(profile?.sitio_web || '') ? profile?.sitio_web : '';
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
       <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
