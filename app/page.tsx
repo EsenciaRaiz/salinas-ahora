@@ -10,6 +10,7 @@ type Business = {
   plan: string;
   nombre: string;
   categoria: string;
+  especialidad?: string;
   descripcion: string;
   direccion: string;
   zona: string;
@@ -132,6 +133,7 @@ function distanceKm(a: Coordinates, b: Coordinates) {
 export default function Home() {
   const [filter, setFilter] = useState<TimeFilter>('todos');
   const [category, setCategory] = useState('Todos');
+  const [specialty, setSpecialty] = useState('');
   const [department, setDepartment] = useState('');
   const [locality, setLocality] = useState('');
   const [query, setQuery] = useState('');
@@ -189,15 +191,16 @@ export default function Home() {
     return () => lifecycle.abort();
   }, []);
 
-  const matchingBusiness = (business: Business, options: { time?: boolean; category?: boolean; department?: boolean; locality?: boolean } = {}) => {
+  const matchingBusiness = (business: Business, options: { time?: boolean; category?: boolean; department?: boolean; locality?: boolean; specialty?: boolean } = {}) => {
     if (!activeByDate(business)) return false;
     const normalized = query.trim().toLocaleLowerCase('es-UY');
     const region = business.departamento || business.departamento_region || '';
     return (!options.time || filter === 'todos' || (filter === 'ahora' ? isOpenNow(business, clock) : openInPeriod(business, clock, filter)))
       && (!options.category || category === 'Todos' || business.categoria === category)
+      && (!options.specialty || !specialty || String(business.especialidad || '').trim() === specialty)
       && (!options.department || !department || region.toLocaleLowerCase('es-UY') === department.toLocaleLowerCase('es-UY'))
       && (!options.locality || !locality || String(business.zona || '').trim().toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))
-      && (!normalized || `${business.nombre} ${business.categoria} ${business.descripcion} ${business.zona} ${region}`.toLocaleLowerCase('es-UY').includes(normalized));
+      && (!normalized || `${business.nombre} ${business.categoria} ${business.especialidad || ''} ${business.descripcion} ${business.zona} ${region}`.toLocaleLowerCase('es-UY').includes(normalized));
   };
   const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business)), [businesses,profileId]);
   useEffect(() => {
@@ -227,6 +230,7 @@ export default function Home() {
   const departments = ['Artigas','Canelones','Cerro Largo','Colonia','Durazno','Flores','Florida','Lavalleja','Maldonado','Montevideo','Paysandú','Río Negro','Rivera','Rocha','Salto','San José','Soriano','Tacuarembó','Treinta y Tres'];
   const clock = useMemo(() => montevideoClock(), [clockTick]);
   const categories = ['Todos', ...Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, department: true, locality: true })).map((business) => business.categoria).filter(Boolean)))];
+  const availableSpecialties = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true })).map((business) => String(business.especialidad || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
   const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).map((business) => business.departamento || business.departamento_region || ''));
   const availableLocalities = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true })).map((business) => String(business.zona || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
   const availableTimes = new Set<TimeFilter>(['todos']);
@@ -234,7 +238,8 @@ export default function Home() {
     if (isOpenNow(business, clock)) availableTimes.add('ahora');
     for (const period of ['manana', 'tarde', 'noche'] as const) if (openInPeriod(business, clock, period)) availableTimes.add(period);
   }
-  const visible = businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true }));
+  const visible = businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true, specialty: true }));
+  useEffect(() => { if (specialty && !availableSpecialties.includes(specialty)) setSpecialty(''); }, [specialty, availableSpecialties.join('|')]);
   useEffect(() => { if (category !== 'Todos' && !categories.includes(category)) setCategory('Todos'); }, [category, categories.join('|')]);
   useEffect(() => { if (department && !availableDepartments.has(department)) setDepartment(''); }, [department, [...availableDepartments].join('|')]);
   useEffect(() => { if (locality && !availableLocalities.some((item) => item.toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))) setLocality(''); }, [locality, availableLocalities.join('|')]);
@@ -299,7 +304,7 @@ export default function Home() {
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
       {image ? <div className={`business-photo-frame ${image.endsWith('.svg') ? 'logo-frame' : ''}`}><img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" decoding="async" width="640" height="420" /></div> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
-      <span className="card-category">{business.categoria}</span>
+      <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
       <h3>{business.nombre}</h3>
       <p>{featured && business.texto_destacado ? business.texto_destacado : business.descripcion}</p>
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
@@ -332,7 +337,7 @@ export default function Home() {
               {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{businessImages(profile?.imagen_url, 160).map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt="" loading="lazy" decoding="async" width="160" height="110"/></button>)}</div>}
             </div>
             <div className="profile-content">
-              <span className="section-kicker">{profile.categoria}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
+              <span className="section-kicker">{profile.categoria}{profile.especialidad ? ` · ${profile.especialidad}` : ''}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
               <h1>{profile.nombre}</h1>
               <p className="profile-description">{profile.descripcion}</p>
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
@@ -380,6 +385,7 @@ export default function Home() {
           <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || availableLocalities.length === 0}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && availableLocalities.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
+          {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>¿Qué especialidad?<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">Todas las especialidades</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
           <button type="submit"><Search size={19} /> Buscar</button>
         </form>
         <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, lugar y horario.</p></div></div>
@@ -387,7 +393,7 @@ export default function Home() {
         <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí'}</button><span role="status">{locationMessage || 'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.'}</span></div>
         {showLocationHelp && <div className="location-help"><strong>¿Querés usar tu ubicación para ordenar los negocios cercanos?</strong><p>Podés buscar por departamento y localidad sin compartirla. Si elegís usarla, el navegador mostrará un permiso en inglés. Esta traducción quedará visible mientras decidís:</p><ul><li><b>Allow this time</b> = Permitir solo esta vez.</li><li><b>Allow while visiting the site</b> = Permitir mientras visitás la página.</li><li><b>Never allow</b> = No permitir.</li></ul><div><button type="button" onClick={locateVisitor} disabled={locationPromptPending}>{locationPromptPending ? 'Esperando tu elección…' : 'Usar mi ubicación'}</button><button type="button" onClick={() => setShowLocationHelp(false)}>Seguir sin ubicación</button></div></div>}
         {locationPromptPending && <div className="location-permission-guide" role="status"><strong>Ayuda para el permiso del navegador</strong><span>Para permitir solo esta vez, elegí <b>Allow this time</b>.</span><span>Para continuar sin ubicación, elegí <b>Never allow</b>.</span></div>}
-        <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
+        <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => { setCategory(item); setSpecialty(''); }}>{item}</button>)}</div>
 
         <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? 'Cargando negocios…' : `${visible.length} ${visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados'}`}</div>
         {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><div className="featured-grid">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
