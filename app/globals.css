@@ -284,3 +284,19 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .footer-ads{padding:26px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;border-bottom:1px solid #ffffff30}.footer-ads .ad-card{min-height:0;background:#fff;color:var(--ink)}.footer-ads .ad-card img{height:170px}.footer-ads .ad-card-content{padding:20px}.footer-ads .ad-card h3{margin:12px 0 7px;font-size:25px}.footer-ads .ad-card a{color:var(--ocean)}
 @media(max-width:760px){.hero-ad-section,.story-ads,.footer-ads{grid-template-columns:1fr}.hero-ad-section .ad-card,.business-grid>.ad-card{grid-template-columns:1fr}.hero-ad-section .ad-card img,.business-grid>.ad-card img{height:170px;min-height:0}.story-ads .ad-card img{height:170px}}
 .story-ads .ad-card p{color:#40586d}.story-ads .ad-card a{border:0;padding:0;white-space:normal;color:var(--ocean)}
+
+/* Mapa opcional de comercios */
+.business-map-panel{margin:0 0 25px;border:1px solid #c8d5d8;background:#fff;box-shadow:0 14px 32px rgba(16,42,67,.09)}
+.business-map-heading{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:12px;padding:16px 18px}
+.business-map-heading>div{display:grid;gap:4px}
+.business-map-heading strong{font:600 23px/1.15 Georgia,serif;color:var(--ink)}
+.business-map-heading span,.business-map-heading p{margin:0;color:#526578;font-size:13px;line-height:1.4}
+.business-map-canvas{height:390px;width:100%;background:#e8efec}
+.business-map-message{margin:0;padding:12px 18px;color:#40586d;font-size:14px}
+.vitrina-map-pin{background:transparent;border:0}
+.vitrina-map-pin span{display:block;width:28px;height:28px;border:4px solid #fff;border-radius:50% 50% 50% 4px;background:#ef6a5b;box-shadow:0 3px 11px #102a4355;transform:rotate(-45deg)}
+.vitrina-map-popup{display:grid;gap:5px;min-width:130px;color:#102a43}
+.vitrina-map-popup strong{font-size:15px}
+.vitrina-map-popup span{font-size:12px}
+.vitrina-map-popup a{font-size:13px;font-weight:800;color:#0f5f78}
+@media(max-width:760px){.business-map-canvas{height:310px}.business-map-heading strong{font-size:21px}}
