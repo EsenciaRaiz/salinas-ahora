@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es-UY">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Privacidad | Vitrina Cerca</title>
+  <meta name="description" content="Conocé cómo Vitrina Cerca recibe, revisa y publica los datos de negocios y cómo solicitar una corrección o retiro.">
+  <link rel="canonical" href="https://vitrinacerca.com/privacidad/">
+  <link rel="icon" href="/favicon.svg">
+  <style>
+    :root{font-family:Arial,sans-serif;color:#102a43;background:#f7f5ef}*{box-sizing:border-box}body{margin:0}main{max-width:760px;margin:auto;padding:32px 22px 64px}a{color:#116078}.brand{font-weight:900;text-decoration:none}.brand strong{color:#ef6a5b}h1{font:500 clamp(38px,6vw,55px)/1.08 Georgia,serif;margin:38px 0 16px}h2{font-size:19px;margin:32px 0 8px}p,li{line-height:1.6;color:#344b5c}li{margin:8px 0}.note{padding:14px 18px;background:#fff;border-left:4px solid #ef6a5b}footer{margin-top:40px;padding-top:16px;border-top:1px solid #d5dfe0;font-size:14px}
+  </style>
+</head>
+<body>
+<main>
+  <a class="brand" href="/">VITRINA <strong>CERCA</strong></a>
+  <h1>Privacidad</h1>
+  <p>Esta información explica el uso de datos al consultar la guía o solicitar una ficha. Última actualización: 24 de setiembre de 2026.</p>
+  <p class="note"><strong>Responsable:</strong> <span id="responsable">Vitrina Cerca</span><br><strong>Contacto sobre datos:</strong> <a id="correo" href="mailto:publicar@salinasahora.uy">publicar@salinasahora.uy</a><span id="domicilio"></span></p>
+  <h2>Datos y finalidad</h2>
+  <p>Al enviar una solicitud recibimos el nombre y la descripción del negocio, categoría, localidad, horarios, datos de contacto, fotos, correo de quien la envía y, si se eligió, dirección y ubicación. Usamos estos datos para revisar la solicitud, comunicarnos con quien la presentó, preparar la ficha y, tras aprobarla, mostrar los campos públicos de la ficha. El correo de contacto del formulario se usa para gestionar la solicitud y no se muestra en la guía.</p>
+  <h2>Qué se publica y qué es opcional</h2>
+  <p>La ficha puede mostrar nombre, descripción, categoría, localidad, horarios y fotos. Los botones de teléfono, WhatsApp y sitio web aparecen solo cuando se proporcionan esos datos. La ubicación en el mapa se muestra únicamente si el negocio la solicita y aporta una ubicación precisa. Quien consulta la guía puede mostrar u ocultar el mapa sin compartir su ubicación; la opción «Buscar cerca de mí» pide permiso al navegador y se usa para ordenar los resultados de esa búsqueda.</p>
+  <h2>Servicios utilizados</h2>
+  <p>Las solicitudes, la planilla y las fotos se gestionan con servicios de Google; el sitio se aloja en DigitalOcean. Si se abre el mapa, el navegador descarga Leaflet desde unpkg y los mapas desde OpenStreetMap. Los botones externos pueden llevar a Google Maps, WhatsApp o al sitio del negocio. Esos servicios aplican sus propias políticas.</p>
+  <h2>Conservación y derechos</h2>
+  <p>Conservamos la información mientras sea necesaria para revisar y mantener las fichas, atender solicitudes y cumplir las obligaciones aplicables. Podés pedir acceso, corrección, actualización o retiro de tus datos y fotos escribiendo al correo indicado arriba e identificando el negocio. Revisaremos la solicitud y responderemos por ese medio.</p>
+  <footer><a href="/">Volver a la guía</a> · <a href="/publicar/">Sumá tu negocio</a></footer>
+</main>
+<script>
+  const endpoint='https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
+  fetch(endpoint).then(response=>response.json()).then(data=>{
+    const config=data.configuracion||{};
+    const responsable=String(config.RESPONSABLE_DATOS||config.NOMBRE_SITIO||'Vitrina Cerca').trim();
+    const correo=String(config.EMAIL_PRIVACIDAD||config.EMAIL_PUBLICAR||'').trim();
+    const domicilio=String(config.DOMICILIO_RESPONSABLE||'').trim();
+    document.getElementById('responsable').textContent=responsable;
+    if(correo&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)){const link=document.getElementById('correo');link.textContent=correo;link.href='mailto:'+correo}
+    if(domicilio)document.getElementById('domicilio').textContent=' · Domicilio: '+domicilio;
+  }).catch(()=>{});
+</script>
+</body>
+</html>
