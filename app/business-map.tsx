@@ -115,7 +115,7 @@ export default function BusinessMap({ businesses }: { businesses: Business[] }) 
   }, [ready, pointKey]);
 
   return <div className="business-map-panel" aria-label="Mapa de negocios publicados">
-    <div className="business-map-heading"><div><strong>Negocios en el mapa</strong><span>{points.length ? points.length + ' ubicaciones visibles en esta búsqueda' : 'Sin ubicaciones visibles en esta búsqueda'}</span></div><p>Los pines muestran el nombre de cada negocio que eligió publicar su ubicación. Podés ocultar el mapa cuando quieras.</p></div>
+    <div className="business-map-heading"><div><strong>Negocios en el mapa</strong><span>{points.length === 1 ? '1 ubicación visible en esta búsqueda' : points.length > 1 ? points.length + ' ubicaciones visibles en esta búsqueda' : 'Sin ubicaciones visibles en esta búsqueda'}</span></div><p>Los pines muestran el nombre de cada negocio que eligió publicar su ubicación. Podés ocultar el mapa cuando quieras.</p></div>
     <div ref={element} className="business-map-canvas" role="region" aria-label="Mapa interactivo de negocios"/>
     {error && <p className="business-map-message" role="status">{error}</p>}
   </div>;
