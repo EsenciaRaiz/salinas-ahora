@@ -3,6 +3,7 @@
 import { ArrowRight, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MessageCircle, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
+import BusinessMap from './business-map';
 
 type Business = {
   id: string;
@@ -150,6 +151,7 @@ export default function Home() {
   const [locationMessage, setLocationMessage] = useState('');
   const [showLocationHelp, setShowLocationHelp] = useState(false);
   const [locationPromptPending, setLocationPromptPending] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -390,7 +392,8 @@ export default function Home() {
         </form>
         <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, lugar y horario.</p></div></div>
         <p className="finder-note">Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.</p>
-        <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí'}</button><span role="status">{locationMessage || 'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.'}</span></div>
+        <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí'}</button><button type="button" aria-expanded={showMap} aria-controls="mapa-negocios" onClick={() => setShowMap((value) => !value)}><MapPin size={17}/> {showMap ? 'Ocultar mapa' : 'Ver mapa'}</button><span role="status">{locationMessage || 'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.'}</span></div>
+        {showMap && <div id="mapa-negocios"><BusinessMap businesses={visible}/></div>}
         {showLocationHelp && <div className="location-help"><strong>¿Querés usar tu ubicación para ordenar los negocios cercanos?</strong><p>Podés buscar por departamento y localidad sin compartirla. Si elegís usarla, el navegador mostrará un permiso en inglés. Esta traducción quedará visible mientras decidís:</p><ul><li><b>Allow this time</b> = Permitir solo esta vez.</li><li><b>Allow while visiting the site</b> = Permitir mientras visitás la página.</li><li><b>Never allow</b> = No permitir.</li></ul><div><button type="button" onClick={locateVisitor} disabled={locationPromptPending}>{locationPromptPending ? 'Esperando tu elección…' : 'Usar mi ubicación'}</button><button type="button" onClick={() => setShowLocationHelp(false)}>Seguir sin ubicación</button></div></div>}
         {locationPromptPending && <div className="location-permission-guide" role="status"><strong>Ayuda para el permiso del navegador</strong><span>Para permitir solo esta vez, elegí <b>Allow this time</b>.</span><span>Para continuar sin ubicación, elegí <b>Never allow</b>.</span></div>}
         <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => { setCategory(item); setSpecialty(''); }}>{item}</button>)}</div>
