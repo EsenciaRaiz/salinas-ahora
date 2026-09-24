@@ -113,6 +113,5 @@ export default function BusinessMap({ businesses }: { businesses: Business[] }) 
     <div className="business-map-heading"><div><strong>Negocios en el mapa</strong><span>{points.length ? points.length + ' ubicaciones visibles en esta búsqueda' : 'Sin ubicaciones visibles en esta búsqueda'}</span></div><p>Solo aparecen los negocios que eligieron mostrar su ubicación.</p></div>
     <div ref={element} className="business-map-canvas" role="region" aria-label="Mapa interactivo de negocios"/>
     {error && <p className="business-map-message" role="status">{error}</p>}
-    {!points.length && <p className="business-map-message">Aún no hay negocios con ubicación exacta habilitada. Para agregar un pin, el negocio debe elegir «Mostrar en el mapa» y «Usar ubicación del local» en el formulario.</p>}
   </div>;
 }
