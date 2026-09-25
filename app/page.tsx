@@ -81,6 +81,11 @@ const publicCacheKey = 'vitrina-public-data-v2';
 function readCachedData(): PublicData | null {
   if (typeof window === 'undefined') return null;
   try {
+    const embedded = document.getElementById('initial-guide-data')?.textContent;
+    if (embedded) {
+      const data = JSON.parse(embedded) as PublicData;
+      if (data.correcto && Array.isArray(data.negocios)) return data;
+    }
     const cached = JSON.parse(window.localStorage.getItem(publicCacheKey) || 'null') as { savedAt?: number; data?: PublicData } | null;
     if (!cached?.savedAt || Date.now() - cached.savedAt > 15 * 60 * 1000) return null;
     return cached.data?.correcto && Array.isArray(cached.data.negocios) ? cached.data : null;
@@ -211,7 +216,9 @@ export default function Home() {
       try { apply(await fetchData(dataUrl)); } catch { if (!received && !controller.signal.aborted) setDataStatus('error'); }
     };
     void (async () => {
-      try { apply(await fetchData('/guide-data.json')); } catch { /* La copia puede no estar disponible. */ }
+      if (!document.getElementById('initial-guide-data')) {
+        try { apply(await fetchData('/guide-data.json')); } catch { /* La copia puede no estar disponible. */ }
+      }
       await refreshLive();
     })();
     const onVisible = () => { if (!document.hidden && Date.now() - lastRefresh > 60_000) void refreshLive(); };
