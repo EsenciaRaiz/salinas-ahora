@@ -8,11 +8,13 @@ const demoIds = new Set(['SAL001', 'SAL002', 'SAL003', 'SAL004']);
 const businessUrl = (business) => `${origin}/?negocio=${encodeURIComponent(business.id)}`;
 
 let businesses = [];
+let publicData = null;
 try {
   const response = await fetch(endpoint, { signal: AbortSignal.timeout(12000) });
   if (!response.ok) throw new Error(`Respuesta ${response.status}`);
   const data = await response.json();
   if (!data.correcto || !Array.isArray(data.negocios)) throw new Error('Respuesta incompleta');
+  publicData = data;
   businesses = data.negocios.filter((business) => business.id && business.nombre && !demoIds.has(business.id));
 } catch (error) {
   console.warn(`Directorio de búsqueda: no se pudo actualizar (${error.message}). Se conserva el archivo anterior.`);
@@ -29,4 +31,5 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://w
 await mkdir('public/directorio', { recursive: true });
 await writeFile('public/directorio/index.html', directory);
 await writeFile('public/sitemap.xml', sitemap);
+await writeFile('public/guide-data.json', JSON.stringify(publicData));
 console.log(`Directorio de búsqueda actualizado: ${businesses.length} negocios publicados.`);
