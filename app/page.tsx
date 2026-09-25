@@ -20,6 +20,9 @@ type Business = {
   telefono: string;
   whatsapp: string;
   sitio_web: string;
+  instagram?: string;
+  facebook?: string;
+  logo_url?: string;
   horario_lunes_a_viernes: string;
   horario_sabado: string;
   horario_domingo: string;
@@ -97,6 +100,11 @@ function websiteUrl(value?: string) {
     const url = new URL(/^https?:\/\//i.test(source) ? source : `https://${source}`);
     return ['https:', 'http:'].includes(url.protocol) && /\./.test(url.hostname) ? url.href : '';
   } catch { return ''; }
+}
+function socialUrl(value: string | undefined, host: string) {
+  const url = websiteUrl(value);
+  if (!url) return '';
+  try { const name = new URL(url).hostname.toLowerCase(); return name === host || name === `www.${host}` ? url : ''; } catch { return ''; }
 }
 
 function businessStyle(category: string, index: number) {
@@ -330,11 +338,12 @@ export default function Home() {
     const whatsapp = contactNumber(business.whatsapp);
     const region = business.departamento || business.departamento_region || '';
     const site = websiteUrl(business.sitio_web);
+    const logo = driveImage(business.logo_url, 160);
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
       {image ? <div className={`business-photo-frame ${image.endsWith('.svg') ? 'logo-frame' : ''}`}><img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" decoding="async" width="640" height="420" /></div> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
-      <h3>{business.nombre}</h3>
+      <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{featured && business.texto_destacado ? business.texto_destacado : business.descripcion}</p>
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}</div>
@@ -356,6 +365,9 @@ export default function Home() {
     const whatsapp = contactNumber(profile?.whatsapp);
     const phone = contactNumber(profile?.telefono);
     const site = websiteUrl(profile?.sitio_web);
+    const instagram = socialUrl(profile?.instagram, 'instagram.com');
+    const facebook = socialUrl(profile?.facebook, 'facebook.com');
+    const logo = driveImage(profile?.logo_url, 160);
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
       <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
       <section className="profile-wrap" aria-live="polite">
@@ -367,20 +379,22 @@ export default function Home() {
             </div>
             <div className="profile-content">
               <span className="section-kicker">{profile.categoria}{profile.especialidad ? ` · ${profile.especialidad}` : ''}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
-              <h1>{profile.nombre}</h1>
+              <h1>{logo && <img className="profile-logo" src={logo} alt="" width="56" height="56" />}{profile.nombre}</h1>
               <p className="profile-description">{profile.descripcion}</p>
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
                 {whatsapp.length >= 8 && <a href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(profile,'whatsapp')} target="_blank" rel="noreferrer"><MessageCircle size={19}/> Escribir por WhatsApp</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
+                {instagram && <a href={instagram} target="_blank" rel="noreferrer">Instagram</a>}
+                {facebook && <a href={facebook} target="_blank" rel="noreferrer">Facebook</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
               </div>
             </div>
           </div>
         </>}
       </section>
-      <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a></div></footer>
+      <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a><a className="footer-privacy" href="/terminos/">Términos de uso</a></div></footer>
     </main>;
   }
 
@@ -388,7 +402,7 @@ export default function Home() {
     <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/">Volver a la guía</a></header>
     <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>{String(configuration.SUBTITULO_PLANES||'Elegí la presencia que mejor acompañe a tu negocio.')}</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA BÁSICA</span><h3>{currency} {basicPrice} <small>/ mes</small></h3><p>{basicDetail}</p><a href={businessFormUrl}>Completar ficha</a></article><article className="featured-plan"><span><Sparkles size={15}/> DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>Consultar premium</a></article></div></section>
     <section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran la ubicación de cada espacio. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current"><strong>Las cinco ubicaciones están operativas.</strong> El lugar del anuncio se elige en la planilla y se confirma antes de contratar. Ninguna ubicación se incluye automáticamente en la ficha básica o destacada.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.',available:true},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.',available:true},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.',available:true},{key:'stories',title:'Historias',description:'Junto a los relatos locales.',available:true},{key:'footer',title:'Pie de página',description:'Al final del sitio.',available:true}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className={place.available?'placement-available':'placement-planned'}>{place.available?'Disponible hoy':'Aún no disponible'}</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. Publicar una ficha básica o destacada no reserva por sí solo uno de estos espacios.</p></section>
-    <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a></div></footer>
+      <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a><a className="footer-privacy" href="/terminos/">Términos de uso</a></div></footer>
   </main>;
 
   return (
