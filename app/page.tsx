@@ -4,6 +4,7 @@ import { ArrowRight, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MessageCircl
 import { useEffect, useMemo, useState } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
 import BusinessMap from './business-map';
+import BusinessCardPhoto from './business-card-photo';
 
 type Business = {
   id: string;
@@ -81,7 +82,7 @@ function readCachedData(): PublicData | null {
   if (typeof window === 'undefined') return null;
   try {
     const cached = JSON.parse(window.localStorage.getItem(publicCacheKey) || 'null') as { savedAt?: number; data?: PublicData } | null;
-    if (!cached?.savedAt || Date.now() - cached.savedAt > 60 * 60 * 1000) return null;
+    if (!cached?.savedAt || Date.now() - cached.savedAt > 15 * 60 * 1000) return null;
     return cached.data?.correcto && Array.isArray(cached.data.negocios) ? cached.data : null;
   } catch { return null; }
 }
@@ -189,21 +190,33 @@ export default function Home() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch(dataUrl, { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error('No se pudo actualizar la guía');
-        return response.json() as Promise<PublicData>;
-      })
-      .then((data) => {
+    let received = !!cachedData;
+    const apply = (data: PublicData) => {
         if (!data.correcto || !Array.isArray(data.negocios)) throw new Error('Datos incompletos');
         setBusinesses(data.negocios.filter((business) => !demonstrationIds.has(business.id)));
         setAdvertisements(Array.isArray(data.publicidad) ? data.publicidad : []);
         setConfiguration(data.configuracion || {});
         setDataStatus('ready');
+        received = true;
         try { window.localStorage.setItem(publicCacheKey, JSON.stringify({ savedAt: Date.now(), data })); } catch { /* Storage may be unavailable. */ }
-      })
-      .catch(() => { if (!cachedData) setDataStatus('error'); });
-    return () => controller.abort();
+    };
+    const fetchData = async (url: string) => {
+      const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+      if (!response.ok) throw new Error('No se pudo actualizar la guía');
+      return response.json() as Promise<PublicData>;
+    };
+    let lastRefresh = Date.now();
+    const refreshLive = async () => {
+      lastRefresh = Date.now();
+      try { apply(await fetchData(dataUrl)); } catch { if (!received && !controller.signal.aborted) setDataStatus('error'); }
+    };
+    void (async () => {
+      try { apply(await fetchData('/guide-data.json')); } catch { /* La copia puede no estar disponible. */ }
+      await refreshLive();
+    })();
+    const onVisible = () => { if (!document.hidden && Date.now() - lastRefresh > 60_000) void refreshLive(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { controller.abort(); document.removeEventListener('visibilitychange', onVisible); };
   }, []);
 
   useEffect(() => { const updateEdition=()=>{ const hour=Math.floor(montevideoClock().minute/60); setIsNight(hour>=20||hour<7); setClockTick((value)=>value+1); }; updateEdition(); const timer=window.setInterval(updateEdition,60000); return()=>window.clearInterval(timer); }, []);
@@ -331,7 +344,7 @@ export default function Home() {
     const style = businessStyle(business.categoria, index);
     const Icon = style.icon;
     const mapHref = businessMapLink(business);
-    const image = driveImage(business.imagen_url, 640);
+    const images = businessImages(business.imagen_url, 640);
     const open = isOpenNow(business, clock);
     const known = hasKnownHours(business, clock.day);
     const phone = contactNumber(business.telefono);
@@ -340,7 +353,7 @@ export default function Home() {
     const site = websiteUrl(business.sitio_web);
     const logo = driveImage(business.logo_url, 160);
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
-      {image ? <div className={`business-photo-frame ${image.endsWith('.svg') ? 'logo-frame' : ''}`}><img className="business-photo" src={image} alt={`Imagen de ${business.nombre}`} loading="lazy" decoding="async" width="640" height="420" /></div> : <div className="business-photo business-photo-placeholder" aria-label="Este negocio todavía no tiene foto" role="img"><Icon size={64} strokeWidth={1.4} aria-hidden="true" /><span>{business.categoria || 'Negocio local'}</span></div>}
+      <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} Icon={Icon} />
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
@@ -401,7 +414,7 @@ export default function Home() {
   if (showPlans) return <main className={isNight ? 'night-mode plans-page' : 'day-mode plans-page'}>
     <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/">Volver a la guía</a></header>
     <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>{String(configuration.SUBTITULO_PLANES||'Elegí la presencia que mejor acompañe a tu negocio.')}</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA BÁSICA</span><h3>{currency} {basicPrice} <small>/ mes</small></h3><p>{basicDetail}</p><a href={businessFormUrl}>Completar ficha</a></article><article className="featured-plan"><span><Sparkles size={15}/> DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>Consultar premium</a></article></div></section>
-    <section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran la ubicación de cada espacio. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current"><strong>Las cinco ubicaciones están operativas.</strong> El lugar del anuncio se elige en la planilla y se confirma antes de contratar. Ninguna ubicación se incluye automáticamente en la ficha básica o destacada.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.',available:true},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.',available:true},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.',available:true},{key:'stories',title:'Historias',description:'Junto a los relatos locales.',available:true},{key:'footer',title:'Pie de página',description:'Al final del sitio.',available:true}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className={place.available?'placement-available':'placement-planned'}>{place.available?'Disponible hoy':'Aún no disponible'}</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. Publicar una ficha básica o destacada no reserva por sí solo uno de estos espacios.</p></section>
+    <section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran posibles ubicaciones. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current">La disponibilidad, duración y precio de cada ubicación se confirman antes de contratar. Ninguna ubicación se incluye automáticamente en la ficha básica o destacada.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.'},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.'},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.'},{key:'stories',title:'Historias',description:'Junto a los relatos locales.'},{key:'footer',title:'Pie de página',description:'Al final del sitio.'}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className="placement-planned">Consultar disponibilidad</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. Publicar una ficha básica o destacada no reserva por sí solo uno de estos espacios.</p></section>
       <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a><a className="footer-privacy" href="/terminos-de-uso/">Términos de uso</a><a className="footer-privacy" href="/autorizacion-de-publicacion/">Autorización de publicación</a><a className="footer-privacy" href="/reglas-de-publicacion/">Reglas de publicación</a></div></footer>
   </main>;
 
