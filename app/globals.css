@@ -306,7 +306,6 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .vitrina-map-popup a{font-size:13px;font-weight:800;color:#0f5f78}
 @media(max-width:760px){.business-map-canvas{height:310px}.business-map-heading strong{font-size:21px}}
 /* Estilo de tarjeta elegido por el negocio; no altera el plan ni el orden. */
-.local-history{grid-template-columns:70px minmax(0,1fr) minmax(0,1fr);align-items:center}.local-history figure{margin:0;min-width:0}.local-history img{display:block;width:100%;height:auto}.local-history figcaption{font-size:12px;line-height:1.6;margin-top:10px;color:#d7eaee}.local-history figcaption a{display:inline;padding:0;border:0;font-weight:400;white-space:normal;text-decoration:underline}.local-history>div>a{display:inline-flex}.local-history p{max-width:560px}@media(max-width:760px){.local-history{grid-template-columns:1fr;gap:24px}.local-history h2{font-size:42px}.local-history figure{grid-column:1}}
 .business-card.editorial{background:#fff8ed;border-left-color:#c98a36}
 .business-card.editorial h3{color:#613d35;font-size:clamp(25px,2.7vw,33px)}
 .business-card.editorial .card-category{color:#8e571e}
