@@ -114,7 +114,7 @@
   }
   window.vitrinaSubmissionStatus=result=>{
     if(!pending||result.requestId!==pending.id)return;
-    finishSubmission({requestId:result.requestId,ok:!!result.received,message:result.received?'Recibimos tu solicitud. Revisaremos los datos antes de publicarlos.':'No figura una solicitud recibida. Podés reintentar el envío sin crear otra solicitud.'});
+    finishSubmission({requestId:result.requestId,ok:!!result.received,message:result.received?'Recibimos tu solicitud. Revisaremos los datos antes de publicarlos.':(result.message||'No figura una solicitud recibida. Podés reintentar el envío sin crear otra solicitud.')});
   };
   form.addEventListener('input',()=>{if(!pending)retryRequestId=null});
   window.addEventListener('message',event=>{if(!pending)return;if(!/^https:\/\/(?:script\.google\.com|(?:[a-z0-9-]+-)?script\.googleusercontent\.com)$/.test(event.origin))return;const result=event.data;if(!result||result.type!=='vitrina-submission')return;finishSubmission(result)});
