@@ -6,6 +6,7 @@ import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, ty
 import BusinessMap from './business-map';
 import BusinessCardPhoto from './business-card-photo';
 import BusinessSocials from './business-socials';
+import { coverageOf, servesDepartment, departments } from '../public/coverage.js';
 
 type Business = {
   id: string;
@@ -254,9 +255,9 @@ export default function Home() {
     return (!options.time || filter === 'todos' || (filter === 'ahora' ? isOpenNow(business, clock) : openInPeriod(business, clock, filter)))
       && (!options.category || category === 'Todos' || business.categoria === category)
       && (!options.specialty || !specialty || String(business.especialidad || '').trim() === specialty)
-      && (!options.department || !department || region.toLocaleLowerCase('es-UY') === department.toLocaleLowerCase('es-UY'))
-      && (!options.locality || !locality || String(business.zona || '').trim().toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))
-      && (!normalized || `${business.nombre} ${business.categoria} ${business.especialidad || ''} ${business.descripcion} ${business.zona} ${region}`.toLocaleLowerCase('es-UY').includes(normalized));
+      && (!options.department || !department || (region.toLocaleLowerCase('es-UY') === department.toLocaleLowerCase('es-UY') || servesDepartment(business, department)))
+      && (!options.locality || !locality || (String(business.zona || '').trim().toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY') || (!!department && servesDepartment(business, department))))
+      && (!normalized || `${business.nombre} ${business.categoria} ${business.especialidad || ''} ${business.descripcion} ${business.zona} ${region} ${coverageOf(business).label}`.toLocaleLowerCase('es-UY').includes(normalized));
   };
   const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business)), [businesses,profileId]);
   useEffect(() => {
@@ -283,12 +284,11 @@ export default function Home() {
     document.head.appendChild(script);
     return () => { document.title = oldTitle; description?.setAttribute('content', oldDescription); canonical?.setAttribute('href', oldCanonical); script.remove(); };
   }, [profile]);
-  const departments = ['Artigas','Canelones','Cerro Largo','Colonia','Durazno','Flores','Florida','Lavalleja','Maldonado','Montevideo','Paysandú','Río Negro','Rivera','Rocha','Salto','San José','Soriano','Tacuarembó','Treinta y Tres'];
   const clock = useMemo(() => montevideoClock(), [clockTick]);
   const categories = ['Todos', ...Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, department: true, locality: true })).map((business) => business.categoria).filter(Boolean)))];
   const availableSpecialties = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true })).map((business) => String(business.especialidad || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
-  const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).map((business) => business.departamento || business.departamento_region || ''));
-  const availableLocalities = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true })).map((business) => String(business.zona || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
+  const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).flatMap((business) => [business.departamento || business.departamento_region || '', ...(coverageOf(business).country ? departments : coverageOf(business).regions)]));
+  const availableLocalities = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true })).filter((business) => (business.departamento || business.departamento_region) === department).map((business) => String(business.zona || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
   const availableTimes = new Set<TimeFilter>(['todos']);
   for (const business of businesses.filter((item) => matchingBusiness(item, { category: true, department: true, locality: true }))) {
     if (isOpenNow(business, clock)) availableTimes.add('ahora');
@@ -366,9 +366,9 @@ export default function Home() {
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
-      <p>{featured && business.texto_destacado ? business.texto_destacado : business.descripcion}</p>
+      <p>{featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description}</p>
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
-      <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}</div>
+      <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
         <a className="details" href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
         {whatsapp.length >= 8 && <a className="details" href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(business,'whatsapp')} target="_blank" rel="noreferrer">WhatsApp <ArrowRight size={16} /></a>}
@@ -401,7 +401,7 @@ export default function Home() {
             <div className="profile-content">
               <span className="section-kicker">{profile.categoria}{profile.especialidad ? ` · ${profile.especialidad}` : ''}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
               <h1>{logo && <img className="profile-logo" src={logo} alt="" width="56" height="56" />}{profile.nombre}</h1>
-              <p className="profile-description">{profile.descripcion}</p>
+              <p className="profile-description">{coverageOf(profile).description}</p>{coverageOf(profile).label && <p className="profile-coverage">{coverageOf(profile).label}</p>}
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
                 {whatsapp.length >= 8 && <a href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(profile,'whatsapp')} target="_blank" rel="noreferrer"><MessageCircle size={19}/> Escribir por WhatsApp</a>}

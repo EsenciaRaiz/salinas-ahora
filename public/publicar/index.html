@@ -23,7 +23,8 @@
     <div class="full"><label for="estilo_tarjeta">Estilo de la tarjeta (opcional)</label><select id="estilo_tarjeta" name="estilo_tarjeta"><option>Clásica</option><option>Editorial</option></select><p class="small"><strong>Clásica:</strong> fondo blanco y lectura simple. <strong>Editorial:</strong> fondo cálido y título más expresivo. La elección no cambia el plan ni da prioridad en la guía.</p></div>
     <div><label for="departamento">Departamento *</label><select id="departamento" name="departamento" required><option value="">Elegí uno</option><option>Artigas</option><option>Canelones</option><option>Cerro Largo</option><option>Colonia</option><option>Durazno</option><option>Flores</option><option>Florida</option><option>Lavalleja</option><option>Maldonado</option><option>Montevideo</option><option>Paysandú</option><option>Río Negro</option><option>Rivera</option><option>Rocha</option><option>Salto</option><option>San José</option><option>Soriano</option><option>Tacuarembó</option><option>Treinta y Tres</option></select></div>
     <div><label for="localidad">Ciudad, localidad o barrio *</label><input id="localidad" name="localidad" required maxlength="80" placeholder="Ej.: Salinas o Pocitos"><p class="small">Si el negocio está en Montevideo, escribí el barrio.</p></div>
-    <div class="full"><label class="check"><input id="mostrarMapa" name="mostrarMapa" type="checkbox" value="si">Mostrar el negocio en el mapa</label><p class="small">Si no lo marcás, mostraremos solo localidad y departamento.</p></div>
+    <div class="full"><label for="coverage-mode">¿En qué zonas ofrecés tus servicios?</label><select id="coverage-mode"><option value="local">Solo en mi localidad</option><option value="varios">En varios departamentos</option><option value="pais">En todo Uruguay</option></select><p class="small">La ubicación de arriba es donde está tu negocio. Aquí elegís dónde atendés o prestás servicios.</p><fieldset id="coverage-regions" hidden><legend>Marcá los departamentos donde atendés</legend><div id="coverage-options" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px"></div></fieldset></div>
+    <div class="full"><label class="check"><input id="mostrarMapa" name="mostrarMapa" type="checkbox" value="si">Mostrar el negocio en el mapa</label><p class="small">Si no lo marcás, mostraremos solo localidad y departamento. El mapa señala la ubicación real, no las zonas de atención.</p></div>
     <div class="full" id="map-fields" hidden><label for="direccion">Dirección del negocio</label><input id="direccion" name="direccion" maxlength="120" placeholder="Calle y número o esquina"><p class="small">Para que aparezca un marcador en el mapa de la guía, usá la ubicación exacta desde el local. La dirección permite crear el enlace a Google Maps.</p><button type="button" id="use-location">Usar ubicación del local</button><span id="location-info" role="status"></span><input type="hidden" id="coordinates" name="coordinates"></div>
     <div><label for="whatsapp">WhatsApp del negocio (opcional)</label><input id="whatsapp" name="whatsapp" type="tel" placeholder="Ej.: 099 123 456 o +598 99 123 456"></div>
     <div><label for="telefono">Teléfono para llamadas (opcional)</label><input id="telefono" name="telefono" type="tel" placeholder="Ej.: 099 123 456 o +598 99 123 456"><p class="small">Solo se mostrarán botones de contacto para los datos que completes.</p></div>
@@ -46,6 +47,16 @@
 <iframe id="submission-frame" name="submission-frame" title="Envío de solicitud" hidden></iframe>
 <script type="module">
   import { normalizeHours } from '/hours.js';
+  import { departments as coverageDepartments, withCoverage } from '/coverage.js';
+  const coverageMode = document.getElementById('coverage-mode');
+  const coverageRegions = document.getElementById('coverage-regions');
+  document.getElementById('coverage-options').replaceChildren(...coverageDepartments.map(region => {
+    const label = document.createElement('label'); label.className = 'check';
+    const input = document.createElement('input'); input.type = 'checkbox'; input.value = region;
+    label.append(input, document.createTextNode(region)); return label;
+  }));
+  coverageMode.addEventListener('change', () => { coverageRegions.hidden = coverageMode.value !== 'varios'; });
+  document.getElementById('business-form').addEventListener('reset', () => { coverageRegions.hidden = true; });
   const hoursInputs = ['lunes', 'sabado', 'domingo'].map(id => document.getElementById(id));
   function prepareHours(input) {
     const normalized = normalizeHours(input.value);
@@ -64,6 +75,14 @@
       event.stopImmediatePropagation();
       invalid.reportValidity();
     }
+    if (!invalid) {
+      try {
+        withCoverage(document.getElementById('descripcion').value, coverageMode.value, Array.from(coverageRegions.querySelectorAll('input:checked')).map(input => input.value));
+      } catch (error) {
+        event.preventDefault(); event.stopImmediatePropagation();
+        document.getElementById('status').textContent = error.message;
+      }
+    }
   }, true);
   const endpoint='https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
   const form=document.getElementById('business-form'),photo=document.getElementById('photo'),logo=document.getElementById('logo'),preview=document.getElementById('preview'),logoPreview=document.getElementById('logo-preview'),status=document.getElementById('status'),send=document.getElementById('send'),map=document.getElementById('mostrarMapa'),address=document.getElementById('direccion'),coords=document.getElementById('coordinates'),category=document.getElementById('categoria'),specialty=document.getElementById('especialidad');
@@ -79,7 +98,7 @@
   let pending=null,retryRequestId=null;
   form.addEventListener('input',()=>{if(!pending)retryRequestId=null});
   window.addEventListener('message',event=>{if(!pending)return;if(!/^https:\/\/(?:script\.google\.com|[a-z0-9-]+-script\.googleusercontent\.com)$/.test(event.origin))return;const result=event.data;if(!result||result.type!=='vitrina-submission'||result.requestId!==pending.id)return;clearTimeout(pending.timeout);pending=null;status.textContent=result.message||'No se pudo confirmar la solicitud.';send.disabled=false;if(result.ok){retryRequestId=null;form.reset();updateSpecialty();document.getElementById('map-fields').hidden=true;preview.style.display='none';logoPreview.style.display='none'}});
-  form.addEventListener('submit',async event=>{event.preventDefault();if(pending)return;send.disabled=true;status.textContent='Preparando las fotos…';try{if(map.checked&&!address.value.trim()&&!coords.value)throw Error('Escribí la dirección o usá la ubicación del local.');const selected=Array.from(photo.files);if(selected.length<1||selected.length>4)throw Error('Elegí de 1 a 4 fotos.');const images=await Promise.all(selected.map(shrink));const data=Object.fromEntries(new FormData(form).entries());data.photoMime='image/jpeg';data.photoBase64s=await Promise.all(images.map(base64));data.logoBase64=logo.files[0]?await base64(await shrink(logo.files[0])):'';const id=retryRequestId||crypto.randomUUID(),transport=document.createElement('form');retryRequestId=id;transport.method='POST';transport.action=endpoint;transport.target='submission-frame';transport.hidden=true;const field=document.createElement('input');field.name='payload';field.value=JSON.stringify({requestId:id,data});transport.append(field);document.body.append(transport);status.textContent='Enviando solicitud…';pending={id,timeout:setTimeout(()=>{pending=null;send.disabled=false;status.textContent='No recibimos confirmación. Podés reintentar el envío sin crear otra solicitud.'},30000)};transport.submit();transport.remove()}catch(error){send.disabled=false;status.textContent=error.message||'No se pudieron preparar las fotos.'}});
+  form.addEventListener('submit',async event=>{event.preventDefault();if(pending)return;send.disabled=true;status.textContent='Preparando las fotos…';try{if(map.checked&&!address.value.trim()&&!coords.value)throw Error('Escribí la dirección o usá la ubicación del local.');const selected=Array.from(photo.files);if(selected.length<1||selected.length>4)throw Error('Elegí de 1 a 4 fotos.');const images=await Promise.all(selected.map(shrink));const data=Object.fromEntries(new FormData(form).entries());data.descripcion=withCoverage(data.descripcion,coverageMode.value,Array.from(coverageRegions.querySelectorAll('input:checked')).map(input=>input.value));data.photoMime='image/jpeg';data.photoBase64s=await Promise.all(images.map(base64));data.logoBase64=logo.files[0]?await base64(await shrink(logo.files[0])):'';const id=retryRequestId||crypto.randomUUID(),transport=document.createElement('form');retryRequestId=id;transport.method='POST';transport.action=endpoint;transport.target='submission-frame';transport.hidden=true;const field=document.createElement('input');field.name='payload';field.value=JSON.stringify({requestId:id,data});transport.append(field);document.body.append(transport);status.textContent='Enviando solicitud…';pending={id,timeout:setTimeout(()=>{pending=null;send.disabled=false;status.textContent='No recibimos confirmación. Podés reintentar el envío sin crear otra solicitud.'},30000)};transport.submit();transport.remove()}catch(error){send.disabled=false;status.textContent=error.message||'No se pudieron preparar las fotos.'}});
 </script>
 </body>
 </html>
