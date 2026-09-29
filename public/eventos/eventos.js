@@ -25,6 +25,13 @@ function render(){
     const links=element('div','','links'),url=safeUrl(event.enlace);
     if(url){const link=element('a','Consultar / reservar');link.href=url;link.target='_blank';link.rel='noopener noreferrer';links.append(link)}
     const phone=String(event.telefono||'').replace(/\D/g,'');if(phone.length>=8&&phone.length<=15){const link=element('a','Llamar al organizador');link.href='tel:+'+phone;links.append(link)}
+    const whatsapp=phone.startsWith('09')?'598'+phone.slice(1):phone;
+    if(/^5989\d{7}$/.test(whatsapp)&&String(event.whatsapp||'').toLowerCase()==='si'){
+      const link=element('a','','whatsapp-link'),icon=document.createElement('img');
+      link.href='https://wa.me/'+whatsapp;link.target='_blank';link.rel='noopener noreferrer';
+      icon.src='/eventos/whatsapp.svg';icon.alt='';icon.width=20;icon.height=20;icon.loading='lazy';
+      link.append(icon,document.createTextNode('WhatsApp'));link.setAttribute('aria-label','Consultar por WhatsApp al organizador de '+event.titulo);links.append(link);
+    }
     if(navigator.share){const share=element('button','Compartir');share.type='button';share.addEventListener('click',()=>navigator.share({title:event.titulo,text:event.titulo+' · '+event.localidad+' · '+date.format(event.inicio),url:'https://vitrinacerca.com/eventos/'}).catch(()=>{}));links.append(share)}
     body.append(links);article.append(body);cards.append(article);
   });
