@@ -30,9 +30,9 @@
     <div class="full"><label for="sitio_web">Sitio web (opcional)</label><input id="sitio_web" name="sitio_web" type="url" inputmode="url" maxlength="250" placeholder="https://tusitio.com"><p class="small">Incluí https:// al comienzo. Mostraremos un botón para visitar tu sitio en la ficha.</p></div>
     <div><label for="instagram">Instagram (opcional)</label><input id="instagram" name="instagram" type="url" inputmode="url" maxlength="250" placeholder="https://www.instagram.com/tucomercio/"></div>
     <div><label for="facebook">Facebook (opcional)</label><input id="facebook" name="facebook" type="url" inputmode="url" maxlength="250" placeholder="https://www.facebook.com/tucomercio/"></div>
-    <div><label for="lunes">Lunes a viernes</label><input id="lunes" name="horario_lunes_a_viernes" placeholder="09:00-13:00, 14:00-18:00"><p class="small">Si hay descanso, escribí las dos franjas separadas por una coma.</p></div>
-    <div><label for="sabado">Sábado</label><input id="sabado" name="horario_sabado" placeholder="09:00-13:00 o Cerrado"></div>
-    <div><label for="domingo">Domingo</label><input id="domingo" name="horario_domingo" placeholder="Cerrado o 24 horas"></div>
+    <div><label for="lunes">Lunes a viernes</label><input id="lunes" name="horario_lunes_a_viernes" maxlength="100" placeholder="Ej.: 9 a 18" aria-describedby="hours-help"><p class="small" id="hours-help">Podés escribir 9 a 18, 9.30 a 18 o, si hay descanso, 9 a 13 y 14 a 18. También Cerrado, 24 horas o A consultar. Lo acomodamos automáticamente.</p></div>
+    <div><label for="sabado">Sábado</label><input id="sabado" name="horario_sabado" maxlength="100" placeholder="Ej.: 9 a 13 o Cerrado" aria-describedby="hours-help"></div>
+    <div><label for="domingo">Domingo</label><input id="domingo" name="horario_domingo" maxlength="100" placeholder="Ej.: Cerrado o 24 horas" aria-describedby="hours-help"></div>
     <div><label for="contacto">Tu correo de contacto *</label><input id="contacto" name="contacto" type="email" required><p class="small">No se mostrará en la web.</p></div>
     <div class="full"><label for="photo">Fotos del negocio *</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp" multiple required><p class="small">Elegí de 1 a 4 fotos. Las reduciremos para que la página cargue rápido.</p><img id="preview" alt="Vista previa de la foto"></div>
     <div class="full"><label for="logo">Logo del negocio (opcional)</label><input id="logo" type="file" accept="image/jpeg,image/png,image/webp"><p class="small">Si tenés logo, podés agregarlo además de las fotos.</p><img id="logo-preview" alt="Vista previa del logo" style="display:none;width:120px;height:120px;object-fit:contain;margin-top:12px"></div>
@@ -44,7 +44,27 @@
   </form>
 </main>
 <iframe id="submission-frame" name="submission-frame" title="Envío de solicitud" hidden></iframe>
-<script>
+<script type="module">
+  import { normalizeHours } from '/hours.js';
+  const hoursInputs = ['lunes', 'sabado', 'domingo'].map(id => document.getElementById(id));
+  function prepareHours(input) {
+    const normalized = normalizeHours(input.value);
+    input.setCustomValidity(normalized === null ? 'Escribí, por ejemplo, 9 a 18 o 9 a 13 y 14 a 18. También podés poner Cerrado, 24 horas o A consultar.' : '');
+    if (normalized !== null) input.value = normalized;
+    return normalized !== null;
+  }
+  hoursInputs.forEach(input => {
+    input.addEventListener('input', () => input.setCustomValidity(''));
+    input.addEventListener('blur', () => prepareHours(input));
+  });
+  document.getElementById('business-form').addEventListener('submit', event => {
+    const invalid = hoursInputs.find(input => !prepareHours(input));
+    if (invalid) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      invalid.reportValidity();
+    }
+  }, true);
   const endpoint='https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
   const form=document.getElementById('business-form'),photo=document.getElementById('photo'),logo=document.getElementById('logo'),preview=document.getElementById('preview'),logoPreview=document.getElementById('logo-preview'),status=document.getElementById('status'),send=document.getElementById('send'),map=document.getElementById('mostrarMapa'),address=document.getElementById('direccion'),coords=document.getElementById('coordinates'),category=document.getElementById('categoria'),specialty=document.getElementById('especialidad');
   const examples={Profesionales:['Escribanía','Abogacía','Contabilidad','Arquitectura','Psicología','Medicina','Odontología','Ingeniería','Veterinaria','Inmobiliaria'],Oficios:['Electricidad','Plomería','Carpintería','Cerrajería','Pintura','Albañilería','Jardinería','Mecánica','Refrigeración','Limpieza']};

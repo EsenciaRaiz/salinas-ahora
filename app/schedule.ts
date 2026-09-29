@@ -1,3 +1,5 @@
+import { normalizeHours } from '../public/hours.js';
+
 export type Hours = {
   horario_lunes_a_viernes?: string;
   horario_sabado?: string;
@@ -26,7 +28,7 @@ function hoursForDay(business: Hours, day: number): string {
 }
 
 function parseHours(value: string): Interval[] {
-  const text = value.trim().toLowerCase();
+  const text = (normalizeHours(value) ?? value.trim()).toLowerCase();
   if (/^(24\s*h|24\s*horas|todo el día)$/.test(text)) return [{ start: 0, end: 1440 }];
   if (!text || /cerrado|consultar|sin horario/.test(text)) return [];
   const intervals: Interval[] = [];
