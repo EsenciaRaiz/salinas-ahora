@@ -19,6 +19,8 @@ export function withCoverage(description, mode, regions) {
   if (mode === 'varios' && !selected.length) throw Error('Marcá al menos un departamento donde atendés.');
   const value = mode === 'pais' ? 'Todo Uruguay' : mode === 'varios' ? selected.join(', ') : '';
   const result = String(description || '').trim() + (value ? `\nZona de atención: ${value}.` : '');
-  if (result.length > 500) throw Error('Acortá un poco la descripción para incluir también la zona de atención (máximo 500 caracteres en total).');
+  // The public description allows 500 characters; the coverage line is metadata
+  // appended for compatibility with existing spreadsheet rows and search pages.
+  if (result.length > 750) throw Error('La descripción y las zonas de atención son demasiado largas. Acortá la descripción e intentá de nuevo.');
   return result;
 }
