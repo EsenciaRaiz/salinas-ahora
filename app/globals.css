@@ -313,4 +313,8 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .business-card.editorial{background:#fff8ed;border-left-color:#c98a36}
 .business-card.editorial h3{color:#613d35;font-size:clamp(25px,2.7vw,33px)}
 .business-card.editorial .card-category{color:#8e571e}
+.business-card.editorial{color:#102a43}
+.business-card.editorial p,.business-card.editorial .address{color:#40586d}
+.business-card.editorial .hours,.business-card.editorial .hours strong{color:#102a43;border-color:#d9cbb7}
+.business-card.editorial .sponsored{color:#765414}
 @media(max-width:700px){.business-card.editorial{border-top-color:#c98a36}}
