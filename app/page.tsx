@@ -362,7 +362,7 @@ export default function Home() {
     const region = business.departamento || business.departamento_region || '';
     const site = websiteUrl(business.sitio_web);
     const logo = driveImage(business.logo_url, 160);
-    return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase()}`} key={business.id || business.nombre}>
+    return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase() === 'editorial' ? 'card-editorial' : ''}`} key={business.id || business.nombre}>
       <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} Icon={Icon} />
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
