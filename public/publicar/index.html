@@ -47,7 +47,7 @@
 <iframe id="submission-frame" name="submission-frame" title="Envío de solicitud" hidden></iframe>
 <script type="module">
   import { normalizeHours } from '/hours.js';
-  import { departments as coverageDepartments, withCoverage } from '/coverage.js';
+  import { departments as coverageDepartments, withCoverage } from '/coverage.js?v=20260929';
   const coverageMode = document.getElementById('coverage-mode');
   const coverageRegions = document.getElementById('coverage-regions');
   document.getElementById('coverage-options').replaceChildren(...coverageDepartments.map(region => {
