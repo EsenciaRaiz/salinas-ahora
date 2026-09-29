@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
 import BusinessMap from './business-map';
 import BusinessCardPhoto from './business-card-photo';
+import BusinessSocials from './business-socials';
 
 type Business = {
   id: string;
@@ -23,6 +24,9 @@ type Business = {
   sitio_web: string;
   instagram?: string;
   facebook?: string;
+  tiktok?: string;
+  youtube?: string;
+  linkedin?: string;
   logo_url?: string;
   horario_lunes_a_viernes: string;
   horario_sabado: string;
@@ -106,11 +110,6 @@ function websiteUrl(value?: string) {
     const url = new URL(/^https?:\/\//i.test(source) ? source : `https://${source}`);
     return ['https:', 'http:'].includes(url.protocol) && /\./.test(url.hostname) ? url.href : '';
   } catch { return ''; }
-}
-function socialUrl(value: string | undefined, host: string) {
-  const url = websiteUrl(value);
-  if (!url) return '';
-  try { const name = new URL(url).hostname.toLowerCase(); return name === host || name === `www.${host}` ? url : ''; } catch { return ''; }
 }
 
 function businessStyle(category: string, index: number) {
@@ -377,6 +376,7 @@ export default function Home() {
         {site && <a className="details" href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
         {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
       </div>
+      <BusinessSocials business={business}/>
     </article>;
   };
 
@@ -388,8 +388,6 @@ export default function Home() {
     const whatsapp = contactNumber(profile?.whatsapp);
     const phone = contactNumber(profile?.telefono);
     const site = websiteUrl(profile?.sitio_web);
-    const instagram = socialUrl(profile?.instagram, 'instagram.com');
-    const facebook = socialUrl(profile?.facebook, 'facebook.com');
     const logo = driveImage(profile?.logo_url, 160);
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
       <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol">{isNight ? <MoonStar size={24} /> : <Sun size={24} />}</span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
@@ -409,10 +407,9 @@ export default function Home() {
                 {whatsapp.length >= 8 && <a href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(profile,'whatsapp')} target="_blank" rel="noreferrer"><MessageCircle size={19}/> Escribir por WhatsApp</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
-                {instagram && <a href={instagram} target="_blank" rel="noreferrer">Instagram</a>}
-                {facebook && <a href={facebook} target="_blank" rel="noreferrer">Facebook</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
               </div>
+              <BusinessSocials business={profile}/>
             </div>
           </div>
         </>}

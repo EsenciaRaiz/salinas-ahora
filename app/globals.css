@@ -187,6 +187,19 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .profile-actions{display:flex;flex-wrap:wrap;gap:11px}
 .profile-actions a{display:inline-flex;align-items:center;gap:9px;padding:13px 17px;border-radius:5px;background:var(--ink);color:white;text-decoration:none;font-weight:800}
 .profile-actions a:hover{background:var(--ocean)}
+.business-socials{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;min-width:0}
+.business-socials .business-social{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:8px 12px;border:1px solid #d5dde3;border-radius:6px;background:#fff;color:#17364c;font-size:13px;font-weight:700;text-decoration:none;transition:box-shadow .18s ease,border-color .18s ease}
+.business-social svg{flex:none}
+.business-social-instagram svg{color:#c13584}
+.business-social-facebook svg{color:#1877f2}
+.business-social-tiktok svg{color:#111}
+.business-social-youtube svg{color:#ff0033}
+.business-social-linkedin svg{color:#0a66c2}
+.business-socials .business-social:hover{border-color:#8499aa;box-shadow:0 3px 8px rgba(16,42,67,.12)}
+.business-socials .business-social:focus-visible{outline:3px solid var(--ocean);outline-offset:3px}
+.business-card .business-socials{grid-column:2;margin:0 0 14px}
+.business-card:has(.business-socials) .card-actions{margin-bottom:8px}
+@media(max-width:700px){.business-card .business-socials{grid-column:1}}
 .share-business{display:inline-block;margin:23px 12px 0 0;padding:11px 0;border:0;background:transparent;color:var(--ocean);font:inherit;font-weight:800;text-decoration:underline;cursor:pointer}
 .share-message{color:#315c55;font-size:14px}
 .profile-empty{max-width:620px;margin:70px auto;text-align:center}
