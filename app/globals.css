@@ -228,7 +228,7 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .profile-wrap{max-width:1040px;padding-top:28px}
 .profile-card{grid-template-columns:minmax(0,46%) minmax(0,54%);box-shadow:0 16px 35px rgba(16,42,67,.08)}
 .profile-gallery{min-height:0}
-.profile-gallery .profile-image,.profile-image{height:100%;min-height:380px;max-height:none}
+.profile-gallery .profile-image,.profile-image{height:100%;min-height:380px;max-height:none;object-fit:contain}
 .profile-content{padding:clamp(25px,3vw,42px)}
 .profile-content h1{font-size:clamp(38px,4vw,54px);margin:10px 0}
 .profile-description{font-size:17px;line-height:1.48;margin:0}
