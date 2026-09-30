@@ -305,8 +305,8 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 
 .business-card .card-actions .details,.business-card .card-actions .map-link{min-height:38px;padding:7px 10px;font-size:13px}
 
-/* Reducir el espacio vacío de las fichas en escritorio */
-@media(min-width:701px){.business-card,.featured-business{grid-template-rows:repeat(7,max-content);align-content:start}.business-card .card-actions{align-self:start}.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{max-height:225px}}
+/* La foto llena la columna, pero el contenido determina la altura de la ficha. */
+@media(min-width:701px){.business-card,.featured-business{position:relative}.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{position:absolute;left:0;top:0;width:max(190px,31%);height:100%;min-height:0;max-height:none;margin:0;overflow:hidden}.business-card .business-socials{grid-column:2;margin-bottom:14px}}
 
 /* Los anuncios siguen a las fichas y no dejan un hueco lateral */
 @media(min-width:901px){.guide-layout{grid-template-columns:1fr;gap:22px}.ad-column{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px}.ad-card,.night-note{min-height:0}.ad-card-content{padding:20px}.ad-card h3{font-size:25px;margin:16px 0 8px}.ad-card-media img{height:125px}.night-note{padding:20px}.night-note strong{font-size:22px;margin-top:9px}}
@@ -352,12 +352,6 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .business-card.card-editorial .sponsored{color:#765414}
 @media(max-width:700px){.business-card.card-editorial{border-top-color:#c98a36}}
 
-/* La foto acompaña toda la altura de la ficha, incluso cuando hay redes. */
-@media(min-width:701px){
-  .business-card,.featured-business{grid-template-rows:repeat(8,max-content)}
-  .business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{grid-row:1/-1;max-height:none}
-  .business-card .business-socials{grid-column:2;margin-bottom:14px}
-}
 .events-teaser{max-width:1480px;margin:0 auto;padding:44px clamp(20px,5vw,72px);display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid #dce3e4;background:#f4f1e8}
 .events-teaser h2{margin:7px 0;font:500 clamp(34px,4vw,50px)/1.1 var(--font-editorial),Georgia,serif}
 .events-teaser p{margin:0;color:#40586d}
