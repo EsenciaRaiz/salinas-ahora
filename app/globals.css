@@ -360,15 +360,17 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 @media(max-width:700px){.events-teaser{align-items:flex-start;flex-direction:column}}
 
 /* Pie editorial compacto y legible en todas las pantallas. */
-.footer-main:has(.social-links){display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 30px;align-items:center}
-.footer-main .social-links{grid-column:1/-1;justify-self:start}
+.footer-main:has(.social-links){display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 22px;align-items:center;padding-block:20px 12px}
+.footer-main .social-links{grid-column:3;grid-row:1;justify-self:end}
 .footer-main .social-links img{display:block;width:22px;height:22px}
 .footer-links{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:11px 22px}
 .footer-links a{color:#d6e1e9;font-size:13px;text-decoration:none}
 .footer-links a:hover{text-decoration:underline;color:#fff}
-.footer-strip{background:#0b2032;color:#d6e1e9;justify-content:flex-start;flex-wrap:wrap;gap:9px 23px}
+.footer-strip{background:#0b2032;color:#d6e1e9;justify-content:flex-start;flex-wrap:wrap;gap:9px 23px;padding-block:10px}
+.footer-strip .footer-credit-brand{margin-left:auto}
+.footer-strip .footer-credit-brand img{display:block;width:112px;height:auto;max-height:32px;object-fit:contain}
 .footer-strip strong{font-weight:500}
-@media(max-width:700px){.footer-main:has(.social-links){grid-template-columns:1fr}.footer-main .social-links,.footer-links{grid-column:1/-1}}
+@media(max-width:700px){.footer-main:has(.social-links){grid-template-columns:auto minmax(0,1fr);gap:10px 14px;padding-block:18px 12px}.footer-main .social-links{grid-column:1/-1;grid-row:auto;justify-self:start}.footer-links{grid-column:1/-1}.footer-strip{align-items:center;flex-direction:row}.footer-strip .footer-credit-brand{margin-left:0}}
 /* La sección ya no tiene número; sus columnas empiezan en el título. */
 .editorial{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto}
 @media(max-width:1100px){.editorial{grid-template-columns:1fr}.editorial p,.editorial a{grid-column:1}}
