@@ -263,7 +263,7 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .social-links .social-linkedin:hover{background:#0a66c2;color:white}
 .social-links .social-whatsapp:hover{background:#25d366;color:#102a43}
 .card-actions .whatsapp-action img,.profile-actions a img,.plans a img{display:block;flex:none}
-.card-actions .whatsapp-action img{width:16px;height:16px}
+.card-actions .whatsapp-action img{width:18px;height:18px}
 .plans a:has(img){display:flex;align-items:center;justify-content:center;gap:8px}
 .footer-main:has(.social-links){grid-template-columns:auto minmax(0,1fr) auto auto auto auto}
 .footer-privacy{color:#d6e1e9;font-size:13px;text-underline-offset:3px;white-space:nowrap}
