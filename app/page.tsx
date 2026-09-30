@@ -313,7 +313,16 @@ export default function Home() {
   const guideVisible=[...featuredVisible,...basicVisible];
   const activeAdvertisements=useMemo(()=>advertisements.filter((ad)=>(ad.publicar === undefined || yes(ad.publicar)) && activeByDate({ fecha_inicio: ad.inicio || ad.fecha_inicio, fecha_fin: ad.fin || ad.fecha_fin })).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const adsAt=(placement:AdPlacement)=>activeAdvertisements.filter((ad)=>placementOf(ad)===placement);
-  const renderAdvertisement=(ad:Advertisement)=><article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} data-ad-placement={placementOf(ad)} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={driveImage(ad.imagen_url,640)} alt={ad.titulo || ad.anunciante} loading="lazy" decoding="async" width="640" height="420" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={ad.enlace || '/?planes=1'} target={ad.enlace ? '_blank' : undefined} rel={ad.enlace ? 'noreferrer' : undefined}>{placementOf(ad)==='cover' && String(ad.enlace || '').includes('instagram.com/') ? 'Ver Instagram' : ad.anunciante} <ArrowRight size={15} /></a></div></article>;
+  const renderAdvertisement=(ad:Advertisement)=>{
+    const florProfile = ad.id === 'ADS005' ? businesses.find((business) => {
+      const name = business.nombre.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const instagram = String(business.instagram || '').toLowerCase().replace(/\/$/, '');
+      return instagram === 'https://www.instagram.com/floreriasalinas' || name.includes('floreria salinas');
+    }) : undefined;
+    const link = florProfile ? businessUrl(florProfile) : ad.enlace || '/?planes=1';
+    const label = florProfile ? 'Ver ficha' : ad.id === 'ADS005' ? 'Ver Instagram' : ad.anunciante;
+    return <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} data-ad-placement={placementOf(ad)} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={driveImage(ad.imagen_url,640)} alt={ad.titulo || ad.anunciante} loading="lazy" decoding="async" width="640" height="420" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={link} target="_blank" rel="noreferrer">{label} <ArrowRight size={15} /></a></div></article>;
+  };
   const nightCount = businesses.filter((business) => activeByDate(business) && openInPeriod(business, clock, 'noche')).length;
   const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
   const currency = String(configuration.MONEDA || 'UYU');
