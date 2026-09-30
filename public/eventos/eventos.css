@@ -6,3 +6,12 @@
 .editorial-link{display:inline-flex;align-items:center;gap:12px;min-height:46px;padding:12px 20px;background:#116078;color:#fff;border:1px solid #116078;border-radius:6px;box-shadow:0 4px 12px #102a4315;transition:background .18s ease,transform .18s ease,box-shadow .18s ease}.editorial-link span{margin-left:0;transition:transform .18s ease}.editorial-link:hover{background:#0b4659;transform:translateY(-2px);box-shadow:0 7px 17px #102a4328}.editorial-link:hover span{transform:translate(2px,-2px)}.editorial-link:focus-visible{outline:3px solid #ef6a5b;outline-offset:4px}.editorial-link:active{transform:translateY(0)}@media(prefers-reduced-motion:reduce){.editorial-link,.editorial-link span{transition:none}.editorial-link:hover,.editorial-link:hover span{transform:none}}
 .poster-link{display:block}.poster-link img{display:block}.poster-link:focus-visible{outline:3px solid #ef6a5b;outline-offset:-3px}
 .whatsapp-link{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 12px;border:1px solid #25d366;border-radius:5px;background:#e9fbef;color:#075e36;font-weight:700;text-decoration:none}.whatsapp-link:hover{background:#d8f7e3}.whatsapp-link:focus-visible{outline:3px solid #116078;outline-offset:3px}.whatsapp-link img{width:20px;height:20px;background:none;object-fit:contain}
+.card summary{display:grid;gap:7px;min-height:155px;padding:19px 20px;cursor:pointer;list-style:none}
+.card summary::-webkit-details-marker{display:none}
+.card summary h2{margin:0;font-size:clamp(21px,2.5vw,26px)}
+.card summary .event-time{font-size:14px;color:#40586d;font-weight:700}
+.card summary .more-label{color:#116078;font-size:13px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.card summary:focus-visible{outline:3px solid #ef6a5b;outline-offset:-3px}
+.card .content{padding-top:0;border-top:1px solid #e1e8e8}
+.card .poster-link{margin-top:18px}
+.card .poster-link img{height:auto;max-height:300px;object-fit:contain}

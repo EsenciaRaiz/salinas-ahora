@@ -339,3 +339,30 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .business-card.card-editorial .hours,.business-card.card-editorial .hours strong{color:#102a43;border-color:#d9cbb7}
 .business-card.card-editorial .sponsored{color:#765414}
 @media(max-width:700px){.business-card.card-editorial{border-top-color:#c98a36}}
+
+/* La foto acompaña toda la altura de la ficha, incluso cuando hay redes. */
+@media(min-width:701px){
+  .business-card,.featured-business{grid-template-rows:repeat(8,max-content)}
+  .business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{grid-row:1/-1;max-height:none}
+  .business-card .business-socials{grid-column:2;margin-bottom:14px}
+}
+.events-teaser{max-width:1480px;margin:0 auto;padding:44px clamp(20px,5vw,72px);display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid #dce3e4;background:#f4f1e8}
+.events-teaser h2{margin:7px 0;font:500 clamp(34px,4vw,50px)/1.1 var(--font-editorial),Georgia,serif}
+.events-teaser p{margin:0;color:#40586d}
+.events-teaser a{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:12px 16px;background:var(--ocean);color:#fff;text-decoration:none;font-weight:800;border-radius:5px}
+.events-teaser a:hover{background:#0b4659}
+@media(max-width:700px){.events-teaser{align-items:flex-start;flex-direction:column}}
+
+/* Pie editorial compacto y legible en todas las pantallas. */
+.footer-main:has(.social-links){display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 30px;align-items:center}
+.footer-main .social-links{grid-column:1/-1;justify-self:start}
+.footer-main .social-links img{display:block;width:22px;height:22px}
+.footer-links{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:11px 22px}
+.footer-links a{color:#d6e1e9;font-size:13px;text-decoration:none}
+.footer-links a:hover{text-decoration:underline;color:#fff}
+.footer-strip{background:#0b2032;color:#d6e1e9;justify-content:flex-start;flex-wrap:wrap;gap:9px 23px}
+.footer-strip strong{font-weight:500}
+@media(max-width:700px){.footer-main:has(.social-links){grid-template-columns:1fr}.footer-main .social-links,.footer-links{grid-column:1/-1}}
+/* La sección ya no tiene número; sus columnas empiezan en el título. */
+.editorial{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto}
+@media(max-width:1100px){.editorial{grid-template-columns:1fr}.editorial p,.editorial a{grid-column:1}}
