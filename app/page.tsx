@@ -330,8 +330,8 @@ export default function Home() {
   const premiumDetail=premiumDetailRaw && premiumDetailRaw !== 'Portada editorial, campaña visual y ubicación publicitaria preferente.' ? premiumDetailRaw : 'Propuesta visual personalizada y espacio publicitario en la ubicación acordada. La duración se confirma antes de contratar.';
   const heroTitle=String(configuration.HERO_TITULO||'Tu zona, a mano.');
   const heroText=String(configuration.HERO_TEXTO||'Descubrí dónde comprar, comer y resolver lo cotidiano. También cuando cae la noche.');
-  const whatsappPublicar=String(configuration.WHATSAPP_PUBLICAR||'').replace(/\D/g,'');
-  const siteWhatsApp=String(configuration.WHATSAPP_VITRINA||'').replace(/\D/g,'');
+  const siteWhatsApp=String(configuration.WHATSAPP_VITRINA||'59893802256').replace(/\D/g,'');
+  const whatsappPublicar=siteWhatsApp;
   const socialLinks=[{key:'instagram',label:'Instagram',url:String(configuration.INSTAGRAM_URL||''),mark:'◎'},{key:'facebook',label:'Facebook',url:String(configuration.FACEBOOK_URL||''),mark:'f'},{key:'tiktok',label:'TikTok',url:String(configuration.TIKTOK_URL||''),mark:'♪'},{key:'youtube',label:'YouTube',url:String(configuration.YOUTUBE_URL||''),mark:'▶'},{key:'linkedin',label:'LinkedIn',url:String(configuration.LINKEDIN_URL||''),mark:'in'},{key:'whatsapp',label:'WhatsApp',url:siteWhatsApp.length>=8?`https://wa.me/${siteWhatsApp}`:'',mark:''}].filter(({url})=>url.startsWith('https://'));
   const romansi = businesses.find((business) => business.id === 'SAL006' || business.nombre.toLowerCase().includes('romansi')); const romansiWhatsApp = String(romansi?.whatsapp || '').replace(/\D/g, ''); const romansiMessageUrl = romansiWhatsApp.length >= 8 ? `https://wa.me/${romansiWhatsApp}?text=${encodeURIComponent('Hola, vi Vitrina Cerca y quisiera consultar por diseño y desarrollo web.')}` : ''; const locateVisitor = () => {
     if (!navigator.geolocation) { setLocationMessage('Tu dispositivo no permite usar la ubicación.'); return; }
