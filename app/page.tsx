@@ -377,8 +377,8 @@ export default function Home() {
         {phone.length >= 8 && <a className="details" href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
         {site && <a className="details" href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
         {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
+        <BusinessSocials business={business}/>
       </div>
-      <BusinessSocials business={business}/>
     </article>;
   };
 

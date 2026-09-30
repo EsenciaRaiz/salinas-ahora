@@ -306,7 +306,12 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .business-card .card-actions .details,.business-card .card-actions .map-link{min-height:38px;padding:7px 10px;font-size:13px}
 
 /* La foto llena la columna, pero el contenido determina la altura de la ficha. */
-@media(min-width:701px){.business-card,.featured-business{position:relative}.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{position:absolute;left:0;top:0;width:max(190px,31%);height:100%;min-height:0;max-height:none;margin:0;overflow:hidden}.business-card .business-socials{grid-column:2;margin-bottom:14px}}
+@media(min-width:701px){.business-card,.featured-business{position:relative}.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{position:absolute;grid-column:auto;grid-row:auto;left:0;top:0;width:max(190px,31%);height:100%;min-height:0;max-height:none;margin:0;overflow:hidden}}
+.business-card .card-actions{gap:5px}
+.business-card .card-actions .details,.business-card .card-actions .map-link{padding:6px 8px;font-size:12px}
+.business-card .card-actions .business-socials{display:flex;flex-wrap:wrap;align-items:center;gap:5px;grid-column:auto;margin:0}
+.business-card .card-actions .business-social{min-height:38px;padding:6px 8px;font-size:12px}
+.business-card .card-actions .business-social svg{width:17px;height:17px}
 
 /* Los anuncios siguen a las fichas y no dejan un hueco lateral */
 @media(min-width:901px){.guide-layout{grid-template-columns:1fr;gap:22px}.ad-column{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:14px}.ad-card,.night-note{min-height:0}.ad-card-content{padding:20px}.ad-card h3{font-size:25px;margin:16px 0 8px}.ad-card-media img{height:125px}.night-note{padding:20px}.night-note strong{font-size:22px;margin-top:9px}}
