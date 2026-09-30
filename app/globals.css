@@ -229,6 +229,10 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .profile-card{grid-template-columns:minmax(0,46%) minmax(0,54%);box-shadow:0 16px 35px rgba(16,42,67,.08)}
 .profile-gallery{min-height:0}
 .profile-gallery .profile-image,.profile-image{height:100%;min-height:380px;max-height:none;object-fit:contain}
+.profile-card-landscape{display:block}
+.profile-card-landscape .profile-gallery{background:#fff}
+.profile-card-landscape .profile-image{display:block;width:100%;height:auto;min-height:0;max-height:none}
+.profile-card-landscape .profile-content{max-width:790px;margin:auto;padding:32px 38px 38px}
 .profile-content{padding:clamp(25px,3vw,42px)}
 .profile-content h1{font-size:clamp(38px,4vw,54px);margin:10px 0}
 .profile-description{font-size:17px;line-height:1.48;margin:0}
@@ -253,6 +257,7 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 .location-help ul{margin:0 0 16px;padding-left:20px;color:#29485c}.location-help li{margin:6px 0}.location-help button:disabled{opacity:.7;cursor:wait}
 .location-permission-guide{position:fixed;z-index:1000;right:18px;bottom:18px;max-width:min(430px,calc(100vw - 36px));display:grid;gap:8px;padding:18px 20px;background:#102a43;color:#fff;border:2px solid #f6c445;box-shadow:0 12px 35px #102a4366;font-size:15px;line-height:1.4}.location-permission-guide strong{font-size:17px}.location-permission-guide b{color:#f6c445}
 @media(max-width:760px){.profile-card{grid-template-columns:1fr}.profile-gallery .profile-image,.profile-image{height:250px;min-height:250px;max-height:250px}.profile-content{padding:25px}.profile-content h1{font-size:40px}.featured-business .business-photo-frame{height:220px}}
+@media(max-width:760px){.profile-card-landscape .profile-image{height:auto;min-height:0;max-height:none}.profile-card-landscape .profile-content{padding:25px}}
 
 /* Pie: redes opcionales y crédito de ROMANSI */
 .social-links a{border-radius:50%;font-size:17px;font-weight:800;line-height:1}
