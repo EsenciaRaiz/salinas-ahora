@@ -97,6 +97,8 @@ nav a:hover { color:var(--ocean); }
 footer { padding:32px clamp(20px,5vw,72px); background:#0b2032; color:#d6e1e9; display:flex; align-items:center; justify-content:space-between; gap:24px; font-size:13px; }
 .footer-brand { color:white; }
 .footer-brand::before{content:"";display:block;grid-column:1;grid-row:1/3;width:38px;height:38px;background:url('/favicon.svg') center/contain no-repeat}
+.day-mode .footer-brand::before{background-image:url('/marca-dia.svg')}
+.night-mode .footer-brand::before{background-image:url('/marca-noche.svg')}
 .footer-brand .brand-dot{display:none}
 .footer-brand{display:grid;grid-template-columns:38px auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;font-family:var(--font-editorial),Georgia,serif;font-size:20px;line-height:1;font-weight:650;letter-spacing:-.045em}
 .footer-brand span:not(.brand-dot){grid-column:2;grid-row:1}
@@ -124,6 +126,7 @@ footer { padding:32px clamp(20px,5vw,72px); background:#0b2032; color:#d6e1e9; d
 
 /* Edición editorial administrada desde Google Sheets */
 .brand-symbol{width:34px;height:34px;display:grid;place-items:center;color:var(--coral)}
+.brand-symbol img{display:block;width:34px;height:34px}
 .hero-status.day{border-top:3px solid var(--sun)}.hero-status.night{border-top:3px solid var(--sky)}
 .featured-section{margin:42px 0 54px;padding:34px;background:#f4f1e8;border-top:1px solid rgba(16,42,67,.18);border-bottom:1px solid rgba(16,42,67,.18)}
 .featured-heading{display:grid;grid-template-columns:1.2fr 1fr;gap:18px 40px;align-items:end;margin-bottom:26px}.featured-heading .section-kicker{grid-column:1/-1}.featured-heading h2,.guide-subheading h2{margin:0;font-family:var(--font-editorial),Georgia,serif;font-size:clamp(36px,4vw,58px);font-weight:540;letter-spacing:-.04em}.featured-heading p{margin:0;color:#526578;line-height:1.55}.featured-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.guide-subheading{margin:0 0 20px}.guide-subheading h2{font-size:38px;margin-top:7px}
@@ -165,6 +168,12 @@ footer{padding:0;display:block}.footer-main{padding:42px clamp(20px,5vw,72px);di
 @media(max-width:620px){.finder-form{grid-template-columns:1fr;margin-top:24px;padding:16px}.finder-form button{grid-column:auto}.finder-heading p{font-size:16px}}
 .hero{min-height:520px}.finder{padding-top:0}.finder-form{position:relative;z-index:2;margin-top:-45px;margin-bottom:36px}.finder-heading{margin-bottom:20px}
 .night-mode .hero-overlay{background:linear-gradient(90deg,rgba(13,21,47,.93) 0%,rgba(30,29,62,.67) 56%,rgba(30,29,62,.32) 100%)}
+.hero>img{transition:filter .8s ease}
+.day-mode .hero>img{filter:brightness(1.18) saturate(1.08)}
+.night-mode .hero>img{filter:brightness(.62) saturate(.9)}
+.day-mode .hero-overlay{background:linear-gradient(90deg,rgba(9,35,50,.78) 0%,rgba(9,35,50,.32) 48%,rgba(9,35,50,.02) 78%),linear-gradient(0deg,rgba(9,35,50,.35),transparent 45%)}
+.night-mode .hero-overlay{background:linear-gradient(90deg,rgba(8,16,36,.86) 0%,rgba(15,23,48,.46) 56%,rgba(15,23,48,.12) 100%),linear-gradient(0deg,rgba(8,16,36,.38),transparent 50%)}
+@media(max-width:620px){.day-mode .hero-overlay{background:linear-gradient(0deg,rgba(9,35,50,.8) 0%,rgba(9,35,50,.14) 90%)}.night-mode .hero-overlay{background:linear-gradient(0deg,rgba(8,16,36,.88) 0%,rgba(8,16,36,.25) 90%)}}
 .night-mode .finder-form button{background:#6353aa}.night-mode .finder-form button:hover{background:#4e408e}
 @media(max-width:900px){.hero{min-height:500px}}
 @media(max-width:620px){.hero{min-height:480px}.finder-form{margin-top:-28px;margin-bottom:30px}}

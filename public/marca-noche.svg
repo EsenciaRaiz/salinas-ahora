@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Propuesta de logo nocturno de Vitrina Cerca">
+  <rect width="160" height="160" rx="28" fill="#0B2B3D"/>
+  <path d="M103 16a31 31 0 1 0 20 47A31 31 0 0 1 103 16Z" fill="#F2CF87"/>
+  <circle cx="43" cy="31" r="2" fill="#F2CF87"/>
+  <circle cx="122" cy="34" r="1.5" fill="#F2CF87"/>
+  <circle cx="41" cy="59" r="10" fill="#6DA9AA"/>
+  <circle cx="80" cy="53" r="11" fill="#E37B6E"/>
+  <circle cx="119" cy="59" r="10" fill="#E9B958"/>
+  <path d="M18 104c0-17 9-26 23-26s23 9 23 26v29H28c-6 0-10-4-10-10v-19Z" fill="#12616B"/>
+  <path d="M54 103c0-23 10-35 26-35s26 12 26 35v30H54v-30Z" fill="#D76C5D"/>
+  <path d="M96 104c0-17 9-26 23-26s23 9 23 26v19c0 6-4 10-10 10H96v-29Z" fill="#DDAE4F"/>
+  <rect x="34" y="108" width="14" height="19" rx="3" fill="#F2CF87"/>
+  <rect x="72" y="98" width="16" height="25" rx="3" fill="#F2CF87"/>
+  <rect x="112" y="108" width="14" height="19" rx="3" fill="#F2CF87"/>
+</svg>

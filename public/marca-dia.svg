@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Propuesta de logo diurno de Vitrina Cerca">
+  <rect width="160" height="160" rx="28" fill="#F6F1E6"/>
+  <circle cx="80" cy="48" r="29" fill="#E8B24C" opacity=".28"/>
+  <circle cx="80" cy="48" r="21" fill="#E8B24C"/>
+  <path d="M80 8v8M80 80v8M40 48h8M112 48h8M51 19l6 6M103 71l6 6M109 19l-6 6M57 71l-6 6" stroke="#D79A37" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="41" cy="59" r="10" fill="#12616B"/>
+  <circle cx="80" cy="53" r="11" fill="#D76C5D"/>
+  <circle cx="119" cy="59" r="10" fill="#DDAE4F"/>
+  <path d="M18 104c0-17 9-26 23-26s23 9 23 26v29H28c-6 0-10-4-10-10v-19Z" fill="#12616B"/>
+  <path d="M54 103c0-23 10-35 26-35s26 12 26 35v30H54v-30Z" fill="#D76C5D"/>
+  <path d="M96 104c0-17 9-26 23-26s23 9 23 26v19c0 6-4 10-10 10H96v-29Z" fill="#DDAE4F"/>
+  <rect x="34" y="108" width="14" height="19" rx="3" fill="#F6F1E6"/>
+  <rect x="72" y="98" width="16" height="25" rx="3" fill="#F6F1E6"/>
+  <rect x="112" y="108" width="14" height="19" rx="3" fill="#F6F1E6"/>
+</svg>
