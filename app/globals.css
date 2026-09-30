@@ -388,3 +388,15 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 /* La sección ya no tiene número; sus columnas empiezan en el título. */
 .editorial{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto}
 @media(max-width:1100px){.editorial{grid-template-columns:1fr}.editorial p,.editorial a{grid-column:1}}
+
+/* Hasta tres anuncios en una sola franja, sin desplazar la búsqueda. */
+.hero-ad-section{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:16px;padding-bottom:4px}
+.hero-ad-section .ad-card,.hero-ad-section .ad-card:not(.ad-card-media){min-height:160px;grid-template-columns:minmax(104px,34%) minmax(0,1fr)}
+.hero-ad-section .ad-card:not(.ad-card-media){grid-template-columns:1fr}
+.hero-ad-section .ad-card img{height:100%;min-height:0;max-height:180px;object-fit:cover}
+.hero-ad-section .ad-card-content{min-width:0;padding:12px 14px}
+.hero-ad-section .ad-card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:5px 0;font-size:clamp(21px,2vw,26px);line-height:1.05}
+.hero-ad-section .ad-card p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:0;font-size:13px;line-height:1.3}
+.hero-ad-section .ad-card a{margin-top:8px;padding:7px 11px;font-size:12px}
+@media(max-width:1120px){.hero-ad-section{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(310px,min(86vw,430px));grid-template-columns:none;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:thin}.hero-ad-section .ad-card{scroll-snap-align:start}}
+@media(max-width:760px){.hero-ad-section .ad-card{grid-template-columns:minmax(105px,34%) minmax(0,1fr)}.hero-ad-section .ad-card img{height:100%;max-height:154px}.hero-ad-section .ad-card p{display:none}.hero-ad-section .ad-card h3{font-size:22px}.hero-ad-section .ad-card-content{padding:11px 12px}}

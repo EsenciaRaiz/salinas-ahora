@@ -451,7 +451,7 @@ export default function Home() {
         <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
         <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares con horario nocturno` : 'Descubrí lo mejor de tu zona'}</strong><small>{isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora'} <ArrowRight size={14} /></small></button>
       </section>
-      {adsAt('cover').length > 0 && <section className="hero-ad-section" aria-label="Anuncios de portada">{adsAt('cover').map(renderAdvertisement)}</section>}
+      {adsAt('cover').length > 0 && <section className="hero-ad-section" aria-label="Anuncios de portada">{adsAt('cover').slice(0,3).map(renderAdvertisement)}</section>}
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
         <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
