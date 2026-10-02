@@ -15,6 +15,8 @@ type Business = {
   nombre: string;
   categoria: string;
   especialidad?: string;
+  etiquetas_busqueda?: string;
+  palabras_clave?: string;
   descripcion: string;
   direccion: string;
   zona: string;
@@ -99,6 +101,9 @@ function readCachedData(): PublicData | null {
 
 
 const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());
+const normalizeSearch = (value: unknown) => String(value || '').toLocaleLowerCase('es-UY').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9ñ]+/g, ' ').trim();
+const searchAliases: Record<string, string[]> = { arquitecto:['arquitectura','planos','proyecto','reforma','construccion'], arquitectura:['arquitecto','planos','proyecto'], herrero:['herreria','rejas','portones','soldadura','hierro','estructuras metalicas'], herreria:['herrero','rejas','portones','soldadura'], web:['pagina web','paginas web','sitio web','diseno web','desarrollo web'], pagina:['pagina web','paginas web','sitio web'], paginas:['paginas web','pagina web','sitio web'], celular:['telefono','smartphone','reparacion de celulares'], carpintero:['carpinteria','muebles','madera'] };
+function businessMatchesQuery(business: Business, query: string, region: string) { const normalized=normalizeSearch(query); if(!normalized)return true; const haystack=normalizeSearch([business.nombre,business.categoria,business.especialidad,business.descripcion,business.etiquetas_busqueda,business.palabras_clave,business.zona,region,coverageOf(business).label].filter(Boolean).join(' ')); return normalized.split(/\s+/).filter(Boolean).every((term)=>haystack.includes(term)||(searchAliases[term]||[]).some((alias)=>haystack.includes(normalizeSearch(alias)))); }
 function contactNumber(value?: string) {
   const digits = String(value || '').replace(/\D/g, '');
   const local = digits.startsWith('598') ? digits.slice(3).replace(/^0/, '') : digits.replace(/^0/, '');
@@ -258,7 +263,7 @@ export default function Home() {
       && (!options.specialty || !specialty || String(business.especialidad || '').trim() === specialty)
       && (!options.department || !department || (region.toLocaleLowerCase('es-UY') === department.toLocaleLowerCase('es-UY') || servesDepartment(business, department)))
       && (!options.locality || !locality || (String(business.zona || '').trim().toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY') || (!!department && servesDepartment(business, department))))
-      && (!normalized || `${business.nombre} ${business.categoria} ${business.especialidad || ''} ${business.descripcion} ${business.zona} ${region} ${coverageOf(business).label}`.toLocaleLowerCase('es-UY').includes(normalized));
+      && businessMatchesQuery(business, query, region);
   };
   const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business)), [businesses,profileId]);
   useEffect(() => {
@@ -455,14 +460,14 @@ export default function Home() {
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
         <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
-          <label>¿Qué estás buscando?<input type="search" placeholder="Ej.: farmacia, peluquería" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <label>¿Qué estás buscando?<input type="search" placeholder="Ej.: herrero, arquitecto, páginas web" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
           <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || availableLocalities.length === 0}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && availableLocalities.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
           {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>¿Qué especialidad?<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">Todas las especialidades</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
           <button type="submit"><Search size={19} /> Buscar</button>
         </form>
-        <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, lugar y horario.</p></div></div>
+        <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">¿Qué necesitás hoy?</h2><p>Buscá por negocio, oficio, producto, servicio, lugar y horario.</p></div></div>
         <p className="finder-note">Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.</p>
         <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí'}</button><button type="button" aria-expanded={showMap} aria-controls="mapa-negocios" onClick={() => setShowMap((value) => !value)}><MapPin size={17}/> {showMap ? 'Ocultar mapa' : 'Ver mapa'}</button><span role="status">{locationMessage || 'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.'}</span></div>
         {showMap && <div id="mapa-negocios"><BusinessMap businesses={visible}/></div>}
