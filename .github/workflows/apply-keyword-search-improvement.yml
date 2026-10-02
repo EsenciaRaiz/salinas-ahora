@@ -22,9 +22,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Aplicar y validar cambios de búsqueda
+      - name: Habilitar pnpm
+        run: corepack enable
+      - name: Aplicar cambios de búsqueda
         run: node scripts/apply-keyword-search-improvement.mjs
-      - name: Guardar cambios
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+      - name: Validar compilación
+        run: pnpm build
+      - name: Guardar cambios validados
         run: |
           if git diff --quiet -- app/page.tsx public/publicar/index.html; then
             echo "No hay cambios pendientes"
