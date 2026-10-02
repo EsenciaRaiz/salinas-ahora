@@ -1,0 +1,59 @@
+import { readFile, writeFile } from 'node:fs/promises';
+
+async function patch(path, replacements) {
+  let text = await readFile(path, 'utf8');
+  for (const [from, to] of replacements) {
+    if (text.includes(to)) continue;
+    if (!text.includes(from)) throw new Error(`No se encontró el bloque esperado en ${path}`);
+    text = text.replace(from, to);
+  }
+  await writeFile(path, text);
+}
+
+await patch('app/page.tsx', [
+  [
+    `  especialidad?: string;\n  descripcion: string;`,
+    `  especialidad?: string;\n  etiquetas_busqueda?: string;\n  palabras_clave?: string;\n  descripcion: string;`
+  ],
+  [
+    `const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());`,
+    `const yes = (value: string) => ['si', 'sí', 'true', '1'].includes(String(value || '').trim().toLowerCase());\nconst normalizeSearch = (value: unknown) => String(value || '').toLocaleLowerCase('es-UY').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/[^a-z0-9ñ]+/g, ' ').trim();\nconst searchAliases: Record<string, string[]> = {\n  arquitecto: ['arquitectura', 'planos', 'proyecto', 'reforma', 'construccion'],\n  arquitectura: ['arquitecto', 'planos', 'proyecto'],\n  herrero: ['herreria', 'rejas', 'portones', 'soldadura', 'hierro', 'estructuras metalicas'],\n  herreria: ['herrero', 'rejas', 'portones', 'soldadura'],\n  web: ['pagina web', 'paginas web', 'sitio web', 'diseno web', 'desarrollo web'],\n  pagina: ['pagina web', 'paginas web', 'sitio web'],\n  paginas: ['paginas web', 'pagina web', 'sitio web'],\n  celular: ['telefono', 'smartphone', 'reparacion de celulares'],\n  carpintero: ['carpinteria', 'muebles', 'madera'],\n};\nfunction businessMatchesQuery(business: Business, query: string, region: string) {\n  const normalized = normalizeSearch(query);\n  if (!normalized) return true;\n  const haystack = normalizeSearch([business.nombre, business.categoria, business.especialidad, business.descripcion, business.etiquetas_busqueda, business.palabras_clave, business.zona, region, coverageOf(business).label].filter(Boolean).join(' '));\n  const terms = normalized.split(/\\s+/).filter(Boolean);\n  return terms.every((term) => haystack.includes(term) || (searchAliases[term] || []).some((alias) => haystack.includes(normalizeSearch(alias))));\n}`
+  ],
+  [
+    `    const normalized = query.trim().toLocaleLowerCase('es-UY');\n    const region = business.departamento || business.departamento_region || '';`,
+    `    const region = business.departamento || business.departamento_region || '';`
+  ],
+  [
+    `      && (!normalized || \`${'${business.nombre} ${business.categoria} ${business.especialidad || \'\'} ${business.descripcion} ${business.zona} ${region} ${coverageOf(business).label}'}\`.toLocaleLowerCase('es-UY').includes(normalized));`,
+    `      && businessMatchesQuery(business, query, region);`
+  ],
+  [
+    `placeholder="Ej.: farmacia, peluquería"`,
+    `placeholder="Ej.: herrero, arquitecto, páginas web"`
+  ],
+  [
+    `<p>Buscá por negocio, lugar y horario.</p>`,
+    `<p>Buscá por negocio, oficio, producto, servicio, lugar y horario.</p>`
+  ]
+]);
+
+await patch('public/publicar/index.html', [
+  [
+    `.consent-box{border:1px solid #d9e1e3;padding:14px 16px;display:grid;gap:10px}`,
+    `.consent-box{border:1px solid #d9e1e3;padding:14px 16px;display:grid;gap:10px}.search-words{background:#f7fbfb;border:1px solid #c9dde0;border-radius:12px;padding:20px}.search-words label{font-size:18px}.search-words .search-tip{display:flex;gap:9px;align-items:flex-start;margin:8px 0 0;color:#526578}.search-words .search-example{margin:10px 0 0;padding:10px 12px;background:#fff;border-radius:8px;border:1px dashed #b8cdd2;color:#40586d;font-size:13px}.search-words input{background:#fff}`
+  ],
+  [
+    `<div class="full"><label for="descripcion">¿Qué ofrecés? *</label><textarea id="descripcion" name="descripcion" required maxlength="500" placeholder="Contá en pocas palabras qué encontrará la gente"></textarea></div>`,
+    `<div class="full"><label for="descripcion">¿Qué ofrecés? *</label><textarea id="descripcion" name="descripcion" required maxlength="500" placeholder="Contá en pocas palabras qué encontrará la gente"></textarea></div>\n    <div class="full search-words"><label for="etiquetas_busqueda">¿Con qué palabras querés que te encuentren? *</label><input id="etiquetas_busqueda" name="etiquetas_busqueda" required maxlength="300" placeholder="Ej.: herrero, rejas, portones, soldadura"><p class="search-tip"><strong>💡</strong><span>Pensá qué escribiría una persona cuando necesita lo que ofrecés. Estas palabras ayudan a que tu negocio aparezca en las búsquedas de Vitrina Cerca.</span></p><p class="search-example" id="keyword-example"><strong>Ejemplo:</strong> herrero, herrería, rejas, portones, soldadura, estructuras metálicas</p><p class="small">Escribí entre 5 y 12 palabras o frases, separadas por comas. No pongas solamente el nombre de tu negocio.</p></div>`
+  ],
+  [
+    `const form=document.getElementById('business-form'),photo=document.getElementById('photo'),logo=document.getElementById('logo'),preview=document.getElementById('preview'),logoPreview=document.getElementById('logo-preview'),status=document.getElementById('status'),send=document.getElementById('send'),map=document.getElementById('mostrarMapa'),address=document.getElementById('direccion'),coords=document.getElementById('coordinates'),category=document.getElementById('categoria'),specialty=document.getElementById('especialidad');`,
+    `const form=document.getElementById('business-form'),photo=document.getElementById('photo'),logo=document.getElementById('logo'),preview=document.getElementById('preview'),logoPreview=document.getElementById('logo-preview'),status=document.getElementById('status'),send=document.getElementById('send'),map=document.getElementById('mostrarMapa'),address=document.getElementById('direccion'),coords=document.getElementById('coordinates'),category=document.getElementById('categoria'),specialty=document.getElementById('especialidad'),keywords=document.getElementById('etiquetas_busqueda'),keywordExample=document.getElementById('keyword-example');`
+  ],
+  [
+    `function updateSpecialty(){const choices=examples[category.value]||[];document.getElementById('specialty-field').hidden=!choices.length;specialty.required=!!choices.length;if(!choices.length)specialty.value='';document.getElementById('specialty-options').replaceChildren(...choices.map(value=>{const option=document.createElement('option');option.value=value;return option}))}`,
+    `const keywordExamples={Oficios:'herrero, herrería, rejas, portones, soldadura, estructuras metálicas',Profesionales:'arquitecto, arquitectura, planos, proyecto, reforma, vivienda',Tecnología:'páginas web, sitio web, diseño web, desarrollo web, tienda online',Servicios:'servicio, reparación, instalación, mantenimiento, atención a domicilio',Belleza:'peluquería, estética, uñas, maquillaje, cuidado personal',Hogar:'muebles, reparación, hogar, instalación, mantenimiento'};\n  function updateSpecialty(){const choices=examples[category.value]||[];document.getElementById('specialty-field').hidden=!choices.length;specialty.required=!!choices.length;if(!choices.length)specialty.value='';document.getElementById('specialty-options').replaceChildren(...choices.map(value=>{const option=document.createElement('option');option.value=value;return option}));const example=keywordExamples[category.value]||'producto, servicio, oficio, especialidad, necesidad que resolvés';keywordExample.innerHTML='<strong>Ejemplo:</strong> '+example;keywords.placeholder='Ej.: '+example}`
+  ]
+]);
+
+console.log('Mejora de búsqueda y palabras clave aplicada.');
