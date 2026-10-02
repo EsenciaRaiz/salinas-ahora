@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Aplicar cambios
+      - name: Aplicar y validar cambios de búsqueda
         run: node scripts/apply-keyword-search-improvement.mjs
       - name: Guardar cambios
         run: |
