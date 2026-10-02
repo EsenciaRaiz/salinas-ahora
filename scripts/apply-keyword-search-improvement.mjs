@@ -2,10 +2,10 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 // Aplica la mejora de forma idempotente para poder validarla en una rama antes de producción.
 async function patch(path, replacements) {
-  let text = await readFile(path, 'utf8');
+  let text = (await readFile(path, 'utf8')).replace(/\r\n/g, '\n');
   for (const [from, to] of replacements) {
     if (text.includes(to)) continue;
-    if (!text.includes(from)) throw new Error(`No se encontró el bloque esperado en ${path}`);
+    if (!text.includes(from)) throw new Error(`No se encontró el bloque esperado en ${path}: ${String(from).slice(0,80)}`);
     text = text.replace(from, to);
   }
   await writeFile(path, text);
