@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Archivo, Fraunces } from 'next/font/google';
 import './globals.css';
+import './hero-ads.css';
 
 const archivo = Archivo({ variable: '--font-sans', subsets: ['latin'] });
 const fraunces = Fraunces({ variable: '--font-editorial', subsets: ['latin'] });
