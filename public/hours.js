@@ -1,6 +1,6 @@
 // Shared by the registration form and the public guide.
 export function normalizeHours(value) {
-  const text = String(value || '').trim().toLowerCase();
+  const text = String(value || '').trim().toLowerCase().replace(/[\s,;]+$/g, '');
   if (!text) return '';
   if (/^(cerrado|cerrada)$/.test(text)) return 'Cerrado';
   if (/^(a consultar|consultar|horario a consultar|sin horario)$/.test(text)) return 'Horario a consultar';
