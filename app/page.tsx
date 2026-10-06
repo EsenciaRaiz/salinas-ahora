@@ -186,6 +186,7 @@ export default function Home() {
   const [businesses, setBusinesses] = useState<Business[]>(() => cachedData?.negocios.filter((business) => !demonstrationIds.has(business.id)) || []);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(() => cachedData?.publicidad || []);
   const [dataStatus, setDataStatus] = useState<'loading' | 'ready' | 'error'>(cachedData ? 'ready' : 'loading');
+  const [liveDataChecked, setLiveDataChecked] = useState(false);
   const [configuration, setConfiguration] = useState<Record<string, string | number>>(() => cachedData?.configuracion || {});
   const [isNight, setIsNight] = useState(() => { const hour = Math.floor(montevideoClock().minute / 60); return hour >= 20 || hour < 7; });
   const [clockTick, setClockTick] = useState(0);
@@ -219,7 +220,8 @@ export default function Home() {
     let lastRefresh = Date.now();
     const refreshLive = async () => {
       lastRefresh = Date.now();
-      try { apply(await fetchData(dataUrl)); } catch { if (!received && !controller.signal.aborted) setDataStatus('error'); }
+      try { apply(await fetchData(dataUrl)); } catch { if (!controller.signal.aborted && !received) setDataStatus('error'); }
+      finally { if (!controller.signal.aborted) setLiveDataChecked(true); }
     };
     void (async () => {
       if (!document.getElementById('initial-guide-data')) {
@@ -409,7 +411,7 @@ export default function Home() {
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
       <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
       <section className="profile-wrap" aria-live="polite">
-        {!profile ? <div className="profile-empty"><h1>{dataStatus === 'loading' ? 'Cargando ficha…' : 'No encontramos esta ficha'}</h1><p>{dataStatus === 'loading' ? 'Un momento, por favor.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
+        {!profile ? <div className="profile-empty"><h1>{!liveDataChecked ? 'Cargando ficha…' : dataStatus === 'error' ? 'No pudimos cargar la ficha' : 'No encontramos esta ficha'}</h1><p>{!liveDataChecked ? 'Un momento, por favor.' : dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
           <div className={`profile-card ${landscapeProfilePhoto ? 'profile-card-landscape' : ''}`}>
             <div className={`profile-gallery ${image?.endsWith('.svg') ? 'logo-gallery' : ''}`}>
               {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`} decoding="async" fetchPriority="high" width="1200" height="800" onLoad={(event) => setLandscapeProfilePhoto(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5)}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
