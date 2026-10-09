@@ -51,7 +51,8 @@ export function hasKnownHours(business: Hours, day: number): boolean {
 }
 
 export function hoursLabel(business: Hours, day: number): string {
-  return hoursForDay(business, day) || 'Horario a consultar';
+  const value = hoursForDay(business, day).trim();
+  return value && /[\p{L}\p{N}]/u.test(value) ? value : 'Horario a consultar';
 }
 
 export function isOpenNow(business: Hours, clock: Clock): boolean {

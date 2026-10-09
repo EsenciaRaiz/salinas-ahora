@@ -375,6 +375,7 @@ export default function Home() {
     const images = businessImages(business.imagen_url, 640);
     const open = isOpenNow(business, clock);
     const known = hasKnownHours(business, clock.day);
+    const hours = hoursLabel(business, clock.day);
     const phone = contactNumber(business.telefono);
     const whatsapp = contactNumber(business.whatsapp);
     const region = business.departamento || business.departamento_region || '';
@@ -386,7 +387,7 @@ export default function Home() {
       <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description}</p>
-      <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span><strong><Clock3 size={15} /> {businessHours(business)}</strong></div>
+      <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
         <a className="details" href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
