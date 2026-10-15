@@ -321,6 +321,7 @@ export default function Home() {
   const activeAdvertisements=useMemo(()=>advertisements.filter((ad)=>(ad.publicar === undefined || yes(ad.publicar)) && activeByDate({ fecha_inicio: ad.inicio || ad.fecha_inicio, fecha_fin: ad.fin || ad.fecha_fin })).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const adsAt=(placement:AdPlacement)=>activeAdvertisements.filter((ad)=>placementOf(ad)===placement);
   const renderAdvertisement=(ad:Advertisement)=>{
+    const imageUrl = ad.imagen_url || (ad.id === 'ADS002' ? '/esencia-raiz-aviso-editorial.webp' : '');
     const florProfile = ad.id === 'ADS005' ? businesses.find((business) => {
       const name = business.nombre.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
       const instagram = String(business.instagram || '').toLowerCase().replace(/\/$/, '');
@@ -328,8 +329,9 @@ export default function Home() {
     }) : undefined;
     const link = florProfile ? businessUrl(florProfile) : ad.enlace || '/?planes=1';
     const label = florProfile ? 'Ver ficha' : ad.id === 'ADS005' ? 'Ver Instagram' : ad.anunciante;
-    return <article className={`ad-card ${ad.imagen_url ? 'ad-card-media' : ''}`} data-ad-placement={placementOf(ad)} key={ad.id || ad.anunciante}>{ad.imagen_url && <img src={driveImage(ad.imagen_url,640)} alt={ad.titulo || ad.anunciante} loading="lazy" decoding="async" width="640" height="420" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={link} target="_blank" rel="noreferrer">{label} <ArrowRight size={15} /></a></div></article>;
+    return <article className={`ad-card ${imageUrl ? 'ad-card-media' : ''}`} data-ad-placement={placementOf(ad)} key={ad.id || ad.anunciante}>{imageUrl && <img src={driveImage(imageUrl,640)} alt={ad.titulo || ad.anunciante} loading="lazy" decoding="async" width="640" height="420" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={link} target="_blank" rel="noreferrer">{label} <ArrowRight size={15} /></a></div></article>;
   };
+  const sideAdvertisements = adsAt('side').slice(0, 3);
   const nightCount = businesses.filter((business) => activeByDate(business) && openInPeriod(business, clock, 'noche')).length;
   const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
   const currency = String(configuration.MONEDA || 'UYU');
@@ -485,7 +487,8 @@ export default function Home() {
           <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{guideVisible.length > 0 ? guideVisible.flatMap((business,index)=>index===0 ? [renderBusinessCard(business,index,false),...adsAt('between').map(renderAdvertisement)] : [renderBusinessCard(business,index,false)]) : visible.length>0 ? adsAt('between').map(renderAdvertisement) : null}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
 
           <aside className="ad-column" aria-label="Espacios patrocinados">
-            {adsAt('side').length > 0 ? adsAt('side').map(renderAdvertisement) : <div className="ad-card"><span>ESPACIO LOCAL</span><h3>Tu negocio puede estar acá</h3><p>Una presencia visible para vecinos que ya están buscando dónde comprar.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15} /></a></div>}
+            {sideAdvertisements.map(renderAdvertisement)}
+            {Array.from({ length: 3 - sideAdvertisements.length }, (_, index) => <article className="ad-card ad-card-placeholder" key={`side-slot-${index}`}><div className="ad-card-content"><span>ESPACIO DISPONIBLE</span><h3>Tu negocio puede estar acá</h3><p>Mostrá lo que ofrecés a quienes buscan en la zona.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15} /></a></div></article>)}
             <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>Ver negocios de noche <ArrowRight size={15} /></span></button>
           </aside>
         </div>
