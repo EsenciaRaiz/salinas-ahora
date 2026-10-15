@@ -494,7 +494,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="editorial" id="historias"><div><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2>Historias y curiosidades del lugar.</h2></div><p>Rincones, recuerdos y detalles para descubrir nuestra zona con otros ojos.</p><a href="/historias/">Descubrir historias <ArrowRight size={18} /></a>{adsAt('stories').length > 0 && <div className="story-ads" aria-label="Anuncios junto a historias">{adsAt('stories').map(renderAdvertisement)}</div>}</section>
+      <section className="editorial" id="historias" aria-labelledby="historias-title"><div className="editorial-copy"><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2 id="historias-title">Historias y curiosidades del lugar</h2><p>Rincones, recuerdos y detalles para descubrir nuestra zona con otros ojos.</p></div><a href="/historias/">Descubrir historias <ArrowRight size={18} /></a>{adsAt('stories').length > 0 && <div className="story-ads" aria-label="Anuncios junto a historias">{adsAt('stories').map(renderAdvertisement)}</div>}</section>
 
       <section className="events-teaser" aria-labelledby="events-teaser-title"><div><span className="section-kicker">CARTELERA LOCAL</span><h2 id="events-teaser-title">Qué pasa cerca</h2><p>Ferias, talleres y encuentros para descubrir en tu zona.</p></div><a href="/eventos/">Ver próximos eventos <ArrowRight size={18}/></a></section>
       <footer>

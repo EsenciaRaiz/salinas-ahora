@@ -394,6 +394,16 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .editorial{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto}
 @media(max-width:1100px){.editorial{grid-template-columns:1fr}.editorial p,.editorial a{grid-column:1}}
 
+/* Invitación a las historias con la misma escala compacta que la cartelera. */
+.editorial{max-width:1480px;margin:0 auto;padding:38px clamp(20px,5vw,72px);grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center}
+.editorial-copy{min-width:0}
+.editorial h2{max-width:850px;margin:7px 0 0;font-size:clamp(34px,3.8vw,50px);line-height:1.08;letter-spacing:-.035em}
+.editorial p{max-width:660px;margin:9px 0 0;color:#d7eaee;font-size:15px;line-height:1.45}
+.editorial>a{grid-column:2;display:inline-flex;align-items:center;gap:10px;width:max-content;padding:11px 15px;border:1px solid #b9d5dc;border-radius:5px;color:#fff;text-decoration:none;font-size:14px;transition:background .18s ease,border-color .18s ease}
+.editorial>a:hover,.editorial>a:focus-visible{background:#ffffff18;border-color:#fff}
+.editorial .story-ads{grid-column:1/-1}
+@media(max-width:700px){.editorial{grid-template-columns:1fr;gap:18px;padding-block:32px}.editorial h2{font-size:clamp(34px,8vw,42px)}.editorial>a{grid-column:1}}
+
 /* Hasta tres anuncios en una sola franja, sin desplazar la búsqueda. */
 .hero-ad-section{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:16px;padding-bottom:4px}
 .hero-ad-section .ad-card,.hero-ad-section .ad-card:not(.ad-card-media){min-height:160px;grid-template-columns:minmax(104px,34%) minmax(0,1fr)}
