@@ -538,3 +538,67 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
   .editorial-copy,.editorial>a,.editorial .story-ads{grid-column:1;grid-row:auto}
   .editorial .story-ads{margin-top:4px}
 }
+
+/* Densidad visual: se conserva la imagen de portada y la lectura cómoda. */
+.site-header{height:70px}
+.hero{min-height:455px}
+.hero-copy{padding-bottom:48px}
+.hero h1{font-size:clamp(58px,7vw,88px);margin:12px 0}
+.hero-copy p{margin-top:16px;line-height:1.45}
+.hero-status{bottom:36px;padding:16px 18px}
+.hero-status strong{font-size:19px}
+.hero-status small{margin-top:9px}
+.finder{padding-top:48px;padding-bottom:64px}
+.finder-form{margin-top:16px;padding:16px;gap:10px}
+.finder-form input,.finder-form select,.finder-form button{height:48px}
+.finder-heading p{margin-top:9px;font-size:16px}
+.finder-note{margin-bottom:14px}
+.proximity{margin-bottom:12px}
+.category-row{padding-bottom:9px}
+.featured-section{margin:22px 0 32px;padding:22px}
+.featured-heading{margin-bottom:16px}
+.business-grid,.featured-grid{gap:11px}
+.guide-layout{margin-top:16px}
+.business-card,.featured-business{column-gap:17px;padding-right:16px}
+.business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{min-height:180px}
+.business-card .card-category{margin-top:15px}
+.business-card h3{font-size:clamp(21px,2.2vw,26px)}
+.business-card.card-editorial h3{font-size:clamp(23px,2.3vw,28px)}
+.business-card .hours{margin-top:7px;padding-top:6px}
+.business-card .address{margin-top:4px}
+.business-card .card-actions{margin:8px 0 10px}
+.hero-ad-section{margin-top:12px}
+.editorial{padding-block:28px}
+.events-teaser{padding-block:30px}
+.placement-guide{padding-top:48px;padding-bottom:52px}
+.plans-page .pricing{padding-top:56px}
+.plans-page .pricing-intro{margin-bottom:30px}
+@media(max-width:900px){
+  .site-header{height:auto}
+  .hero{min-height:465px}
+}
+@media(max-width:700px){
+  .hero{min-height:420px}
+  .hero>img{object-position:center 48%}
+  .hero-copy{padding:0 22px 12px}
+  .hero h1{font-size:clamp(48px,13vw,62px);margin:8px 0}
+  .hero-copy p{margin-top:11px;font-size:15px;line-height:1.4}
+  .hero-status{margin:0 18px 28px;padding:12px 15px}
+  .hero-status strong{font-size:17px;margin-top:5px}
+  .hero-status small{margin-top:7px}
+  .hero-ad-section{margin-top:9px}
+  .hero-ad-section .ad-card,.hero-ad-section .ad-card.ad-card-media{height:118px;min-height:118px}
+  .finder{padding-top:32px;padding-bottom:42px}
+  .finder-form{padding:13px;gap:11px;margin-top:13px}
+  .featured-section{margin:18px -20px 24px;padding:18px 20px}
+  .business-card,.featured-business{padding:0 13px}
+  .business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{height:108px;min-height:108px;max-height:108px}
+  .business-card .card-category,.featured-business .card-category{margin-top:4px}
+  .business-card h3{font-size:21px}
+  .business-card.card-editorial h3{font-size:22px}
+  .business-card p{font-size:13px}
+  .business-card .card-actions a{min-height:38px;font-size:12px}
+  .editorial{padding-block:24px}
+  .events-teaser{padding-block:24px}
+  .placement-guide{padding-top:34px;padding-bottom:38px}
+}
