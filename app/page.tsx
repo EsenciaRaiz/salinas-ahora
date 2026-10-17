@@ -81,7 +81,7 @@ function AdRotator({ ads, label, renderAd }: { ads: Advertisement[]; label: stri
     return () => window.clearInterval(timer);
   }, [ads.length, paused]);
   return <div className="ad-rotation" aria-label={label} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setPaused(false); }}>
-    {ads.length > 0 ? renderAd(ads[current % ads.length]) : <article className="ad-card ad-card-placeholder"><div className="ad-card-content"><span>ESPACIO PUBLICITARIO</span><h3>Tu negocio puede estar acá</h3><p>Mostrá lo que ofrecés a quienes buscan en la zona.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15}/></a></div></article>}
+    {ads.length > 0 ? renderAd(ads[current % ads.length]) : <article className="ad-card ad-card-placeholder"><div className="ad-card-content"><span>ESPACIO PUBLICITARIO DISPONIBLE</span><h3>Tu negocio puede estar acá</h3><p>Mostrá lo que ofrecés a quienes buscan en la zona.</p><a href="/?planes=1">Consultar este espacio <ArrowRight size={15}/></a></div></article>}
     {ads.length > 1 && <div className="ad-rotation-controls" aria-label="Elegir anuncio">{ads.map((ad, index) => <button key={ad.id || index} type="button" aria-label={`Ver anuncio ${index + 1} de ${ads.length}`} aria-current={index === current % ads.length ? 'true' : undefined} onClick={() => setCurrent(index)} />)}</div>}
   </div>;
 }
