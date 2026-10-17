@@ -86,6 +86,12 @@ function AdRotator({ ads, label, renderAd }: { ads: Advertisement[]; label: stri
   </div>;
 }
 
+function AvailableAd({ placement }: { placement: 'side' | 'stories' }) {
+  return <article className={`ad-card ad-card-placeholder available-ad available-ad-${placement}`}>
+    <div className="ad-card-content"><span>ESPACIO PUBLICITARIO DISPONIBLE</span><h3>Tu negocio puede estar acá</h3><p>{placement === 'side' ? 'Mostrá tu marca junto a los negocios de la guía.' : 'Acompañá las historias de nuestra zona con tu marca.'}</p><a href="/?planes=1">Consultar este espacio <ArrowRight size={15}/></a></div>
+  </article>;
+}
+
 const dataUrl = 'https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
 const submissionsEndpoint = 'https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
 const businessFormUrl = '/publicar/';
@@ -335,6 +341,11 @@ export default function Home() {
   const guideVisible=[...featuredVisible,...basicVisible];
   const activeAdvertisements=useMemo(()=>advertisements.filter((ad)=>(ad.publicar === undefined || yes(ad.publicar)) && activeByDate({ fecha_inicio: ad.inicio || ad.fecha_inicio, fecha_fin: ad.fin || ad.fecha_fin })).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const adsAt=(placement:AdPlacement)=>activeAdvertisements.filter((ad)=>placementOf(ad)===placement);
+  const apexAd=activeAdvertisements.find((ad)=>`${ad.id} ${ad.anunciante} ${ad.titulo}`.toLowerCase().includes('apexmind'));
+  const coverAds=adsAt('cover').sort((a,b)=>Number(b===apexAd)-Number(a===apexAd));
+  const sideAds=apexAd && !adsAt('side').some((ad)=>ad.id===apexAd.id || `${ad.anunciante} ${ad.titulo}`.toLowerCase().includes('apexmind'))
+    ? [{...apexAd,id:`${apexAd.id}-side`,ubicacion:'Lateral guía'},...adsAt('side')]
+    : adsAt('side').sort((a,b)=>Number(`${b.anunciante} ${b.titulo}`.toLowerCase().includes('apexmind'))-Number(`${a.anunciante} ${a.titulo}`.toLowerCase().includes('apexmind')));
   const renderAdvertisement=(ad:Advertisement)=>{
     const imageUrl = ad.imagen_url || (ad.id === 'ADS002' ? '/esencia-raiz-aviso-editorial.webp' : '');
     const florProfile = ad.id === 'ADS005' ? businesses.find((business) => {
@@ -472,7 +483,7 @@ export default function Home() {
         <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
         <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares con horario nocturno` : 'Descubrí lo mejor de tu zona'}</strong><small>{isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora'} <ArrowRight size={14} /></small></button>
       </section>
-      <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={adsAt('cover')} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
+      <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={coverAds} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
         <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
@@ -495,16 +506,17 @@ export default function Home() {
         {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><div className="featured-grid">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
 
         <div className="guide-layout">
-          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{guideVisible.length > 0 ? guideVisible.flatMap((business,index)=>[renderBusinessCard(business,index,false),...(index===0 ? adsAt('between').map(renderAdvertisement) : []),...(index===1 ? [<div className="mobile-side-ad" key="mobile-side-ad"><AdRotator ads={adsAt('side')} label="Publicidad junto al listado" renderAd={renderAdvertisement}/></div>] : [])]) : visible.length>0 ? adsAt('between').map(renderAdvertisement) : null}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
+          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{guideVisible.length > 0 ? guideVisible.flatMap((business,index)=>[renderBusinessCard(business,index,false),...(index===0 ? adsAt('between').map(renderAdvertisement) : []),...(index===1 ? [<div className="mobile-side-ad" key="mobile-side-ad"><AdRotator ads={sideAds} label="Publicidad junto al listado" renderAd={renderAdvertisement}/><div className="mobile-available-ads"><AvailableAd placement="side"/><AvailableAd placement="side"/></div></div>] : [])]) : visible.length>0 ? adsAt('between').map(renderAdvertisement) : null}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
 
           <aside className="ad-column" aria-label="Publicidad lateral">
-            <AdRotator ads={adsAt('side')} label="Publicidad lateral" renderAd={renderAdvertisement}/>
+            <AdRotator ads={sideAds} label="Publicidad lateral" renderAd={renderAdvertisement}/>
+            <div className="available-side-ads" aria-label="Dos espacios publicitarios disponibles"><AvailableAd placement="side"/><AvailableAd placement="side"/></div>
             <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>Ver negocios de noche <ArrowRight size={15} /></span></button>
           </aside>
         </div>
       </section>
 
-      <section className="editorial" id="historias" aria-labelledby="historias-title"><div className="editorial-copy"><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2 id="historias-title">Historias y curiosidades del lugar</h2><p>Rincones, recuerdos y detalles para descubrir nuestra zona con otros ojos.</p></div><a href="/historias/">Descubrir historias <ArrowRight size={18} /></a>{adsAt('stories').length > 0 && <div className="story-ads" aria-label="Anuncios junto a historias">{adsAt('stories').map(renderAdvertisement)}</div>}</section>
+      <section className="editorial" id="historias" aria-labelledby="historias-title"><div className="editorial-copy"><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2 id="historias-title">Historias y curiosidades del lugar</h2><p>Rincones, recuerdos y detalles para descubrir nuestra zona con otros ojos.</p></div><a href="/historias/">Descubrir historias <ArrowRight size={18} /></a><div className="story-ads" aria-label="Anuncios junto a historias">{adsAt('stories').length ? <AdRotator ads={adsAt('stories')} label="Publicidad junto a historias" renderAd={renderAdvertisement}/> : <AvailableAd placement="stories"/>}</div></section>
 
       <section className="events-teaser" aria-labelledby="events-teaser-title"><div><span className="section-kicker">CARTELERA LOCAL</span><h2 id="events-teaser-title">Qué pasa cerca</h2><p>Ferias, talleres y encuentros para descubrir en tu zona.</p></div><a href="/eventos/">Ver próximos eventos <ArrowRight size={18}/></a></section>
       <footer>

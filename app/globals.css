@@ -512,3 +512,29 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
   .plans-page .pricing h1{font-size:clamp(36px,9vw,44px)}
   .profile-content h1{font-size:clamp(33px,9vw,40px)}
 }
+/* Dos muestras de contratación visibles, sin crear anuncios activos ficticios. */
+.available-side-ads{display:grid;gap:10px}
+.available-ad{min-height:0;background:#fff;border:1px dashed #b7c9cf;color:var(--ink)}
+.available-ad .ad-card-content{padding:13px 15px}
+.available-ad .ad-card-content>span{font-size:9px;letter-spacing:.1em;color:var(--ocean)}
+.available-ad h3{margin:6px 0 4px;font-size:20px;line-height:1.05}
+.available-ad p{margin:0;font-size:11px;line-height:1.35}
+.available-ad a{margin-top:8px;color:var(--ocean);font-size:11px}
+.ad-column .available-side-ads .ad-card{height:auto;min-height:0}
+.mobile-available-ads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px}
+.mobile-available-ads .available-ad h3{font-size:17px}
+.mobile-available-ads .available-ad p{display:none}
+.mobile-available-ads .available-ad a{font-size:10px}
+.editorial{grid-template-columns:minmax(0,1fr) minmax(255px,340px);align-items:center;gap:12px 30px}
+.editorial-copy{grid-column:1;grid-row:1}
+.editorial>a{grid-column:1;grid-row:2;justify-self:start}
+.editorial .story-ads{grid-column:2;grid-row:1/3;grid-template-columns:1fr;min-width:0}
+.story-ads .ad-card{border-top:3px solid var(--sun)}
+.story-ads .available-ad .ad-card-content{padding:18px 20px}
+.story-ads .available-ad h3{font-size:23px}
+.story-ads .available-ad p{font-size:12px}
+@media(max-width:800px){
+  .editorial{grid-template-columns:1fr}
+  .editorial-copy,.editorial>a,.editorial .story-ads{grid-column:1;grid-row:auto}
+  .editorial .story-ads{margin-top:4px}
+}
