@@ -602,3 +602,24 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
   .events-teaser{padding-block:24px}
   .placement-guide{padding-top:34px;padding-bottom:38px}
 }
+
+/* Fichas más densas: el contenido, no una fila flexible, define la altura. */
+.business-card,.featured-business{grid-template-rows:repeat(7,auto)}
+.business-card .card-top{height:17px}
+.business-card .sponsored{margin-top:7px}
+.business-card .card-category,.featured-business .card-category{margin-top:4px}
+.business-card h3{margin:2px 0 3px;font-size:clamp(20px,2vw,24px);line-height:1.05}
+.business-card.card-editorial h3{font-size:clamp(21px,2.1vw,26px)}
+.business-card p{line-height:1.32}
+.business-card .hours{margin-top:6px;padding-top:5px}
+.business-card .address{margin-top:3px}
+.business-card .card-actions{align-self:start;margin:7px 0 9px}
+.featured-heading h2,.guide-subheading h2{font-size:clamp(29px,3vw,40px)}
+@media(max-width:700px){
+  .business-card,.featured-business{grid-template-rows:repeat(7,auto)}
+  .business-card .card-top{height:17px}
+  .business-card h3{font-size:20px}
+  .business-card.card-editorial h3{font-size:21px}
+  .business-card .card-actions{margin:7px 0 10px}
+  .featured-heading h2,.guide-subheading h2{font-size:clamp(28px,7.5vw,34px)}
+}
