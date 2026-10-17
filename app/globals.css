@@ -623,3 +623,10 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
   .business-card .card-actions{margin:7px 0 10px}
   .featured-heading h2,.guide-subheading h2{font-size:clamp(28px,7.5vw,34px)}
 }
+
+/* En celular, los filtros aparecen cuando comienza una búsqueda. */
+@media(max-width:620px){
+  .finder-form.mobile-search-idle{margin-bottom:20px}
+  .finder-form.mobile-search-idle>label:not(:first-child),
+  .finder-form.mobile-search-idle>button{display:none}
+}
