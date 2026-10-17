@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowRight, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
 import BusinessMap from './business-map';
 import BusinessCardPhoto from './business-card-photo';
@@ -70,6 +70,21 @@ type PublicData = {
   publicidad: Advertisement[];
   configuracion: Record<string, string | number>;
 };
+
+function AdRotator({ ads, label, renderAd }: { ads: Advertisement[]; label: string; renderAd: (ad: Advertisement) => ReactNode }) {
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  useEffect(() => { setCurrent(0); }, [ads.map((ad) => ad.id).join('|')]);
+  useEffect(() => {
+    if (ads.length < 2 || paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => { if (!document.hidden) setCurrent((index) => (index + 1) % ads.length); }, 10_000);
+    return () => window.clearInterval(timer);
+  }, [ads.length, paused]);
+  return <div className="ad-rotation" aria-label={label} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setPaused(false); }}>
+    {ads.length > 0 ? renderAd(ads[current % ads.length]) : <article className="ad-card ad-card-placeholder"><div className="ad-card-content"><span>ESPACIO PUBLICITARIO</span><h3>Tu negocio puede estar acá</h3><p>Mostrá lo que ofrecés a quienes buscan en la zona.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15}/></a></div></article>}
+    {ads.length > 1 && <div className="ad-rotation-controls" aria-label="Elegir anuncio">{ads.map((ad, index) => <button key={ad.id || index} type="button" aria-label={`Ver anuncio ${index + 1} de ${ads.length}`} aria-current={index === current % ads.length ? 'true' : undefined} onClick={() => setCurrent(index)} />)}</div>}
+  </div>;
+}
 
 const dataUrl = 'https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
 const submissionsEndpoint = 'https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
@@ -142,9 +157,9 @@ function businessMapLink(business: Business) {
     return url.toString();
   } catch { return ''; }
 }
-function activeByDate(item:{fecha_inicio?:string;fecha_fin?:string}) { const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Montevideo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()); const part=(type:string)=>parts.find((entry)=>entry.type===type)?.value||'00'; const today=`${part('year')}-${part('month')}-${part('day')}`; const start=String(item.fecha_inicio||'').slice(0,10), end=String(item.fecha_fin||'').slice(0,10); return (!start||start<=today)&&(!end||end>=today); }
+function activeByDate(item:{fecha_inicio?:string;fecha_fin?:string}, honorEnd=true) { const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Montevideo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()); const part=(type:string)=>parts.find((entry)=>entry.type===type)?.value||'00'; const today=`${part('year')}-${part('month')}-${part('day')}`; const start=String(item.fecha_inicio||'').slice(0,10), end=String(item.fecha_fin||'').slice(0,10); return (!start||start<=today)&&(!honorEnd||!end||end>=today); }
 function orderOf(item:{orden?:string|number}) { const value=Number(item.orden); return Number.isFinite(value)&&value>0?value:9999; }
-function featuredBusiness(business:Business) { return yes(business.destacado)||String(business.plan||'').toLowerCase().includes('destac'); }
+function featuredBusiness(business:Business) { return activeByDate(business) && (yes(business.destacado)||String(business.plan||'').toLowerCase().includes('destac')); }
 type AdPlacement = 'cover' | 'side' | 'between' | 'stories' | 'footer';
 function placementOf(ad: Advertisement): AdPlacement {
   const name = String(ad.ubicacion || '').toLocaleLowerCase('es-UY').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -257,7 +272,7 @@ export default function Home() {
   }, []);
 
   const matchingBusiness = (business: Business, options: { time?: boolean; category?: boolean; department?: boolean; locality?: boolean; specialty?: boolean } = {}) => {
-    if (!activeByDate(business)) return false;
+    if (!activeByDate(business, false)) return false;
     const normalized = query.trim().toLocaleLowerCase('es-UY');
     const region = business.departamento || business.departamento_region || '';
     return (!options.time || filter === 'todos' || (filter === 'ahora' ? isOpenNow(business, clock) : openInPeriod(business, clock, filter)))
@@ -267,7 +282,7 @@ export default function Home() {
       && (!options.locality || !locality || (String(business.zona || '').trim().toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY') || (!!department && servesDepartment(business, department))))
       && businessMatchesQuery(business, query, region);
   };
-  const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business)), [businesses,profileId]);
+  const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business, false)), [businesses,profileId]);
   useEffect(() => {
     if (!profile) return;
     const oldTitle = document.title;
@@ -331,14 +346,10 @@ export default function Home() {
     const label = florProfile ? 'Ver ficha' : ad.id === 'ADS005' ? 'Ver Instagram' : ad.anunciante;
     return <article className={`ad-card ${imageUrl ? 'ad-card-media' : ''}`} data-ad-placement={placementOf(ad)} key={ad.id || ad.anunciante}>{imageUrl && <img src={driveImage(imageUrl,640)} alt={ad.titulo || ad.anunciante} loading="lazy" decoding="async" width="640" height="420" />}<div className="ad-card-content"><span>PUBLICACIÓN PATROCINADA</span><h3>{ad.titulo}</h3><p>{ad.texto}</p><a href={link} target="_blank" rel="noreferrer">{label} <ArrowRight size={15} /></a></div></article>;
   };
-  const sideAdvertisements = adsAt('side').slice(0, 3);
-  const nightCount = businesses.filter((business) => activeByDate(business) && openInPeriod(business, clock, 'noche')).length;
+  const nightCount = businesses.filter((business) => activeByDate(business, false) && openInPeriod(business, clock, 'noche')).length;
   const email = String(configuration.EMAIL_PUBLICAR || 'contacto@vitrinacerca.com');
   const currency = String(configuration.MONEDA || 'UYU');
-  const basicPrice = String(configuration.PRECIO_BASICA || 190);
-  const launchPrice = String(configuration.PRECIO_LANZAMIENTO_BASICA || 99);
   const trialDays = String(configuration.DIAS_PRUEBA || 60);
-  const launchMonths = String(configuration.MESES_LANZAMIENTO || 6);
   const featuredPrice = String(configuration.PRECIO_DESTACADA || 490);
   const footerText = String(configuration.TEXTO_PIE || 'Guía independiente de comercios, servicios e historias locales.');
   const premiumPrice=String(configuration.PRECIO_PREMIUM||990);
@@ -442,8 +453,8 @@ export default function Home() {
 
   if (showPlans) return <main className={isNight ? 'night-mode plans-page' : 'day-mode plans-page'}>
     <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/">Volver a la guía</a></header>
-    <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>{String(configuration.SUBTITULO_PLANES||'Elegí la presencia que mejor acompañe a tu negocio.')}</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA BÁSICA</span><h3>{currency} {launchPrice} <small>/ mes</small></h3><p><strong>Precio de lanzamiento</strong></p><p>{trialDays} días gratis desde la publicación. Después, {launchPrice} pesos uruguayos por mes durante los primeros {launchMonths} meses pagos. Luego, {currency} {basicPrice} por mes.</p><p>Sin cobro ni renovación automática. Antes de finalizar la prueba, elegís si querés continuar.</p><p>{basicDetail}</p><a href={businessFormUrl}>Completar ficha</a></article><article className="featured-plan"><span><Sparkles size={15}/> DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Consultar premium</a></article></div></section>
-    <section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran posibles ubicaciones. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current">La disponibilidad, duración y precio de cada ubicación se confirman antes de contratar. Ninguna ubicación se incluye automáticamente en la ficha básica o destacada.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.'},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.'},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.'},{key:'stories',title:'Historias',description:'Junto a los relatos locales.'},{key:'footer',title:'Pie de página',description:'Al final del sitio.'}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className="placement-planned">Consultar disponibilidad</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. Publicar una ficha básica o destacada no reserva por sí solo uno de estos espacios.</p></section>
+    <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>Tu ficha en el listado es gratuita. Si querés más visibilidad, podés elegir una publicidad paga.</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA EN LA GUÍA</span><h3>Gratis</h3><p><strong>Registrarte y aparecer en el listado no tiene costo ni fecha de vencimiento.</strong></p><p>{basicDetail}</p><p>Revisamos los datos antes de publicar. Podés solicitar correcciones.</p><a href={businessFormUrl}>Completar ficha gratis</a></article><article className="featured-plan"><span><Sparkles size={15}/> PUBLICIDAD DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail} Es una opción publicitaria; tu ficha en el listado sigue siendo gratuita.</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PUBLICIDAD PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Consultar premium</a></article></div><p className="pricing-trial">Para las publicidades, podés consultar por la prueba gratuita de {trialDays} días desde su publicación. Antes de cualquier etapa paga confirmamos ubicación, duración, precio y medio de pago; no hay cobro ni renovación automática.</p></section>
+    <section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran posibles ubicaciones. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current">La ficha en el listado es gratuita. La disponibilidad, duración y precio de cada espacio publicitario se confirman antes de contratar.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.'},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.'},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.'},{key:'stories',title:'Historias',description:'Junto a los relatos locales.'},{key:'footer',title:'Pie de página',description:'Al final del sitio.'}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className="placement-planned">Consultar disponibilidad</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. La ficha gratuita no reserva un espacio publicitario.</p></section>
       <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a><a className="footer-privacy" href="/terminos-de-uso/">Términos de uso</a><a className="footer-privacy" href="/autorizacion-de-publicacion/">Autorización de publicación</a><a className="footer-privacy" href="/reglas-de-publicacion/">Reglas de publicación</a></div></footer>
   </main>;
 
@@ -461,7 +472,7 @@ export default function Home() {
         <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
         <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} lugares con horario nocturno` : 'Descubrí lo mejor de tu zona'}</strong><small>{isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora'} <ArrowRight size={14} /></small></button>
       </section>
-      {adsAt('cover').length > 0 && <section className="hero-ad-section" aria-label="Anuncios de portada">{adsAt('cover').slice(0,3).map(renderAdvertisement)}</section>}
+      <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={adsAt('cover')} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
         <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
@@ -484,11 +495,10 @@ export default function Home() {
         {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><div className="featured-grid">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
 
         <div className="guide-layout">
-          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{guideVisible.length > 0 ? guideVisible.flatMap((business,index)=>index===0 ? [renderBusinessCard(business,index,false),...adsAt('between').map(renderAdvertisement)] : [renderBusinessCard(business,index,false)]) : visible.length>0 ? adsAt('between').map(renderAdvertisement) : null}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
+          <div><div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Todos los negocios</h2></div><div className="business-grid">{guideVisible.length > 0 ? guideVisible.flatMap((business,index)=>[renderBusinessCard(business,index,false),...(index===0 ? adsAt('between').map(renderAdvertisement) : []),...(index===1 ? [<div className="mobile-side-ad" key="mobile-side-ad"><AdRotator ads={adsAt('side')} label="Publicidad junto al listado" renderAd={renderAdvertisement}/></div>] : [])]) : visible.length>0 ? adsAt('between').map(renderAdvertisement) : null}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
 
-          <aside className="ad-column" aria-label="Espacios patrocinados">
-            {sideAdvertisements.map(renderAdvertisement)}
-            {Array.from({ length: 3 - sideAdvertisements.length }, (_, index) => <article className="ad-card ad-card-placeholder" key={`side-slot-${index}`}><div className="ad-card-content"><span>ESPACIO DISPONIBLE</span><h3>Tu negocio puede estar acá</h3><p>Mostrá lo que ofrecés a quienes buscan en la zona.</p><a href="/?planes=1">Conocer opciones <ArrowRight size={15} /></a></div></article>)}
+          <aside className="ad-column" aria-label="Publicidad lateral">
+            <AdRotator ads={adsAt('side')} label="Publicidad lateral" renderAd={renderAdvertisement}/>
             <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>Ver negocios de noche <ArrowRight size={15} /></span></button>
           </aside>
         </div>
@@ -498,7 +508,7 @@ export default function Home() {
 
       <section className="events-teaser" aria-labelledby="events-teaser-title"><div><span className="section-kicker">CARTELERA LOCAL</span><h2 id="events-teaser-title">Qué pasa cerca</h2><p>Ferias, talleres y encuentros para descubrir en tu zona.</p></div><a href="/eventos/">Ver próximos eventos <ArrowRight size={18}/></a></section>
       <footer>
-        {adsAt('footer').length > 0 && <div className="footer-ads" aria-label="Anuncios del pie de página">{adsAt('footer').map(renderAdvertisement)}</div>}
+        <div className="footer-ads" aria-label="Publicidad antes del pie de página"><AdRotator ads={adsAt('footer')} label="Publicidad antes del pie de página" renderAd={renderAdvertisement}/></div>
         <div className="footer-main">
           <a className="brand footer-brand" href="/" aria-label="Vitrina Cerca, inicio"><span>VITRINA</span><strong>CERCA</strong></a>
           <p>{footerText}</p>

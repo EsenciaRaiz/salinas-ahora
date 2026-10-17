@@ -415,3 +415,77 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .hero-ad-section .ad-card a{margin-top:8px;padding:7px 11px;font-size:12px}
 @media(max-width:1120px){.hero-ad-section{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(310px,min(86vw,430px));grid-template-columns:none;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:thin}.hero-ad-section .ad-card{scroll-snap-align:start}}
 @media(max-width:760px){.hero-ad-section .ad-card{grid-template-columns:minmax(105px,34%) minmax(0,1fr)}.hero-ad-section .ad-card img{height:100%;max-height:154px}.hero-ad-section .ad-card p{display:none}.hero-ad-section .ad-card h3{font-size:22px}.hero-ad-section .ad-card-content{padding:11px 12px}}
+
+/* Un anuncio por ubicación, rotación estable y tarjetas proporcionadas. */
+.ad-rotation{min-width:0;width:100%}
+.ad-rotation>.ad-card{width:100%;min-width:0;min-height:0;margin:0;border:1px solid #d8ddd9;border-top:3px solid var(--sun);background:#fff;box-shadow:0 8px 24px rgba(16,42,67,.07)}
+.ad-rotation .ad-card-content{min-width:0;padding:16px 18px}
+.ad-rotation .ad-card-content>span{color:var(--ocean);font-size:10px;letter-spacing:.13em}
+.ad-rotation .ad-card h3{margin:7px 0 5px;font-size:clamp(21px,2vw,27px);line-height:1.08}
+.ad-rotation .ad-card p{margin:0;color:#43576a;font-size:13px;line-height:1.4}
+.ad-rotation .ad-card a{margin-top:11px;color:var(--ocean);font-size:13px;text-decoration:none}
+.ad-rotation .ad-card a:hover{text-decoration:underline}
+.ad-rotation-controls{display:flex;justify-content:center;gap:7px;min-height:24px;padding:8px 0 3px}
+.ad-rotation-controls button{width:17px;height:17px;padding:0;border:0;border-radius:50%;background:#aab8be;cursor:pointer;box-shadow:inset 0 0 0 5px #f7f5ef}
+.ad-rotation-controls button[aria-current="true"]{background:var(--ocean);box-shadow:inset 0 0 0 3px #f7f5ef,0 0 0 1px var(--ocean)}
+.ad-rotation-controls button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.hero-ad-section{display:block;width:min(1380px,calc(100% - 40px));max-width:none;margin:16px auto 0;padding:0;overflow:visible}
+.hero-ad-section .ad-card,.hero-ad-section .ad-card:not(.ad-card-media){display:grid;grid-template-columns:minmax(0,30%) minmax(0,1fr);min-height:145px;height:145px}
+.hero-ad-section .ad-card:not(.ad-card-media){grid-template-columns:1fr}
+.hero-ad-section .ad-card img{width:100%;height:100%;max-height:none;min-height:0;object-fit:cover}
+.hero-ad-section .ad-card-content{padding:15px 20px}
+.hero-ad-section .ad-card h3{font-size:clamp(22px,2.2vw,29px)}
+.hero-ad-section .ad-card p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.hero-ad-section .ad-card a{display:inline-flex;width:max-content;max-width:100%;margin-top:9px;padding:6px 11px;border-radius:4px;background:var(--ocean);color:#fff;font-size:12px}
+.hero-ad-section .ad-card:not(.ad-card-media)::before{content:none}
+.hero-ad-section+.finder .finder-form{margin-top:16px}
+.guide-layout{grid-template-columns:minmax(0,1fr) minmax(235px,280px);gap:22px;align-items:start}
+.ad-column{position:sticky;top:18px;display:flex;flex-direction:column;gap:14px;overflow:visible}
+.ad-column>.ad-rotation{min-width:0}
+.ad-column .ad-card{display:block;height:auto;min-height:0}
+.ad-column .ad-card-media img{width:100%;height:135px;object-fit:cover}
+.ad-column .ad-card-content{padding:15px}
+.ad-column .ad-card h3{font-size:23px}
+.ad-column .ad-card p{font-size:12px}
+.ad-column .night-note{height:auto;min-height:0;flex:none;padding:16px}
+.ad-column .night-note strong{margin-top:6px;font-size:22px}
+.ad-column .night-note p{margin:8px 0;font-size:12px}
+.mobile-side-ad{display:none}
+.footer-ads{display:block;padding:22px clamp(20px,5vw,72px);border-bottom:1px solid #ffffff30}
+.footer-ads .ad-rotation{max-width:1380px;margin:auto}
+.footer-ads .ad-card,.footer-ads .ad-card.ad-card-media{display:grid;grid-template-columns:minmax(0,25%) minmax(0,1fr);min-height:130px;height:130px}
+.footer-ads .ad-card:not(.ad-card-media){grid-template-columns:1fr}
+.footer-ads .ad-card img{width:100%;height:100%;object-fit:cover}
+.footer-ads .ad-card-content{padding:14px 18px}
+.footer-ads .ad-card h3{font-size:23px}
+.footer-ads .ad-card p{font-size:12px}
+.footer-ads .ad-rotation-controls button{box-shadow:inset 0 0 0 5px #0b2032}
+.footer-ads .ad-rotation-controls button[aria-current="true"]{box-shadow:inset 0 0 0 3px #0b2032,0 0 0 1px #fff;background:var(--sun)}
+.pricing-trial{max-width:800px;margin:22px 0 0;color:#40586d;line-height:1.5}
+@media(max-width:1000px){.guide-layout{grid-template-columns:1fr}.ad-column{position:static;display:none}.mobile-side-ad{display:block}.mobile-side-ad .ad-card{display:grid;grid-template-columns:minmax(0,28%) minmax(0,1fr);height:145px}.mobile-side-ad .ad-card:not(.ad-card-media){grid-template-columns:1fr}.mobile-side-ad .ad-card img{width:100%;height:100%;object-fit:cover}}
+@media(max-width:700px){
+  .hero-ad-section{width:calc(100% - 28px);margin-top:12px}
+  .hero-ad-section .ad-card,.hero-ad-section .ad-card.ad-card-media{grid-template-columns:minmax(0,33%) minmax(0,1fr);height:132px;min-height:132px}
+  .hero-ad-section .ad-card:not(.ad-card-media){grid-template-columns:1fr}
+  .hero-ad-section .ad-card-content{padding:11px 13px}
+  .hero-ad-section .ad-card h3{font-size:20px}
+  .hero-ad-section .ad-card p{display:none}
+  .hero-ad-section .ad-card a{margin-top:7px;padding:5px 8px;font-size:11px}
+  .business-card,.featured-business{min-height:0;padding:0 13px}
+  .business-card .business-photo-frame,.business-card .business-photo-placeholder,.featured-business .business-photo-frame{width:calc(100% + 26px);height:125px;min-height:125px;max-height:125px;margin:0 -13px}
+  .business-card .card-category,.featured-business .card-category{margin-top:4px}
+  .business-card h3{font-size:23px}
+  .business-card p{-webkit-line-clamp:2;font-size:12px}
+  .business-card .hours{margin-top:9px;padding-top:7px}
+  .business-card .card-actions{gap:5px;margin:9px 0 11px}
+  .business-card .card-actions a{font-size:11px;min-height:33px;padding:5px 7px}
+  .mobile-side-ad .ad-card,.mobile-side-ad .ad-card.ad-card-media{grid-template-columns:minmax(0,31%) minmax(0,1fr);height:140px}
+  .mobile-side-ad .ad-card:not(.ad-card-media){grid-template-columns:1fr}
+  .mobile-side-ad .ad-card-content{padding:11px 13px}
+  .mobile-side-ad .ad-card h3{font-size:20px}
+  .mobile-side-ad .ad-card p{display:none}
+  .footer-ads .ad-card,.footer-ads .ad-card.ad-card-media{grid-template-columns:minmax(0,30%) minmax(0,1fr);height:130px}
+  .footer-ads .ad-card:not(.ad-card-media){grid-template-columns:1fr}
+  .footer-ads .ad-card p{display:none}
+  .footer-ads .ad-card h3{font-size:19px}
+}
