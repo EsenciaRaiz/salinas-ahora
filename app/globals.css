@@ -461,7 +461,7 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
 .footer-ads .ad-card p{font-size:12px}
 .footer-ads .ad-rotation-controls button{box-shadow:inset 0 0 0 5px #0b2032}
 .footer-ads .ad-rotation-controls button[aria-current="true"]{box-shadow:inset 0 0 0 3px #0b2032,0 0 0 1px #fff;background:var(--sun)}
-.pricing-trial{max-width:800px;margin:22px 0 0;color:#40586d;line-height:1.5}
+.pricing-note{max-width:800px;margin:22px 0 0;color:#40586d;line-height:1.5}
 @media(max-width:1000px){.guide-layout{grid-template-columns:1fr}.ad-column{position:static;display:none}.mobile-side-ad{display:block}.mobile-side-ad .ad-card{display:grid;grid-template-columns:minmax(0,28%) minmax(0,1fr);height:145px}.mobile-side-ad .ad-card:not(.ad-card-media){grid-template-columns:1fr}.mobile-side-ad .ad-card img{width:100%;height:100%;object-fit:cover}}
 @media(max-width:700px){
   .hero-ad-section{width:calc(100% - 28px);margin-top:12px}
