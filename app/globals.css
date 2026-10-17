@@ -583,7 +583,7 @@ a.footer-credit-brand:hover,a.footer-credit-brand:focus-visible{color:var(--sun)
   .hero-copy{padding:0 22px 12px}
   .hero h1{font-size:clamp(48px,13vw,62px);margin:8px 0}
   .hero-copy p{margin-top:11px;font-size:15px;line-height:1.4}
-  .hero-status{margin:0 18px 28px;padding:12px 15px}
+  .hero-status{right:auto;bottom:auto;margin:0 18px 28px;padding:12px 15px}
   .hero-status strong{font-size:17px;margin-top:5px}
   .hero-status small{margin-top:7px}
   .hero-ad-section{margin-top:9px}
