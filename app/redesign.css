@@ -115,3 +115,6 @@
 
 .homepage-redesign .only-featured-results { display:block; }
 .homepage-redesign .only-featured-results .ad-column { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); }
+
+.homepage-redesign .finder-form button { background:var(--coral); }
+.homepage-redesign .finder-form button:hover { background:#d95648; }
