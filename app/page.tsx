@@ -452,13 +452,13 @@ export default function Home() {
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
-        {saveButton(business)}
         <a className={`details ${!whatsapp && !phone && !site ? 'primary-action' : ''}`} href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
         {whatsapp.length >= 8 && <a className="details whatsapp-action primary-action" href={whatsappContactUrl(whatsapp,business)} onClick={() => recordContact(business,'whatsapp',contact.intent)} title="Se abre WhatsApp con un mensaje que podés completar y enviar." aria-label={`${contact.label} a ${business.nombre} por WhatsApp`} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="17" height="17"/> {contact.label}</a>}
         {phone.length >= 8 && <a className={`details ${!whatsapp ? 'primary-action' : ''}`} href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
         {site && <a className={`details ${!whatsapp && !phone ? 'primary-action' : ''}`} href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
         {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
         <BusinessSocials business={business}/>
+        {saveButton(business)}
       </div>
     </article>;
   };
