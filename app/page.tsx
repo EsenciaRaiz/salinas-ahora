@@ -6,9 +6,11 @@ import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, ty
 import BusinessMap from './business-map';
 import BusinessCardPhoto from './business-card-photo';
 import BusinessSocials from './business-socials';
+import { businessContact, whatsappContactUrl, type ContactIntent } from './contact-intent';
+import { BusinessFacts, LocalDiscoveries, Newsletter, MerchantTestimonials, type BusinessExtras, type Testimonial } from './business-features';
 import { coverageOf, servesDepartment, departments } from '../public/coverage.js';
 
-type Business = {
+type Business = BusinessExtras & {
   id: string;
   destacado: string;
   plan: string;
@@ -65,6 +67,7 @@ type Advertisement = {
 };
 
 type PublicData = {
+  testimonios?: Testimonial[];
   correcto: boolean;
   negocios: Business[];
   publicidad: Advertisement[];
@@ -104,10 +107,13 @@ const dataUrl = 'https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQx
 const submissionsEndpoint = 'https://script.google.com/macros/s/AKfycbzwe6W8twxuZ41hr2yipctyKBoqXNapkqOBLlXsurCA9aaWrm4RUr1uGYk6hIOTDx8a/exec';
 const businessFormUrl = '/publicar/';
 const businessUrl = (business: Business) => `https://vitrinacerca.com/?negocio=${encodeURIComponent(business.id)}`;
-type ContactAction = 'whatsapp' | 'telefono' | 'sitio' | 'mapa';
-function recordContact(business: Business, action: ContactAction) {
+type ContactAction = 'whatsapp' | 'telefono' | 'sitio' | 'mapa' | 'visita';
+function recordContact(business: Business, action: ContactAction, intent?: ContactIntent, source: 'guia' | 'ficha' = 'guia') {
+  if (typeof window === 'undefined' || !['vitrinacerca.com','www.vitrinacerca.com'].includes(window.location.hostname)) return;
   if (!business.id) return;
   const parameters = new URLSearchParams({ metric: 'contacto', id: business.id, action });
+  parameters.set('source',source);
+  if (action === 'whatsapp' && intent) parameters.set('intent',intent);
   void fetch(`${submissionsEndpoint}?${parameters.toString()}`, { mode: 'no-cors', keepalive: true }).catch(() => undefined);
 }
 
@@ -226,6 +232,7 @@ export default function Home() {
   const [dataStatus, setDataStatus] = useState<'loading' | 'ready' | 'error'>(cachedData ? 'ready' : 'loading');
   const [liveDataChecked, setLiveDataChecked] = useState(false);
   const [configuration, setConfiguration] = useState<Record<string, string | number>>(() => cachedData?.configuracion || {});
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => cachedData?.testimonios || []);
   const [isNight, setIsNight] = useState(() => { const hour = Math.floor(montevideoClock().minute / 60); return hour >= 20 || hour < 7; });
   const [clockTick, setClockTick] = useState(0);
   const [profileId] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('negocio') || '');
@@ -246,6 +253,7 @@ export default function Home() {
         setBusinesses(data.negocios.filter((business) => !demonstrationIds.has(business.id)));
         setAdvertisements(Array.isArray(data.publicidad) ? data.publicidad : []);
         setConfiguration(data.configuracion || {});
+        setTestimonials(data.testimonios || []);
         setDataStatus('ready');
         received = true;
         try { window.localStorage.setItem(publicCacheKey, JSON.stringify({ savedAt: Date.now(), data })); } catch { /* Storage may be unavailable. */ }
@@ -306,6 +314,16 @@ export default function Home() {
       && businessMatchesQuery(business, query, region);
   };
   const profile = useMemo(() => businesses.find((business) => business.id === profileId && activeByDate(business, false)), [businesses,profileId]);
+  useEffect(() => {
+    if (!profile || !yes(String(configuration.FICHAS_AMPLIADAS_ACTIVAS || ''))) return;
+    const key = `vitrina-view:${profile.id}`;
+    try {
+      const last = Number(sessionStorage.getItem(key) || 0);
+      if (Date.now() - last < 30 * 60 * 1000) return;
+      sessionStorage.setItem(key,String(Date.now()));
+    } catch { return; }
+    recordContact(profile,'visita',undefined,'ficha');
+  }, [profile?.id,configuration.FICHAS_AMPLIADAS_ACTIVAS]);
   useEffect(() => {
     if (!profile) return;
     const oldTitle = document.title;
@@ -420,6 +438,7 @@ export default function Home() {
     const hours = hoursLabel(business, clock.day);
     const phone = contactNumber(business.telefono);
     const whatsapp = contactNumber(business.whatsapp);
+    const contact = businessContact(business);
     const region = business.departamento || business.departamento_region || '';
     const site = websiteUrl(business.sitio_web);
     const logo = driveImage(business.logo_url, 160);
@@ -434,7 +453,7 @@ export default function Home() {
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
         <a className={`details ${!whatsapp && !phone && !site ? 'primary-action' : ''}`} href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
-        {whatsapp.length >= 8 && <a className="details whatsapp-action primary-action" href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(business,'whatsapp')} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="17" height="17"/> WhatsApp</a>}
+        {whatsapp.length >= 8 && <a className="details whatsapp-action primary-action" href={whatsappContactUrl(whatsapp,business)} onClick={() => recordContact(business,'whatsapp',contact.intent)} title="Se abre WhatsApp con un mensaje que podés completar y enviar." aria-label={`${contact.label} a ${business.nombre} por WhatsApp`} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="17" height="17"/> {contact.label}</a>}
         {phone.length >= 8 && <a className={`details ${!whatsapp ? 'primary-action' : ''}`} href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
         {site && <a className={`details ${!whatsapp && !phone ? 'primary-action' : ''}`} href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
         {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
@@ -449,6 +468,7 @@ export default function Home() {
     const image = images[selectedPhoto] || images[0];
     const mapHref = profile ? businessMapLink(profile) : '';
     const whatsapp = contactNumber(profile?.whatsapp);
+    const contact = profile ? businessContact(profile) : null;
     const phone = contactNumber(profile?.telefono);
     const site = websiteUrl(profile?.sitio_web);
     const logo = driveImage(profile?.logo_url, 160);
@@ -467,12 +487,14 @@ export default function Home() {
               <p className="profile-description">{coverageOf(profile).description}</p>{coverageOf(profile).label && <p className="profile-coverage">{coverageOf(profile).label}</p>}
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
-                {whatsapp.length >= 8 && <a href={`https://wa.me/${whatsapp}`} onClick={() => recordContact(profile,'whatsapp')} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> Escribir por WhatsApp</a>}
+                {whatsapp.length >= 8 && contact && <a href={whatsappContactUrl(whatsapp,profile)} onClick={() => recordContact(profile,'whatsapp',contact.intent,'ficha')} aria-describedby="contact-help" target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> {contact.label}</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
               </div>
+              {whatsapp.length >= 8 && <p className="contact-help" id="contact-help">Se abre WhatsApp con un mensaje para completar. Vos decidís cuándo enviarlo. El precio, la disponibilidad y las condiciones se acuerdan directamente con el negocio.</p>}
               <BusinessSocials business={profile}/>
+              <BusinessFacts business={profile}/>
             </div>
           </div>
         </>}
@@ -484,7 +506,7 @@ export default function Home() {
   if (showPlans) return <main className={isNight ? 'night-mode plans-page' : 'day-mode plans-page'}>
     <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/">Volver a la guía</a></header>
     <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>Tu ficha en el listado es gratuita. Si querés más visibilidad, podés elegir una publicidad paga.</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA EN LA GUÍA</span><h3>Gratis</h3><p><strong>Registrarte y aparecer en el listado no tiene costo ni fecha de vencimiento.</strong></p><p>{basicDetail}</p><p>Revisamos los datos antes de publicar. Podés solicitar correcciones.</p><a href={businessFormUrl}>Completar ficha gratis</a></article><article className="featured-plan"><span><Sparkles size={15}/> PUBLICIDAD DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail} Es una opción publicitaria; tu ficha en el listado sigue siendo gratuita.</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PUBLICIDAD PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Consultar premium</a></article></div><p className="pricing-note">La ficha en el listado es gratuita. La publicidad destacada y los espacios publicitarios son opcionales y pagos. Antes de contratar una publicidad, confirmamos con vos su ubicación, duración, precio y medio de pago; no hay cobro ni renovación automática.</p></section>
-    <section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran posibles ubicaciones. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current">La ficha en el listado es gratuita. La disponibilidad, duración y precio de cada espacio publicitario se confirman antes de contratar.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.'},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.'},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.'},{key:'stories',title:'Historias',description:'Junto a los relatos locales.'},{key:'footer',title:'Pie de página',description:'Al final del sitio.'}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className="placement-planned">Consultar disponibilidad</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. La ficha gratuita no reserva un espacio publicitario.</p></section>
+    <section className="merchant-example" aria-labelledby="example-title"><span className="section-kicker">ASÍ FUNCIONA</span><h2 id="example-title">Tu ficha, con información para elegirte</h2><p>Nombre y fotos de tu negocio, rubro, localidad, horarios y medios de contacto. Podés sumar menú o catálogo, precios orientativos, cobertura, entregas y una historia breve: esos datos también están incluidos en la ficha gratuita.</p><p>Los anuncios pagos agregan difusión o ubicaciones publicitarias; no son necesarios para recibir consultas desde tu ficha.</p>{businesses.filter((business)=>!featuredBusiness(business)).slice(0,1).map((business)=><p key={business.id}>Mirá un ejemplo real de la guía: <a href={businessUrl(business)}>{business.nombre}</a>.</p>)}</section><MerchantTestimonials testimonials={testimonials} businesses={businesses}/><section className="contact-benefits" aria-labelledby="contact-benefits-title"><span className="section-kicker">INCLUIDO EN TU FICHA GRATUITA</span><h2 id="contact-benefits-title">Que te encuentren y te consulten.</h2><p>Si publicás tu WhatsApp, tu ficha tendrá un botón acorde a tu actividad: pedir presupuesto, consultar un producto, disponibilidad, menú o un turno.</p><p>Quien te encuentra puede completar un mensaje y enviártelo directamente. Vos respondés y acordás los detalles con tu cliente; no necesitás aprender a usar otro sistema.</p><p className="contact-measurement">Los clics en los botones indican interés. No confirman mensajes enviados, presupuestos aceptados, reservas ni ventas.</p></section><section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran posibles ubicaciones. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current">La ficha en el listado es gratuita. La disponibilidad, duración y precio de cada espacio publicitario se confirman antes de contratar.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.'},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.'},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.'},{key:'stories',title:'Historias',description:'Junto a los relatos locales.'},{key:'footer',title:'Pie de página',description:'Al final del sitio.'}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className="placement-planned">Consultar disponibilidad</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. La ficha gratuita no reserva un espacio publicitario.</p></section>
       <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a><a className="footer-privacy" href="/terminos-de-uso/">Términos de uso</a><a className="footer-privacy" href="/autorizacion-de-publicacion/">Autorización de publicación</a><a className="footer-privacy" href="/reglas-de-publicacion/">Reglas de publicación</a></div></footer>
   </main>;
 
@@ -526,6 +548,7 @@ export default function Home() {
           <a className="discovery-card" href="/eventos/"><img src="/eventos/cartelera-editorial-1080.webp" alt="Ilustración de la cartelera local de Vitrina Cerca" loading="lazy" width="640" height="420"/><div><span>AGENDA LOCAL</span><h3>Encontrá tu próximo plan</h3><p>Consultá las ferias, talleres y encuentros publicados.</p><b>Explorar la agenda <ArrowRight size={16}/></b></div></a>
         </div>
       </section>
+      <LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))} selectLocality={(place)=>{ const entry=businesses.find((business)=>business.zona===place); setOnlySaved(false);setQuery('');setFilter('todos');setCategory('Todos');setSpecialty('');setDepartment(entry?.departamento || entry?.departamento_region || '');setLocality(place);document.getElementById('guia')?.scrollIntoView({behavior:'smooth'}); }}/>
       <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={coverAds} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
 
       <section className="finder" id="guia" aria-labelledby="finder-title">
@@ -555,6 +578,7 @@ export default function Home() {
       <section className="editorial" id="historias" aria-labelledby="historias-title"><div className="editorial-copy"><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2 id="historias-title">Historias y curiosidades del lugar</h2><p>Rincones, recuerdos y detalles para descubrir nuestra zona con otros ojos.</p></div><a href="/historias/">Descubrir historias <ArrowRight size={18} /></a><div className="story-ads" aria-label="Anuncios junto a historias">{adsAt('stories').length ? <AdRotator ads={adsAt('stories')} label="Publicidad junto a historias" renderAd={renderAdvertisement}/> : <AvailableAd placement="stories"/>}</div></section>
 
       <section className="events-teaser" aria-labelledby="events-teaser-title"><div><span className="section-kicker">CARTELERA LOCAL</span><h2 id="events-teaser-title">Qué pasa cerca</h2><p>Ferias, talleres y encuentros para descubrir en tu zona.</p></div><a href="/eventos/">Ver próximos eventos <ArrowRight size={18}/></a></section>
+      {yes(String(configuration.RESUMEN_SEMANAL_ACTIVO || '')) && <Newsletter action={submissionsEndpoint}/>}
       <section className="merchant-invitation" aria-labelledby="merchant-title"><div><span className="section-kicker">SUMATE A VITRINA CERCA</span><h2 id="merchant-title">Tu próximo cliente puede estar cerca.</h2><p>Dale a tu negocio un lugar en la guía de tu zona. La ficha básica es gratuita.</p><a href="/?planes=1">Conocé cómo publicar <ArrowRight size={17}/></a></div></section>
       <footer>
         <div className="footer-ads" aria-label="Publicidad antes del pie de página"><AdRotator ads={adsAt('footer')} label="Publicidad antes del pie de página" renderAd={renderAdvertisement}/></div>
