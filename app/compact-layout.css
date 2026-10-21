@@ -81,7 +81,7 @@
   .homepage-redesign .hero-ad-section .ad-card:not(.ad-card-media) { grid-template-columns:1fr; }
   .homepage-redesign .hero-ad-section .ad-card-content { padding:12px; }
   .homepage-redesign .hero-ad-section .ad-card h3 { font-size:20px; }
-  .homepage-redesign .featured-section { margin:18px 0; padding:12px; }
+  .homepage-redesign .featured-section { margin:18px 0; padding:0; background:transparent; }
   .homepage-redesign .featured-heading { margin-bottom:12px; }
   .homepage-redesign .featured-heading h2,.homepage-redesign .guide-subheading h2 { font-size:28px; }
   .homepage-redesign .guide-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:18px; margin-top:16px; }
