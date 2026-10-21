@@ -132,3 +132,12 @@
  .homepage-redesign .business-card .card-top { top:66px; left:12px; }
  .homepage-redesign .business-card h3 { font-size:19px; }
 }
+/* Visible favorites control on cards and full profiles. */
+.homepage-redesign .business-card .save-business,.business-profile .save-business { position:static; display:inline-flex; align-items:center; justify-content:center; gap:6px; width:auto; height:auto; min-height:40px; padding:8px 10px; border:1px solid #b8c8d0; border-radius:5px; background:#fff; color:#102a43; font:600 12px/1.3 Arial,sans-serif; cursor:pointer; flex-shrink:0; }
+.homepage-redesign .business-card .save-business { order:3; }
+.homepage-redesign .business-card .save-business.is-saved,.business-profile .save-business.is-saved { background:#fff0ed; border-color:#d78579; color:#a2312a; }
+.save-business.is-saved svg { fill:#f8c4bc; }
+.save-business:focus-visible { outline:3px solid #116078; outline-offset:3px; }
+.favorite-confirmation { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); max-width:calc(100% - 32px); width:max-content; z-index:1000; background:#102a43; color:white; padding:13px 20px; border-radius:8px; box-shadow:0 6px 24px #102a4333; font:600 14px/1.4 Arial,sans-serif; pointer-events:none; opacity:0; }
+.favorite-confirmation.is-visible { opacity:1; }
+@media(max-width:700px) { .homepage-redesign .business-card .save-business { min-height:44px; padding:8px; font-size:11px; } .homepage-redesign .business-card .card-category { padding-right:0; } .homepage-redesign .business-card .card-actions { flex-wrap:wrap; } .favorite-confirmation { bottom:18px; text-align:center; } }

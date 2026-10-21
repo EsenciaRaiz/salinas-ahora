@@ -206,11 +206,19 @@ export default function Home() {
   const [onlySaved, setOnlySaved] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const toggleSaved = (id: string) => {
-    const next = saved.includes(id) ? saved.filter((item) => item !== id) : [...saved, id];
+    const removing = saved.includes(id);
+    const next = removing ? saved.filter((item) => item !== id) : [...saved, id];
     setSaved(next);
-    try { localStorage.setItem('vitrina-favorites', JSON.stringify(next)); setSaveMessage(''); }
+    try { localStorage.setItem('vitrina-favorites', JSON.stringify(next)); setSaveMessage(removing ? 'Quitado de favoritos' : 'Guardado en favoritos'); }
     catch { setSaveMessage('Tus favoritos se conservarán solo mientras esta página esté abierta.'); }
   };
+  useEffect(() => {
+    if (!saveMessage) return;
+    const timeout = window.setTimeout(() => setSaveMessage(''), 4500);
+    return () => window.clearTimeout(timeout);
+  }, [saveMessage, saved]);
+  const saveButton = (business: Business) => <button type="button" className={`save-business ${saved.includes(business.id) ? 'is-saved' : ''}`} aria-label={`${saved.includes(business.id) ? 'Quitar de favoritos' : 'Guardar negocio'}: ${business.nombre}`} aria-pressed={saved.includes(business.id)} onClick={() => toggleSaved(business.id)}><Heart size={17} aria-hidden="true"/><span>{saved.includes(business.id) ? 'Guardado' : 'Guardar negocio'}</span></button>;
+  const saveConfirmation = <div className={`favorite-confirmation ${saveMessage ? 'is-visible' : ''}`} role="status" aria-live="polite" aria-atomic="true">{saveMessage}</div>;
   const [filter, setFilter] = useState<TimeFilter>('todos');
   const [category, setCategory] = useState('Todos');
   const [specialty, setSpecialty] = useState('');
@@ -435,7 +443,7 @@ export default function Home() {
     const site = websiteUrl(business.sitio_web);
     const logo = driveImage(business.logo_url, 160);
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase() === 'editorial' ? 'card-editorial' : ''}`} key={business.id || business.nombre}>
-      <button type="button" className={`save-business ${saved.includes(business.id) ? 'is-saved' : ''}`} aria-label={`${saved.includes(business.id) ? 'Quitar de' : 'Agregar a'} favoritos: ${business.nombre}`} aria-pressed={saved.includes(business.id)} onClick={() => toggleSaved(business.id)}><Heart size={20}/></button>
+
       <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} Icon={Icon} />
       <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
       <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
@@ -444,6 +452,7 @@ export default function Home() {
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
+        {saveButton(business)}
         <a className={`details ${!whatsapp && !phone && !site ? 'primary-action' : ''}`} href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
         {whatsapp.length >= 8 && <a className="details whatsapp-action primary-action" href={whatsappContactUrl(whatsapp,business)} onClick={() => recordContact(business,'whatsapp',contact.intent)} title="Se abre WhatsApp con un mensaje que podés completar y enviar." aria-label={`${contact.label} a ${business.nombre} por WhatsApp`} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="17" height="17"/> {contact.label}</a>}
         {phone.length >= 8 && <a className={`details ${!whatsapp ? 'primary-action' : ''}`} href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
@@ -466,6 +475,7 @@ export default function Home() {
     const logo = driveImage(profile?.logo_url, 160);
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
       <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
+      {saveConfirmation}
       <section className="profile-wrap" aria-live="polite">
         {!profile ? <div className="profile-empty"><h1>{!liveDataChecked ? 'Cargando ficha…' : dataStatus === 'error' ? 'No pudimos cargar la ficha' : 'No encontramos esta ficha'}</h1><p>{!liveDataChecked ? 'Un momento, por favor.' : dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
           <div className={`profile-card ${landscapeProfilePhoto ? 'profile-card-landscape' : ''}`}>
@@ -479,6 +489,7 @@ export default function Home() {
               <p className="profile-description">{coverageOf(profile).description}</p>{coverageOf(profile).label && <p className="profile-coverage">{coverageOf(profile).label}</p>}
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
+                {saveButton(profile)}
                 {whatsapp.length >= 8 && contact && <a href={whatsappContactUrl(whatsapp,profile)} onClick={() => recordContact(profile,'whatsapp',contact.intent,'ficha')} aria-describedby="contact-help" target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> {contact.label}</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
@@ -530,7 +541,7 @@ export default function Home() {
           <a href="/eventos/"><Sparkles size={16}/> Planes y eventos</a>
           <button type="button" aria-pressed={filter === 'noche'} onClick={() => showPeriod('noche')}><MoonStar size={16}/> De noche</button>
           <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> Mis favoritos{saved.length ? ' (' + saved.length + ')' : ''}</button>
-        </div><p className="save-note" role="status">{saveMessage}</p>
+        </div>{saveConfirmation}
       </section>
       <section className="discovery-selection" aria-labelledby="discovery-title">
         <div className="discovery-heading"><div><span className="section-kicker">INSPIRACIÓN LOCAL</span><h2 id="discovery-title">Descubrí algo cerca tuyo</h2></div><a href="/historias/">Más historias <ArrowRight size={16}/></a></div>
