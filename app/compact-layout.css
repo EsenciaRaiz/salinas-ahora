@@ -123,3 +123,12 @@
   .homepage-redesign .footer-main .brand { font-size:15px; }
   .homepage-redesign .footer-strip,.homepage-redesign .footer-tagline { padding-inline:16px; overflow-wrap:anywhere; }
 }
+/* Keep information and actions together instead of stretching the last row. */
+.homepage-redesign .business-card { min-height:190px; grid-template-rows:repeat(6,auto); gap:5px 16px; }
+.homepage-redesign .business-card .card-actions { align-self:start; margin-top:3px; }
+@media(max-width:700px) {
+ .homepage-redesign .business-card { min-height:0; grid-template-columns:72px minmax(0,1fr); grid-template-rows:auto minmax(48px,auto) auto auto auto auto; gap:5px 10px; padding:12px; }
+ .homepage-redesign .business-card .business-photo-frame,.homepage-redesign .business-card .business-photo-placeholder { width:72px; height:76px; min-height:76px; max-height:76px; }
+ .homepage-redesign .business-card .card-top { top:66px; left:12px; }
+ .homepage-redesign .business-card h3 { font-size:19px; }
+}
