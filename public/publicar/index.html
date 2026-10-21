@@ -26,7 +26,7 @@
     <div class="full"><label for="descripcion">¿Qué ofrecés? *</label><textarea id="descripcion" name="descripcion" required maxlength="500" placeholder="Contá en pocas palabras qué encontrará la gente"></textarea></div>
     <div class="full search-words"><label for="etiquetas_busqueda">¿Con qué palabras querés que te encuentren? *</label><input id="etiquetas_busqueda" name="etiquetas_busqueda" required maxlength="300" placeholder="Ej.: herrero, rejas, portones, soldadura"><p class="search-tip"><strong>💡</strong><span>Pensá qué escribiría una persona cuando necesita lo que ofrecés. Estas palabras ayudan a que tu negocio aparezca en las búsquedas de Vitrina Cerca.</span></p><p class="search-example" id="keyword-example"><strong>Ejemplo:</strong> herrero, herrería, rejas, portones, soldadura, estructuras metálicas</p><p class="small">Escribí entre 5 y 12 palabras o frases, separadas por comas. No pongas solamente el nombre de tu negocio.</p></div>
 
-    <details class="full business-details" id="business-extra-fields" hidden><summary>Enriquecé tu ficha (opcional y gratuito)</summary><p>Completá lo que corresponda a tu actividad. Se mostrará solo después de revisar tu ficha. No publiques datos de clientes.</p>
+    <details class="full business-details" id="business-extra-fields"><summary>Enriquecé tu ficha (opcional y gratuito)</summary><p>Completá lo que corresponda a tu actividad. Se mostrará solo después de revisar tu ficha. No publiques datos de clientes.</p>
     <label for="menu_url">Enlace al menú o catálogo</label><input id="menu_url" name="menu_url" type="url" maxlength="500" placeholder="https://...">
     <label for="precios_orientativos">Precios orientativos</label><textarea id="precios_orientativos" name="precios_orientativos" maxlength="700" placeholder="Indicá el producto o servicio, precio y moneda. Aclará si es desde o aproximado."></textarea>
     <label for="productos_destacados">Productos o servicios que querés destacar</label><textarea id="productos_destacados" name="productos_destacados" maxlength="700"></textarea>
@@ -83,7 +83,6 @@
 <iframe id="submission-frame" name="submission-frame" title="Envío de solicitud" hidden></iframe>
 <script>
   (() => {
-    fetch('https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec').then(response=>response.json()).then(data=>{document.getElementById('business-extra-fields').hidden=!/^s[ií]$/i.test(String(data.configuracion?.FICHAS_AMPLIADAS_ACTIVAS||''))}).catch(()=>{});
     const form = document.getElementById('business-form');
     const steps = Array.from(form.querySelectorAll('.form-step'));
     const progress = document.getElementById('form-progress');
