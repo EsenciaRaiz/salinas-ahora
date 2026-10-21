@@ -6,6 +6,8 @@ import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, ty
 import BusinessMap from './business-map';
 import BusinessCardPhoto from './business-card-photo';
 import BusinessSocials from './business-socials';
+import TimedRotator from './timed-rotator';
+import { freeRotationActive } from './rotation-policy';
 import { businessContact, whatsappContactUrl, type ContactIntent } from './contact-intent';
 import { BusinessFacts, LocalDiscoveries, Newsletter, MerchantTestimonials, type BusinessExtras, type Testimonial } from './business-features';
 import { coverageOf, servesDepartment, departments } from '../public/coverage.js';
@@ -75,18 +77,7 @@ type PublicData = {
 };
 
 function AdRotator({ ads, label, renderAd }: { ads: Advertisement[]; label: string; renderAd: (ad: Advertisement) => ReactNode }) {
-  const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
-  useEffect(() => { setCurrent(0); }, [ads.map((ad) => ad.id).join('|')]);
-  useEffect(() => {
-    if (ads.length < 2 || paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setInterval(() => { if (!document.hidden) setCurrent((index) => (index + 1) % ads.length); }, 10_000);
-    return () => window.clearInterval(timer);
-  }, [ads.length, paused]);
-  return <div className="ad-rotation" aria-label={label} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setPaused(false); }}>
-    {ads.length > 0 ? renderAd(ads[current % ads.length]) : <article className="ad-card ad-card-placeholder"><div className="ad-card-content"><span>ESPACIO PUBLICITARIO DISPONIBLE</span><h3>Tu negocio puede estar acá</h3><p>Mostrá lo que ofrecés a quienes buscan en la zona.</p><a href="/?planes=1">Consultar este espacio <ArrowRight size={15}/></a></div></article>}
-    {ads.length > 1 && <div className="ad-rotation-controls" aria-label="Elegir anuncio">{ads.map((ad, index) => <button key={ad.id || index} type="button" aria-label={`Ver anuncio ${index + 1} de ${ads.length}`} aria-current={index === current % ads.length ? 'true' : undefined} onClick={() => setCurrent(index)} />)}</div>}
-  </div>;
+  return <TimedRotator items={ads} label={label} renderItem={renderAd} className="ad-rotation"/>;
 }
 
 function AvailableAd({ placement }: { placement: 'side' | 'stories' }) {
@@ -374,6 +365,7 @@ export default function Home() {
   const featuredVisible=useMemo(()=>visible.filter(featuredBusiness).sort(byDistance),[visible,visitorLocation]);
   const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort(byDistance),[visible,visitorLocation]);
   const guideVisible=basicVisible;
+  const rotateFreeBusinesses = freeRotationActive();
   const activeAdvertisements=useMemo(()=>advertisements.filter((ad)=>(ad.publicar === undefined || yes(ad.publicar)) && activeByDate({ fecha_inicio: ad.inicio || ad.fecha_inicio, fecha_fin: ad.fin || ad.fecha_fin })).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const adsAt=(placement:AdPlacement)=>activeAdvertisements.filter((ad)=>placementOf(ad)===placement);
   const apexAd=activeAdvertisements.find((ad)=>`${ad.id} ${ad.anunciante} ${ad.titulo}`.toLowerCase().includes('apexmind'));
@@ -562,14 +554,17 @@ export default function Home() {
         <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => { setCategory(item); setSpecialty(''); }}>{item}</button>)}</div>
 
         <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? 'Cargando negocios…' : `${visible.length} ${visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados'}`}{onlySaved && <button className="clear-saved-filter" type="button" onClick={() => setOnlySaved(false)}>Mis favoritos · Ver todos</button>}</div>
-        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><div className="featured-grid">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
+        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><TimedRotator items={featuredVisible} label="Negocios destacados" className="business-rotation" renderItem={(business,index)=>renderBusinessCard(business,index,true)}/></section>}
 
         <div className={`guide-layout ${!guideVisible.length && visible.length ? 'only-featured-results' : ''}`}>
-          <div>{guideVisible.length > 0 && <div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Explorá la guía</h2></div>}<div className="business-grid">{guideVisible.length > 0 ? guideVisible.flatMap((business,index)=>[renderBusinessCard(business,index,false),...(index===0 ? adsAt('between').map(renderAdvertisement) : []),...(index===1 ? [<div className="mobile-side-ad" key="mobile-side-ad"><AdRotator ads={sideAds} label="Publicidad junto al listado" renderAd={renderAdvertisement}/><div className="mobile-available-ads"><AvailableAd placement="side"/></div></div>] : [])]) : visible.length>0 ? adsAt('between').map(renderAdvertisement) : null}{visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : onlySaved && saved.length === 0 ? 'Todavía no guardaste negocios' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : onlySaved && saved.length === 0 ? 'Tocá el corazón de una ficha para tenerla a mano. Se guarda en este navegador.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}</div></div>
+          <div className="guide-results">{guideVisible.length > 0 && <div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Explorá la guía</h2></div>}
+            {guideVisible.length > 0 && (rotateFreeBusinesses ? <TimedRotator items={guideVisible} label="Negocios de la guía" className="business-rotation" renderItem={(business,index)=>renderBusinessCard(business,index,false)}/> : <div className="business-grid">{guideVisible.map((business,index)=>renderBusinessCard(business,index,false))}</div>)}
+            {adsAt('between').length > 0 && <div className="between-ad-slot"><AdRotator ads={adsAt('between')} label="Publicidad entre resultados" renderAd={renderAdvertisement}/></div>}
+            {visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : onlySaved && saved.length === 0 ? 'Todavía no guardaste negocios' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : onlySaved && saved.length === 0 ? 'Tocá el corazón de una ficha para tenerla a mano. Se guarda en este navegador.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}
+          </div>
 
           <aside className="ad-column" aria-label="Publicidad lateral">
             <AdRotator ads={sideAds} label="Publicidad lateral" renderAd={renderAdvertisement}/>
-            <div className="available-side-ads" aria-label="Espacio publicitario disponible"><AvailableAd placement="side"/></div>
             <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>Ver negocios de noche <ArrowRight size={15} /></span></button>
           </aside>
         </div>
