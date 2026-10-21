@@ -24,7 +24,7 @@ export default function TimedRotator<T extends { id: string }>({ items, label, r
     const updateVisibility = () => setHidden(document.hidden);
     preference.addEventListener('change', updatePreference);
     document.addEventListener('visibilitychange', updateVisibility);
-    const observer = new IntersectionObserver(entries => setInView(entries[0]?.isIntersecting ?? false), { threshold: 0.2 });
+    const observer = new IntersectionObserver(entries => setInView((entries[0]?.intersectionRatio ?? 0) >= 0.2), { threshold: 0.2 });
     if (container.current) observer.observe(container.current);
     return () => { observer.disconnect(); preference.removeEventListener('change', updatePreference); document.removeEventListener('visibilitychange', updateVisibility); };
   }, [hasItems]);

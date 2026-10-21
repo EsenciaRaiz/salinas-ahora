@@ -11,6 +11,7 @@
 .homepage-redesign .rotation-controls .rotation-pause { margin-left:8px; padding-inline:12px; }
 .homepage-redesign .guide-results,.homepage-redesign .guide-layout>*,.homepage-redesign .ad-column,.homepage-redesign .newsletter-signup>div { min-width:0; }
 .homepage-redesign .guide-subheading { margin-bottom:18px; }
+.homepage-redesign .business-grid { grid-template-columns:minmax(0,1fr); }
 .homepage-redesign .between-ad-slot { margin-top:20px; }
 .homepage-redesign .hero-ad-section { width:calc(100% - 48px); max-width:1200px; margin-inline:auto; }
 .homepage-redesign .ad-column { grid-auto-flow:row; grid-auto-columns:auto; overflow:visible; }
