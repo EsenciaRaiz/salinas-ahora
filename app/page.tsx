@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Heart, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
+import { ArrowRight, Share2, Heart, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
 import BusinessMap from './business-map';
@@ -204,6 +204,19 @@ function distanceKm(a: Coordinates, b: Coordinates) {
 export default function Home() {
   const [saved, setSaved] = useState<string[]>(() => { try { const items: unknown = JSON.parse(localStorage.getItem('vitrina-favorites') || '[]'); return Array.isArray(items) ? items.filter((item): item is string => typeof item === 'string') : []; } catch { return []; } });
   const [onlySaved, setOnlySaved] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareMessage, setShareMessage] = useState('');
+  const shareBusiness = async (business: Business) => {
+    if (navigator.share) {
+      try { await navigator.share({ title: business.nombre + ' en Vitrina Cerca', text: 'Conocé ' + business.nombre + ' en Vitrina Cerca.', url: businessUrl(business) }); return; }
+      catch (error) { if (error instanceof Error && error.name === 'AbortError') return; }
+    }
+    setShareMessage(''); setShareOpen(true);
+  };
+  const copyBusinessLink = async (business: Business) => {
+    try { await navigator.clipboard.writeText(businessUrl(business)); setShareMessage('Enlace copiado'); }
+    catch { setShareMessage('Seleccioná y copiá el enlace de abajo.'); }
+  };
   const [saveMessage, setSaveMessage] = useState('');
   const toggleSaved = (id: string) => {
     const removing = saved.includes(id);
@@ -490,11 +503,13 @@ export default function Home() {
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
                 {saveButton(profile)}
+                <button type="button" className="share-business" onClick={() => { setShareMessage(''); setShareOpen(true); }}><Share2 size={17} aria-hidden="true"/> Compartir mi ficha</button>
                 {whatsapp.length >= 8 && contact && <a href={whatsappContactUrl(whatsapp,profile)} onClick={() => recordContact(profile,'whatsapp',contact.intent,'ficha')} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> {contact.label}</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
               </div>
+              {shareOpen && <section className="share-business-panel" aria-label="Compartir esta ficha"><h2>Compartí este negocio</h2><p>Elegí cómo compartir el enlace a esta ficha.</p><div className="share-options">{typeof navigator.share === 'function' && <button type="button" onClick={() => shareBusiness(profile)}>Más opciones para compartir</button>}<button type="button" onClick={() => copyBusinessLink(profile)}>Copiar enlace</button><a href={'https://wa.me/?text=' + encodeURIComponent('Conocé ' + profile.nombre + ' en Vitrina Cerca: ' + businessUrl(profile))} target="_blank" rel="noopener noreferrer">Compartir por WhatsApp</a><button type="button" onClick={() => setShareOpen(false)}>Cerrar</button></div><label>Enlace de la ficha<input readOnly value={businessUrl(profile)} onFocus={event => event.currentTarget.select()}/></label><p role="status">{shareMessage}</p></section>}
               <BusinessSocials business={profile}/>
               <BusinessFacts business={profile}/>
             </div>
@@ -528,8 +543,10 @@ export default function Home() {
       </section>
       <section className="search-landing" aria-label="Buscá en tu zona">        <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
           <label>¿Qué estás buscando?<input type="search" placeholder="Ej.: herrero, arquitecto, páginas web" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <details className="search-zone-filter"><summary>{department ? [locality, department].filter(Boolean).join(' · ') : 'Filtrar por zona (opcional)'}</summary><div className="search-zone-options">
           <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || availableLocalities.length === 0}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && availableLocalities.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          </div></details>
           <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
           {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>¿Qué especialidad?<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">Todas las especialidades</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
           <button type="submit"><Search size={19} /> Buscar</button>
@@ -550,7 +567,7 @@ export default function Home() {
           <a className="discovery-card" href="/eventos/"><img src="/eventos/cartelera-editorial-1080.webp" alt="Ilustración de la cartelera local de Vitrina Cerca" loading="lazy" width="640" height="420"/><div><span>AGENDA LOCAL</span><h3>Encontrá tu próximo plan</h3><p>Consultá las ferias, talleres y encuentros publicados.</p><b>Explorar la agenda <ArrowRight size={16}/></b></div></a>
         </div>
       </section>
-      <LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))} selectLocality={(place)=>{ const entry=businesses.find((business)=>business.zona===place); setOnlySaved(false);setQuery('');setFilter('todos');setCategory('Todos');setSpecialty('');setDepartment(entry?.departamento || entry?.departamento_region || '');setLocality(place);document.getElementById('guia')?.scrollIntoView({behavior:'smooth'}); }}/>
+      <LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))}/>
       <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={coverAds} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
 
       <section className="finder" id="guia" aria-labelledby="finder-title">

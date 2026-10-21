@@ -44,10 +44,7 @@ export function BusinessFacts({ business }: { business: BusinessExtras }) {
   </div>;
 }
 
-export function LocalDiscoveries({ businesses, selectLocality }: { businesses: Entry[]; selectLocality: (place: string) => void }) {
-  const counts = new Map<string,number>();
-  businesses.forEach(entry => { if (entry.zona && !/online|coordinar/i.test(entry.zona)) counts.set(entry.zona, (counts.get(entry.zona) || 0) + 1); });
-  const places = [...counts.entries()].sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0],'es')).slice(0,6);
+export function LocalDiscoveries({ businesses }: { businesses: Entry[] }) {
   const today = uruguayDay();
   const week = Math.floor(Date.parse(today) / 604800000);
   const ordered = [...businesses].sort((a,b)=>a.id.localeCompare(b.id));
@@ -55,7 +52,6 @@ export function LocalDiscoveries({ businesses, selectLocality }: { businesses: E
   const promotions = businesses.filter(entry=>currentPromotion(entry,today));
   const stories = businesses.filter(entry=>entry.historia_negocio);
   return <>
-    {!!places.length && <section className="locality-discovery" aria-labelledby="localities-title"><span className="section-kicker">EXPLORÁ POR LOCALIDAD</span><h2 id="localities-title">Tu zona tiene mucho para ofrecer</h2><div className="locality-pills">{places.map(([place,count])=><button key={place} type="button" onClick={()=>selectLocality(place)}><MapPin size={16}/><span>{place}<small>{count} {count===1?'negocio':'negocios'}</small></span><ArrowRight size={16}/></button>)}</div></section>}
     {!!selected.length && <section className="weekly-discovery" aria-labelledby="weekly-title"><div className="discovery-heading"><div><span className="section-kicker">UNA SELECCIÓN QUE CAMBIA CADA SEMANA</span><h2 id="weekly-title">Descubrimientos de la semana</h2></div><a href="/eventos/">Planes para el fin de semana <ArrowRight size={16}/></a></div><p className="selection-explainer">Conocé distintas propuestas de la guía. Esta selección rota semanalmente; no es un ranking ni una valoración.</p><div className="discovery-grid">{selected.map(entry=><a key={entry.id} className="discovery-card" href={profile(entry)}>{photo(entry.imagen_url) && <img src={photo(entry.imagen_url)} alt={`Imagen publicada por ${entry.nombre}`} loading="lazy" width="640" height="420"/>}<div><span>{entry.zona || 'URUGUAY'} · {entry.categoria}</span><h3>{entry.nombre}</h3><p>{entry.descripcion.slice(0,140)}</p><b>Conocer el negocio <ArrowRight size={16}/></b></div></a>)}</div></section>}
     {!!promotions.length && <section className="local-promotions" aria-labelledby="promotions-title"><span className="section-kicker">PROPUESTAS CON FECHA</span><h2 id="promotions-title">Beneficios para aprovechar</h2><div className="discovery-grid">{promotions.map(entry=><a className="promotion-card" key={entry.id} href={profile(entry)}><Tag size={20}/><h3>{entry.promocion_titulo}</h3><p>{entry.promocion_detalle}</p><strong>{entry.nombre} · {entry.zona}</strong><small>Vigente hasta {String(entry.promocion_fin).slice(0,10).split('-').reverse().join('/')} inclusive. Consultá condiciones con el comercio.</small><b>Ver propuesta <ArrowRight size={16}/></b></a>)}</div></section>}
     {!!stories.length && <section className="merchant-stories" aria-labelledby="merchant-stories-title"><span className="section-kicker">PERSONAS DE NUESTRA ZONA</span><h2 id="merchant-stories-title">Detrás del mostrador</h2><div className="discovery-grid">{stories.slice(0,3).map(entry=><a className="discovery-card" key={entry.id} href={profile(entry)}>{photo(entry.imagen_url) && <img src={photo(entry.imagen_url)} alt={`Imagen publicada por ${entry.nombre}`} loading="lazy" width="640" height="420"/>}<div><span>{entry.zona}</span><h3>{entry.persona_nombre || entry.nombre}</h3><p>{entry.historia_negocio?.slice(0,160)}</p><b>Leer su historia <ArrowRight size={16}/></b></div></a>)}</div></section>}
