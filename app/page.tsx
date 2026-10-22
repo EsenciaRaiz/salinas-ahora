@@ -458,8 +458,7 @@ export default function Home() {
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase() === 'editorial' ? 'card-editorial' : ''}`} key={business.id || business.nombre}>
 
       <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} Icon={Icon} />
-      <div className="card-top"><span className="business-icon"><Icon size={22} /></span>{featured && <span className="sponsored"><Star size={13} /> Destacado</span>}</div>
-      <span className="card-category">{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>
+      <div className="card-category"><span>{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>{featured && <span className="sponsored"><Star size={13} aria-hidden="true"/> Destacado</span>}</div>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{cardSummary(featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description)}</p>
       <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
