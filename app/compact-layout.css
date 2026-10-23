@@ -182,3 +182,31 @@
 .homepage-redesign .business-card .card-actions>a,.homepage-redesign .business-card .save-business { min-height:40px; padding:8px; font-size:11px; }
 @media(min-width:701px) and (max-width:1000px) { .homepage-redesign .business-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:700px) { .homepage-redesign .business-grid { grid-template-columns:minmax(0,1fr); } .homepage-redesign .business-card .business-photo-frame,.homepage-redesign .business-card .business-photo-placeholder { height:130px; min-height:130px; max-height:130px; } .homepage-redesign .business-card .card-actions>a,.homepage-redesign .business-card .save-business { min-height:44px; } .homepage-redesign .guide-layout .ad-column { grid-template-columns:minmax(0,1fr); } }
+/* Tighten section rhythm while preserving typography and touch targets. */
+.homepage-redesign :is(.discovery-selection,.weekly-discovery,.locality-discovery,.local-promotions,.merchant-stories,.finder) { padding-top:14px; padding-bottom:8px; }
+.homepage-redesign .hero-ad-section { margin-top:8px; margin-bottom:0; }
+.homepage-redesign :is(.discovery-heading,.finder-heading,.featured-heading,.guide-subheading) { margin-bottom:10px; gap:10px; }
+.homepage-redesign .section-kicker { margin-bottom:5px; }
+.homepage-redesign :is(.weekly-discovery,.local-promotions,.merchant-stories) h2 { margin-bottom:10px; }
+.homepage-redesign .finder-heading p { margin:6px 0; }
+.homepage-redesign .category-row { margin-top:8px; padding-bottom:6px; }
+.homepage-redesign .featured-section { margin:12px 0; padding:14px; }
+.homepage-redesign .guide-layout { gap:12px; }
+.homepage-redesign .rotation-controls { padding-top:6px; }
+.homepage-redesign .between-ad-slot { margin-top:10px; }
+.homepage-redesign :is(.editorial,.events-teaser,.newsletter-signup,.merchant-invitation) { margin-top:10px; margin-bottom:10px; padding-top:18px; padding-bottom:18px; }
+.homepage-redesign :is(.editorial,.events-teaser,.newsletter-signup,.merchant-invitation) h2 { margin-top:5px; margin-bottom:8px; }
+.homepage-redesign :is(.editorial,.events-teaser,.newsletter-signup,.merchant-invitation) p { margin-top:6px; margin-bottom:10px; }
+.homepage-redesign .discovery-card>div { padding-top:12px; padding-bottom:12px; }
+.homepage-redesign .discovery-card h3 { margin-top:6px; margin-bottom:6px; }
+.homepage-redesign .discovery-card p { margin-bottom:8px; }
+@media(max-width:700px) {
+ .homepage-redesign :is(.discovery-selection,.weekly-discovery,.locality-discovery,.local-promotions,.merchant-stories,.finder) { padding-top:12px; padding-bottom:6px; }
+ .homepage-redesign .featured-section { margin:10px 0; padding:0; }
+ .homepage-redesign :is(.discovery-heading,.finder-heading,.featured-heading,.guide-subheading) { margin-bottom:8px; gap:4px; }
+ .homepage-redesign :is(.editorial,.events-teaser,.newsletter-signup,.merchant-invitation) { margin-top:8px; margin-bottom:8px; padding-top:14px; padding-bottom:14px; }
+ .homepage-redesign .discovery-grid { padding-bottom:4px; }
+}
+.homepage-redesign .finder-note { margin:6px 0 8px; }
+.homepage-redesign .proximity { margin-bottom:6px; gap:8px; }
+.homepage-redesign .result-count { padding:8px 0; }
