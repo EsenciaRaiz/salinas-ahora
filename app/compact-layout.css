@@ -313,3 +313,33 @@
 @media(max-width:700px) {
   .homepage-redesign .business-card { grid-template-rows:118px repeat(6,auto); }
 }
+
+/* Navy search panel: consistent fields and restrained quick links. */
+.homepage-redesign .search-landing { background:#102a43; border:1px solid #386079; border-radius:10px; box-shadow:0 12px 28px #102a4326; padding:20px; color:#f7f5ef; }
+.homepage-redesign .search-landing .finder-form { grid-template-columns:minmax(0,1.7fr) minmax(0,1.2fr) minmax(0,1fr) auto; gap:12px; }
+.homepage-redesign .search-landing .finder-form label { color:#f7f5ef; font-weight:600; gap:8px; }
+.homepage-redesign .search-landing .finder-form input { color:#102a43; background:#f7f5ef; border-color:#d6dfdf; font-weight:400; }
+.homepage-redesign .search-landing .finder-form select,.homepage-redesign .search-zone-filter summary { background:#102a43; color:#f7f5ef; border:1px solid #648298; }
+.homepage-redesign .search-landing .finder-form select option { background:#102a43; color:#f7f5ef; }
+.homepage-redesign .search-zone-filter summary { display:flex; align-items:center; gap:9px; min-height:48px; padding:10px 13px; list-style:none; font-weight:400; }
+.homepage-redesign .search-zone-filter summary::-webkit-details-marker { display:none; }
+.homepage-redesign .search-zone-filter summary svg { flex-shrink:0; }
+.homepage-redesign .search-zone-filter[open] summary { border-color:#f7f5ef; }
+.homepage-redesign .search-zone-options { background:#102a43; border-color:#648298; }
+.homepage-redesign .search-landing .finder-form>button { grid-column:auto; height:48px; margin:0; }
+.homepage-redesign .search-landing .discovery-shortcuts { border-top:1px solid #426078; margin-top:16px; padding-top:14px; gap:8px; }
+.homepage-redesign .search-landing .discovery-shortcuts :is(a,button) { background:transparent; color:#f7f5ef; border:1px solid #648298; font-size:12px; text-decoration:none; padding:8px 13px; min-height:40px; }
+.homepage-redesign .search-landing .discovery-shortcuts :is(a,button):hover { background:#24465f; border-color:#c3d2db; }
+.homepage-redesign .search-landing .discovery-shortcuts button[aria-pressed=true] { background:#f7f5ef; color:#102a43; border-color:#f7f5ef; }
+.homepage-redesign .search-landing :is(input,select,summary,button,a):focus-visible { outline:3px solid #f8b4a7; outline-offset:3px; }
+@media(max-width:900px) {
+ .homepage-redesign .search-landing .finder-form { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .homepage-redesign .search-landing .finder-form>label:first-child,.homepage-redesign .search-landing .finder-form>button { grid-column:1/-1; }
+ .homepage-redesign .search-zone-options { padding-top:12px; }
+ .homepage-redesign .search-landing .finder-form :is(input,select) { font-size:16px; }
+ .homepage-redesign .search-landing .discovery-shortcuts :is(a,button) { min-height:44px; }
+}
+@media(max-width:400px) {
+ .homepage-redesign .search-landing { padding:16px 12px; }
+ .homepage-redesign .search-zone-filter summary { padding-inline:8px; gap:5px; font-size:12px; }
+}
