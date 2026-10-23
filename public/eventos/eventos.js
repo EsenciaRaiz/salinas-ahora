@@ -1,6 +1,10 @@
 const endpoint='https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
 const cards=document.querySelector('#cards'),status=document.querySelector('#status'),locality=document.querySelector('#localidad'),entry=document.querySelector('#entrada'),more=document.querySelector('#more');
 let events=[],limit=9,expiryTimer;
+const requestedEvent=new URLSearchParams(location.search).get('evento');
+const eventKey=event=>String(event.id||[event.titulo,event.inicio,event.localidad].join('|'));
+const eventUrl=event=>'https://vitrinacerca.com/eventos/?evento='+encodeURIComponent(eventKey(event));
+const eventMessage=event=>'¡Mirá este evento que vi en Vitrina Cerca! 📍 '+event.titulo+' — '+event.localidad+'. Todos los detalles acá: ';
 const date=new Intl.DateTimeFormat('es-UY',{timeZone:'America/Montevideo',weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 function safeUrl(value){try{const url=new URL(value);return url.protocol==='https:'?url.href:''}catch{return ''}}
 function eventImageUrl(value){
@@ -15,7 +19,7 @@ function eventImageUrl(value){
 }
 function element(tag,text,className){const node=document.createElement(tag);node.textContent=text;if(className)node.className=className;return node}
 function render(){
-  const visible=events.filter(event=>event.fin>Date.now()&&(!locality.value||event.localidad===locality.value)&&(!entry.value||event.entrada===entry.value));
+  const visible=events.filter(event=>event.fin>Date.now()&&(!requestedEvent||eventKey(event)===requestedEvent)&&(!locality.value||event.localidad===locality.value)&&(!entry.value||event.entrada===entry.value));
   cards.replaceChildren();
   visible.slice(0,limit).forEach(event=>{
     const article=element('article','','card'),detail=document.createElement('details'),summary=document.createElement('summary'),body=element('div','','content');
@@ -34,15 +38,28 @@ function render(){
       icon.src='/eventos/whatsapp.svg';icon.alt='';icon.width=20;icon.height=20;icon.loading='lazy';
       link.append(icon,document.createTextNode('WhatsApp'));link.setAttribute('aria-label','Consultar por WhatsApp al organizador de '+event.titulo);links.append(link);
     }
-    if(navigator.share){const share=element('button','Compartir');share.type='button';share.addEventListener('click',()=>navigator.share({title:event.titulo,text:event.titulo+' · '+event.localidad+' · '+date.format(event.inicio),url:'https://vitrinacerca.com/eventos/'}).catch(()=>{}));links.append(share)}
     body.append(links);detail.append(body);article.append(detail);cards.append(article);
+    const sharing=element('div','','event-sharing'),shareToggle=element('button','Compartir evento'),panel=element('div','','event-share-panel'),feedback=element('p','','share-feedback');
+    shareToggle.type='button';shareToggle.setAttribute('aria-expanded','false');panel.hidden=true;
+    const shareId='compartir-evento-'+encodeURIComponent(eventKey(event));panel.id=shareId;shareToggle.setAttribute('aria-controls',shareId);
+    shareToggle.addEventListener('click',()=>{panel.hidden=!panel.hidden;shareToggle.setAttribute('aria-expanded',String(!panel.hidden))});
+    const wa=element('a','Compartir por WhatsApp');wa.href='https://wa.me/?text='+encodeURIComponent(eventMessage(event)+eventUrl(event));wa.target='_blank';wa.rel='noopener noreferrer';
+    const copy=element('button','Copiar enlace');copy.type='button';feedback.setAttribute('role','status');
+    const manual=element('input');manual.value=eventUrl(event);manual.readOnly=true;manual.setAttribute('aria-label','Enlace de '+event.titulo);manual.hidden=true;
+    copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(eventUrl(event));feedback.textContent='Enlace copiado';}catch{manual.hidden=false;manual.focus();manual.select();feedback.textContent='Seleccioná y copiá el enlace.'}});
+    panel.append(wa,copy);
+    if(navigator.share){const native=element('button','Más opciones');native.type='button';native.addEventListener('click',async()=>{try{await navigator.share({title:event.titulo,text:eventMessage(event),url:eventUrl(event)})}catch(error){if(error.name!=='AbortError')feedback.textContent='Podés compartir por WhatsApp o copiar el enlace.'}});panel.append(native)}
+    panel.append(manual,feedback);sharing.append(shareToggle,panel);article.append(sharing);
+    if(requestedEvent){detail.open=true;document.title=event.titulo+' | Vitrina Cerca';}
   });
   status.textContent=visible.length?visible.length+' evento'+(visible.length===1?'':'s')+' próximo'+(visible.length===1?'':'s'):(events.some(event=>event.fin>Date.now())?'No hay eventos con estos filtros.':'Todavía no hay próximos eventos publicados. ¿Tenés uno para compartir?');
+  if(requestedEvent&&!visible.length)status.textContent='Este evento ya terminó o no está disponible. Podés consultar el resto de la agenda.';
   more.hidden=visible.length<=limit;
   clearTimeout(expiryTimer);
   const nextEnd=Math.min(...events.filter(event=>event.fin>Date.now()).map(event=>event.fin));
   if(Number.isFinite(nextEnd))expiryTimer=setTimeout(render,Math.min(nextEnd-Date.now()+100,2147483647));
 }
+if(requestedEvent){const all=element('a','Ver todos los eventos');all.href='/eventos/';all.className='all-events';status.before(all);document.querySelector('.filters').hidden=true;}
 for(const control of [locality,entry])control.addEventListener('change',()=>{limit=9;render()});more.addEventListener('click',()=>{limit+=9;render()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&events.length)render()});
 function showEvents(items){const selected=locality.value;events=items.filter(event=>Number.isFinite(event.inicio)&&Number.isFinite(event.fin)).sort((a,b)=>a.inicio-b.inicio);const all=element('option','Todas las localidades');all.value='';locality.replaceChildren(all);[...new Set(events.map(event=>event.localidad))].sort().forEach(value=>{const option=element('option',value);option.value=value;locality.append(option)});if([...locality.options].some(option=>option.value===selected))locality.value=selected;render()}
