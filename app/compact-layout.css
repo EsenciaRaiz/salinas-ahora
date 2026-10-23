@@ -343,3 +343,31 @@
  .homepage-redesign .search-landing { padding:16px 12px; }
  .homepage-redesign .search-zone-filter summary { padding-inline:8px; gap:5px; font-size:12px; }
 }
+
+/* Directory first; compact editorial stories share the same baseline. */
+.homepage-redesign .magazine-discovery .discovery-heading { margin-bottom:10px; }
+.homepage-redesign .magazine-discovery .discovery-heading h2 { font-size:clamp(26px,3vw,34px); line-height:1.15; }
+.homepage-redesign .magazine-discovery .magazine-nav { margin-bottom:10px; padding:7px 0; }
+.homepage-redesign .magazine-heading { margin:10px 0 8px; }
+.homepage-redesign .magazine-heading>h3 { font-size:22px; }
+.homepage-redesign .magazine-stories { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.homepage-redesign .magazine-side { display:contents; }
+.homepage-redesign .magazine-stories>a,.homepage-redesign .magazine-side>a { display:grid; grid-template-columns:100px minmax(0,1fr); grid-template-rows:auto auto auto auto; gap:3px 12px; padding:0 0 10px; border-bottom:1px solid #d7dcda; align-content:start; }
+.homepage-redesign .magazine-stories>a>img,.homepage-redesign .magazine-side>a>img { grid-column:1; grid-row:1/5; width:100px; height:112px; object-fit:cover; }
+.homepage-redesign .magazine-stories>a>:not(img) { grid-column:2; margin:0; }
+.homepage-redesign .magazine-side>a>div { grid-column:2; }
+.homepage-redesign .magazine-stories h3 { font-size:23px; line-height:1.15; margin:3px 0; }
+.homepage-redesign .magazine-stories p { font-size:13px; margin:4px 0; }
+.homepage-redesign .magazine-stories .magazine-label { margin:0; }
+.homepage-redesign .magazine-plans { gap:20px; padding:6px 0 10px; }
+.homepage-redesign .magazine-plans h3 { font-size:23px; }
+.homepage-redesign .magazine-plans p { font-size:13px; margin:4px 0; }
+@media(max-width:700px) {
+ .homepage-redesign .magazine-stories { grid-template-columns:1fr; gap:10px; }
+ .homepage-redesign .magazine-stories>a,.homepage-redesign .magazine-side>a { grid-template-columns:80px minmax(0,1fr); }
+ .homepage-redesign .magazine-stories>a>img,.homepage-redesign .magazine-side>a>img { width:80px; height:100px; }
+ .homepage-redesign .magazine-stories h3,.homepage-redesign .magazine-plans h3 { font-size:21px; }
+ .homepage-redesign .magazine-plans { grid-template-columns:1fr; gap:10px; }
+ .homepage-redesign .magazine-plans>a+a { border-left:0; border-top:1px solid #d7dcda; padding:10px 0 0; }
+}
+.homepage-redesign .magazine-stories>a>div{grid-column:2;grid-row:1/5}.homepage-redesign .guide-layout .ad-column{align-items:start}.homepage-redesign .guide-layout .night-note{min-height:0;padding:20px}.homepage-redesign .guide-layout .night-note p{margin:8px 0}

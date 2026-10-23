@@ -532,7 +532,7 @@ export default function Home() {
     <main className={`homepage-redesign ${isNight ? 'night-mode' : 'day-mode'}`}>
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a>
-        <nav aria-label="Navegación principal"><a href="#guia">Explorá tu zona</a><a href="#historias">Historias</a><a href="/salidas/">Salidas</a><a href="/eventos/">Eventos</a><a href="/?planes=1">Publicar</a></nav>
+        <nav aria-label="Navegación principal"><a href="#guia">Explorá tu zona</a><a href="#descubrir">Historias</a><a href="/salidas/">Salidas</a><a href="/eventos/">Eventos</a><a href="/?planes=1">Publicar</a></nav>
         <a className="header-cta" href={businessFormUrl} aria-label="Sumá tu negocio: abrir formulario">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
       </header>
 
@@ -560,20 +560,6 @@ export default function Home() {
           <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> Mis favoritos{saved.length ? ' (' + saved.length + ')' : ''}</button>
         </div>{saveConfirmation}
       </section>
-      <section className="discovery-selection magazine-discovery" id="descubrir" aria-labelledby="discovery-title">
-        <div className="discovery-heading"><div><span className="section-kicker">INSPIRACIÓN LOCAL</span><h2 id="discovery-title">Historias para descubrir.<br/>Planes para disfrutar.</h2></div></div>
-        <nav className="magazine-nav" aria-label="Qué querés descubrir"><a href="#historias-lugares">Lugares y curiosidades</a><a href="#historias-negocios">Negocios con historia</a><a href="/eventos/">Eventos · gratis y pagos</a><a href="/salidas/">Salidas y visitas</a></nav>
-        <div className="magazine-heading"><h3 id="historias-lugares">Historias de nuestros lugares</h3><a href="/historias/">Todas las historias <ArrowRight size={16}/></a></div>
-        <div className="magazine-stories">
-          <a className="magazine-lead" href="/historias/arco-de-salinas/"><img src="/salinas-atardecer.webp" alt="Paisaje costero al atardecer, imagen ilustrativa" loading="lazy" width="640" height="420"/><span className="magazine-label">SALINAS · CANELONES</span><h3>Una bienvenida con historia</h3><p>Conocé el Arco de Salinas y su relación con el obelisco.</p><b>Leer historia <ArrowRight size={16}/></b></a>
-          <div className="magazine-side"><a href="/historias/marindia/"><img src="/parque-pajaros-marindia.png" alt="Parque de los Pájaros de Marindia" loading="lazy" width="640" height="420"/><div><span className="magazine-label">MARINDIA · CANELONES</span><h3>Un lugar, muchas historias</h3><p>Sus raíces y el parque que construyeron los vecinos.</p><b>Descubrir Marindia <ArrowRight size={16}/></b></div></a><a className="magazine-note" href="/historias/pinamar/"><div><span className="magazine-label">PINAMAR · CANELONES</span><h3>Los árboles que cambiaron el paisaje</h3><p>De los antiguos arenales al nacimiento del balneario.</p><b>Leer historia <ArrowRight size={16}/></b></div></a></div>
-        </div>
-        <div className="magazine-heading"><h3>Elegí tu próximo plan</h3></div>
-        <div className="magazine-plans"><a href="/eventos/"><span className="magazine-label">EVENTOS · GRATIS Y PAGOS</span><h3>Qué pasa cerca</h3><p>Ferias, talleres y encuentros. Compartí cada evento con su enlace.</p><b>Explorar la agenda <ArrowRight size={16}/></b></a><a href="/salidas/"><span className="magazine-label">SALIDAS Y VISITAS</span><h3>Una escapada entre viñedos</h3><p>Conocé la propuesta de recorridos y almuerzos en bodegas de Canelones.</p><b>Descubrir las experiencias <ArrowRight size={16}/></b></a></div>
-      </section>
-      <LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))}/>
-      <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={coverAds} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
-
       <section className="finder" id="guia" aria-labelledby="finder-title">
 
         <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">Negocios para tener a mano</h2><p>Buscá por negocio, oficio, producto, servicio, lugar y horario.</p></div></div>
@@ -601,10 +587,21 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="editorial" id="historias" aria-labelledby="historias-title"><div className="editorial-copy"><span className="section-kicker light">HISTORIAS DEL LUGAR</span><h2 id="historias-title">Historias y curiosidades del lugar</h2><p>Rincones, recuerdos y detalles para descubrir nuestra zona con otros ojos.</p></div><a href="/historias/">Descubrir historias <ArrowRight size={18} /></a><div className="story-ads" aria-label="Anuncios junto a historias">{adsAt('stories').length ? <AdRotator ads={adsAt('stories')} label="Publicidad junto a historias" renderAd={renderAdvertisement}/> : <AvailableAd placement="stories"/>}</div></section>
+      <section className="discovery-selection magazine-discovery" id="descubrir" aria-labelledby="discovery-title">
+        <div className="discovery-heading"><div><span className="section-kicker">INSPIRACIÓN LOCAL</span><h2 id="discovery-title">Historias para descubrir. Planes para disfrutar.</h2></div></div>
+        <nav className="magazine-nav" aria-label="Qué querés descubrir"><a href="#historias-lugares">Lugares y curiosidades</a><a href="#historias-negocios">Negocios con historia</a><a href="/eventos/">Eventos · gratis y pagos</a><a href="/salidas/">Salidas y visitas</a></nav>
+        <div className="magazine-heading"><h3 id="historias-lugares">Historias de nuestros lugares</h3><a href="/historias/">Todas las historias <ArrowRight size={16}/></a></div>
+        <div className="magazine-stories">
+          <a className="magazine-lead" href="/historias/arco-de-salinas/"><img src="/salinas-atardecer.webp" alt="Paisaje costero al atardecer, imagen ilustrativa" loading="lazy" width="640" height="420"/><div><span className="magazine-label">SALINAS · CANELONES</span><h3>Una bienvenida con historia</h3><p>Conocé el Arco de Salinas y su relación con el obelisco.</p><b>Leer historia <ArrowRight size={16}/></b></div></a>
+          <div className="magazine-side"><a href="/historias/marindia/"><img src="/parque-pajaros-marindia.png" alt="Parque de los Pájaros de Marindia" loading="lazy" width="640" height="420"/><div><span className="magazine-label">MARINDIA · CANELONES</span><h3>Un lugar, muchas historias</h3><p>Sus raíces y el parque que construyeron los vecinos.</p><b>Descubrir Marindia <ArrowRight size={16}/></b></div></a></div>
+        </div>
+        <div className="magazine-heading"><h3>Elegí tu próximo plan</h3></div>
+        <div className="magazine-plans"><a href="/eventos/"><span className="magazine-label">EVENTOS · GRATIS Y PAGOS</span><h3>Qué pasa cerca</h3><p>Ferias, talleres y encuentros. Compartí cada evento con su enlace.</p><b>Explorar la agenda <ArrowRight size={16}/></b></a><a href="/salidas/"><span className="magazine-label">SALIDAS Y VISITAS</span><h3>Una escapada entre viñedos</h3><p>Conocé la propuesta de recorridos y almuerzos en bodegas de Canelones.</p><b>Descubrir las experiencias <ArrowRight size={16}/></b></a></div>
+      </section>
+      <LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))}/>
+      <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={coverAds} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
 
-      <section className="events-teaser" aria-labelledby="salidas-title"><div><span className="section-kicker">SALIDAS Y EXPERIENCIAS</span><h2 id="salidas-title">Una escapada entre viñedos</h2><p>Recorridos, sabores e historias para compartir en Canelones. Estamos reuniendo las propuestas de sus anfitriones.</p></div><a href="/salidas/">Descubrir las salidas <ArrowRight size={18}/></a></section>
-      <section className="events-teaser" aria-labelledby="events-teaser-title"><div><span className="section-kicker">CARTELERA LOCAL</span><h2 id="events-teaser-title">Qué pasa cerca</h2><p>Ferias, talleres y encuentros para descubrir en tu zona.</p></div><a href="/eventos/">Ver próximos eventos <ArrowRight size={18}/></a></section>
+      {!!adsAt('stories').length && <section className="hero-ad-section" aria-label="Publicidad junto a historias"><AdRotator ads={adsAt('stories')} label="Publicidad junto a historias" renderAd={renderAdvertisement}/></section>}
       {yes(String(configuration.RESUMEN_SEMANAL_ACTIVO || '')) && <Newsletter action={submissionsEndpoint}/>}
       <section className="merchant-invitation" aria-labelledby="merchant-title"><div><span className="section-kicker">SUMATE A VITRINA CERCA</span><h2 id="merchant-title">Tu próximo cliente puede estar cerca.</h2><p>Dale a tu negocio un lugar en la guía de tu zona. La ficha básica es gratuita.</p><a href="/?planes=1">Conocé cómo publicar <ArrowRight size={17}/></a></div></section>
       <footer>
