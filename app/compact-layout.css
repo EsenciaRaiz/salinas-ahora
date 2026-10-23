@@ -153,6 +153,22 @@
 .share-options button,.share-options a { display:inline-flex; align-items:center; min-height:44px; padding:9px 12px; border:1px solid #b8c8d0; border-radius:5px; background:white; color:#102a43; font:600 13px Arial,sans-serif; cursor:pointer; text-decoration:none; }
 .share-business-panel label { display:block; font-size:13px; }
 .share-business-panel input { display:block; width:100%; min-width:0; padding:10px; margin-top:5px; border:1px solid #b8c8d0; border-radius:5px; background:white; color:#102a43; font-size:16px; }
+
+/* Keep contact actions and personal tools in separate, aligned rows. */
+.business-profile .profile-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.business-profile .profile-actions>a { display:flex; align-items:center; justify-content:center; min-width:0; min-height:44px; margin:0; padding:10px 12px; font:700 13px/1.3 Arial,sans-serif; text-align:center; }
+.business-profile .profile-actions>a:last-child:nth-child(odd) { grid-column:1/-1; }
+.business-profile .profile-actions svg,.business-profile .profile-actions img { flex-shrink:0; }
+.business-profile .profile-utilities { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:8px; }
+.business-profile .profile-utilities>button { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; min-width:0; min-height:44px; margin:0; padding:10px 12px; border:1px solid #b8c8d0; border-radius:5px; background:#fff; color:#102a43; font:600 13px/1.3 Arial,sans-serif; text-decoration:none; text-align:center; }
+.business-profile .profile-utilities svg { flex-shrink:0; }
+.business-profile .share-business-panel { margin:10px 0 0; padding:12px; }
+.business-profile .share-business-panel h2 { font-size:22px; margin:0 0 6px; }
+.business-profile .share-business-panel p { margin:0 0 10px; line-height:1.4; }
+.business-profile .share-business-panel p[role=status]:empty { display:none; }
+.business-profile .share-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:10px; }
+.business-profile .share-options>a,.business-profile .share-options>button { justify-content:center; width:100%; min-width:0; margin:0; padding:8px; font-size:12px; line-height:1.3; text-align:center; }
+.business-profile .share-business-panel input { box-sizing:border-box; font-size:14px; }
 @media(max-width:900px) { .homepage-redesign .finder-form { grid-template-columns:repeat(2,minmax(0,1fr)); } .homepage-redesign .finder-form>label:first-child,.homepage-redesign .finder-form>button { grid-column:1/-1; } }
 @media(max-width:700px) { .homepage-redesign .finder-form { grid-template-columns:minmax(0,1fr); } .homepage-redesign .finder-form>label { grid-column:1/-1; } }
 @media(min-width:901px) { .search-zone-filter { position:relative; } .search-zone-options { position:absolute; top:calc(100% + 8px); left:0; width:100%; min-width:240px; padding:14px; border:1px solid #c4ced0; border-radius:8px; background:#f7f5ef; box-shadow:0 10px 25px #102a4326; z-index:10; } }

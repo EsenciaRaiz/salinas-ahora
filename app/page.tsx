@@ -501,12 +501,14 @@ export default function Home() {
               <p className="profile-description">{coverageOf(profile).description}</p>{coverageOf(profile).label && <p className="profile-coverage">{coverageOf(profile).label}</p>}
               <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
-                {saveButton(profile)}
-                <button type="button" className="share-business" onClick={() => { setShareMessage(''); setShareOpen(true); }}><Share2 size={17} aria-hidden="true"/> Compartir mi ficha</button>
                 {whatsapp.length >= 8 && contact && <a href={whatsappContactUrl(whatsapp,profile)} onClick={() => recordContact(profile,'whatsapp',contact.intent,'ficha')} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> {contact.label}</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
                 {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
                 {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
+              </div>
+              <div className="profile-utilities">
+                {saveButton(profile)}
+                <button type="button" className="share-business" aria-expanded={shareOpen} onClick={() => { setShareMessage(''); setShareOpen(open => !open); }}><Share2 size={17} aria-hidden="true"/> Compartir ficha</button>
               </div>
               {shareOpen && <section className="share-business-panel" aria-label="Compartir esta ficha"><h2>Compartí este negocio</h2><p>Elegí cómo compartir el enlace a esta ficha.</p><div className="share-options">{typeof navigator.share === 'function' && <button type="button" onClick={() => shareBusiness(profile)}>Más opciones para compartir</button>}<button type="button" onClick={() => copyBusinessLink(profile)}>Copiar enlace</button><a href={'https://wa.me/?text=' + encodeURIComponent('Conocé ' + profile.nombre + ' en Vitrina Cerca: ' + businessUrl(profile))} target="_blank" rel="noopener noreferrer">Compartir por WhatsApp</a><button type="button" onClick={() => setShareOpen(false)}>Cerrar</button></div><label>Enlace de la ficha<input readOnly value={businessUrl(profile)} onFocus={event => event.currentTarget.select()}/></label><p role="status">{shareMessage}</p></section>}
               <BusinessSocials business={profile}/>
