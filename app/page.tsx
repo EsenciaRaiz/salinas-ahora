@@ -363,8 +363,11 @@ export default function Home() {
   const clock = useMemo(() => montevideoClock(), [clockTick]);
   const categories = ['Todos', ...Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, department: true, locality: true })).map((business) => business.categoria).filter(Boolean)))];
   const availableSpecialties = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true })).map((business) => String(business.especialidad || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
-  // The location menu represents published business locations, not delivery coverage.
-  const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).map((business) => String(business.departamento || business.departamento_region || '').trim()).filter((region) => departments.includes(region)));
+  // Include both the business address and its declared service coverage.
+  const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).flatMap((business) => {
+    const region = String(business.departamento || business.departamento_region || '').trim();
+    return departments.filter((item) => item === region || servesDepartment(business, item));
+  }));
   const availableLocalities = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true })).filter((business) => (business.departamento || business.departamento_region) === department).map((business) => String(business.zona || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
   const availableTimes = new Set<TimeFilter>(['todos']);
   for (const business of businesses.filter((item) => matchingBusiness(item, { category: true, department: true, locality: true }))) {
