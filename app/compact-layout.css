@@ -391,3 +391,20 @@
 @media (max-width:360px) {
  .homepage-redesign .search-landing .finder-form { grid-template-columns:minmax(0,3fr) minmax(0,5fr); }
 }
+
+/* Bring the first listings closer on phones while keeping the cover photo and controls. */
+@media (max-width:700px) {
+ .homepage-redesign .finder { padding-top:4px; }
+ .homepage-redesign .finder-heading .section-kicker,
+ .homepage-redesign .finder-heading p { display:none; }
+ .homepage-redesign .finder-heading { margin-bottom:4px; }
+ .homepage-redesign .category-row { margin-top:4px; }
+ .homepage-redesign .result-count { padding:5px 0; }
+ .homepage-redesign .hero { height:190px; min-height:190px; }
+ .homepage-redesign .hero-copy { padding:10px 20px 24px; }
+ .homepage-redesign .hero h1 { font-size:clamp(30px,8.5vw,34px); line-height:1.05; margin:7px 0; }
+ .homepage-redesign .hero-copy p { font-size:13px; line-height:1.25; margin-top:5px; }
+}
+@media (max-width:360px) {
+ .homepage-redesign .hero { height:210px; min-height:210px; }
+}
