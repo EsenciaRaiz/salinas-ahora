@@ -537,7 +537,10 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a>
         <nav aria-label="Navegación principal"><a href="#guia">Explorá tu zona</a><a href="#descubrir">Historias</a><a href="/salidas/">Salidas</a><a href="/eventos/">Eventos</a><a href="/?planes=1">Publicar</a></nav>
-        <a className="header-cta" href={businessFormUrl} aria-label="Sumá tu negocio: abrir formulario">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
+        <div className="header-join">
+          <a className="header-cta" href={businessFormUrl} aria-label="Sumá tu negocio: abrir formulario">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
+          <span className="header-join-note">Ficha básica gratis, sin mensualidad ni vencimiento</span>
+        </div>
       </header>
 
       <section className="hero" id="inicio">
