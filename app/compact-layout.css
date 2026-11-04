@@ -371,3 +371,18 @@
  .homepage-redesign .magazine-plans>a+a { border-left:0; border-top:1px solid #d7dcda; padding:10px 0 0; }
 }
 .homepage-redesign .magazine-stories>a>div{grid-column:2;grid-row:1/5}.homepage-redesign .guide-layout .ad-column{align-items:start}.homepage-redesign .guide-layout .night-note{min-height:0;padding:20px}.homepage-redesign .guide-layout .night-note p{margin:8px 0}
+
+/* Keep the mobile search panel compact without changing its controls. */
+@media (max-width:700px) {
+ .homepage-redesign .search-landing { padding:12px; }
+ .homepage-redesign .search-landing .finder-form { gap:8px; }
+ .homepage-redesign .search-landing .discovery-shortcuts { margin-top:10px; padding-top:10px; gap:6px; }
+}
+
+/* Keep the free basic listing visible beside the invitation to join. */
+.homepage-redesign .header-join { justify-self:end; display:flex; flex-direction:column; align-items:center; gap:3px; }
+.homepage-redesign .header-join-note { max-width:220px; color:#445c6c; font-size:10px; line-height:1.2; text-align:center; }
+@media (max-width:700px) {
+ .homepage-redesign .site-header { height:auto; min-height:70px; }
+ .homepage-redesign .header-join-note { max-width:145px; font-size:9px; }
+}
