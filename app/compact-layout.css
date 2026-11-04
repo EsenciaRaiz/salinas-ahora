@@ -384,5 +384,5 @@
 .homepage-redesign .header-join-note { max-width:220px; color:#445c6c; font-size:10px; line-height:1.2; text-align:center; }
 @media (max-width:700px) {
  .homepage-redesign .site-header { height:auto; min-height:70px; }
- .homepage-redesign .header-join-note { max-width:145px; font-size:9px; }
+ .homepage-redesign .header-join-note { max-width:clamp(128px,40vw,160px); font-size:10px; }
 }
