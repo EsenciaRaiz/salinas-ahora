@@ -386,3 +386,8 @@
  .homepage-redesign .site-header { height:auto; min-height:70px; }
  .homepage-redesign .header-join-note { max-width:clamp(128px,40vw,160px); font-size:10px; }
 }
+
+/* Give the schedule label room on narrow phones without enlarging the search panel. */
+@media (max-width:360px) {
+ .homepage-redesign .search-landing .finder-form { grid-template-columns:minmax(0,3fr) minmax(0,5fr); }
+}
