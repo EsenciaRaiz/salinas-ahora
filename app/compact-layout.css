@@ -450,3 +450,10 @@
  .homepage-redesign .search-zone-filter summary { padding-inline:5px; gap:3px; font-size:11px; }
  .homepage-redesign .search-zone-filter summary svg { width:14px; height:14px; }
 }
+
+/* Let mobile visitors scan the free directory without advancing each slide. */
+.homepage-redesign .guide-view-toggle { display:none; }
+@media(max-width:700px) {
+ .homepage-redesign .guide-view-toggle { display:inline-flex; align-items:center; justify-content:center; min-height:44px; margin:0 0 10px; padding:8px 14px; border:1px solid #9db9bd; border-radius:999px; background:#f7f6f1; color:#123047; font:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+ .homepage-redesign .guide-view-toggle:hover,.homepage-redesign .guide-view-toggle:focus-visible { background:#e5efec; }
+}
