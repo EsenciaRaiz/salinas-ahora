@@ -408,3 +408,11 @@
 @media (max-width:360px) {
  .homepage-redesign .hero { height:210px; min-height:210px; }
 }
+
+/* Five quick links in two balanced mobile rows, with full-size touch targets. */
+@media (max-width:700px) {
+ .homepage-redesign .search-landing .discovery-shortcuts { grid-template-columns:repeat(6,minmax(0,1fr)); }
+ .homepage-redesign .search-landing .discovery-shortcuts>:nth-child(-n+3) { grid-column:span 2; }
+ .homepage-redesign .search-landing .discovery-shortcuts>:nth-child(n+4) { grid-column:span 3; }
+ .homepage-redesign .search-landing .discovery-shortcuts :is(a,button) { min-height:44px; }
+}
