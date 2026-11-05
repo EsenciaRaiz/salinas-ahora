@@ -162,6 +162,10 @@ function businessStyle(category: string, index: number) {
 function businessHours(business: Business) {
   return hoursLabel(business, montevideoClock().day);
 }
+function closedToday(business: Business, day: number) {
+  const hours = day === 0 ? business.horario_domingo : day === 6 ? business.horario_sabado : business.horario_lunes_a_viernes;
+  return /^cerrado$/i.test(String(hours || '').trim());
+}
 
 function driveImage(value?: string, width=1200) { const source=String(value||'').split('|')[0].trim(); if(!source) return ''; const match=source.match(/(?:\/d\/|[?&]id=)([-\w]{20,})/); return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w${width}` : source; }
 function businessImages(value?: string, width=1200) { return String(value||'').split('|').map((item)=>driveImage(item,width)).filter(Boolean).slice(0,4); }
@@ -467,6 +471,7 @@ export default function Home() {
     const open = isOpenNow(business, clock);
     const known = hasKnownHours(business, clock.day);
     const hours = hoursLabel(business, clock.day);
+    const closed = closedToday(business, clock.day);
     const phone = contactNumber(business.telefono);
     const whatsapp = contactNumber(business.whatsapp);
     const contact = businessContact(business);
@@ -479,7 +484,7 @@ export default function Home() {
       <div className="card-category"><span>{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>{featured && <span className="sponsored"><Star size={13} aria-hidden="true"/> Destacado</span>}</div>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{cardSummary(featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description)}</p>
-      <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
+      <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : closed ? 'Cerrado hoy' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
         <a className={`details ${!whatsapp && !phone && !site ? 'primary-action' : ''}`} href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
@@ -517,7 +522,7 @@ export default function Home() {
               <span className="section-kicker">{profile.categoria}{profile.especialidad ? ` · ${profile.especialidad}` : ''}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
               <h1>{logo && <img className="profile-logo" src={logo} alt="" width="56" height="56" />}{profile.nombre}</h1>
               <p className="profile-description">{coverageOf(profile).description}</p>{coverageOf(profile).label && <p className="profile-coverage">{coverageOf(profile).label}</p>}
-              <div className="profile-facts"><div><Clock3 size={18}/><span>{hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
+              <div className="profile-facts"><div><Clock3 size={18}/><span>{closedToday(profile,clock.day) ? 'Cerrado hoy' : hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
                 {whatsapp.length >= 8 && contact && <a href={whatsappContactUrl(whatsapp,profile)} onClick={() => recordContact(profile,'whatsapp',contact.intent,'ficha')} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> {contact.label}</a>}
                 {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
