@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 
 const endpoint = 'https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec';
 const origin = 'https://vitrinacerca.com';
@@ -7,6 +7,11 @@ const escapeXml = escapeHtml;
 const demoIds = new Set(['SAL001', 'SAL002', 'SAL003', 'SAL004']);
 const businessUrl = (business) => `${origin}/?negocio=${encodeURIComponent(business.id)}`;
 const searchKeywords = (business) => String(business.etiquetas_busqueda || business.palabras_clave || '').trim();
+const curatedBusinesses = JSON.parse(await readFile(new URL('../app/curated-businesses.json', import.meta.url), 'utf8'));
+const mergeCurated = (items) => {
+  const ids = new Set(items.map((business) => business.id));
+  return [...items, ...curatedBusinesses.filter((business) => !ids.has(business.id))];
+};
 
 let businesses = [];
 let publicData = null;
@@ -15,11 +20,18 @@ try {
   if (!response.ok) throw new Error(`Respuesta ${response.status}`);
   const data = await response.json();
   if (!data.correcto || !Array.isArray(data.negocios)) throw new Error('Respuesta incompleta');
-  publicData = data;
-  businesses = data.negocios.filter((business) => business.id && business.nombre && !demoIds.has(business.id));
+  businesses = mergeCurated(data.negocios.filter((business) => business.id && business.nombre && !demoIds.has(business.id)));
+  publicData = { ...data, negocios: businesses };
 } catch (error) {
-  console.warn(`Directorio de búsqueda: no se pudo actualizar (${error.message}). Se conserva el archivo anterior.`);
-  process.exit(0);
+  console.warn(`Directorio de búsqueda: no se pudo actualizar (${error.message}). Se usa la última copia disponible.`);
+  try {
+    const data = JSON.parse(await readFile('public/guide-data.json', 'utf8'));
+    businesses = mergeCurated(data.negocios.filter((business) => business.id && business.nombre && !demoIds.has(business.id)));
+    publicData = { ...data, negocios: businesses };
+  } catch {
+    console.warn('No hay una copia de la guía disponible; se conserva el directorio anterior.');
+    process.exit(0);
+  }
 }
 
 const entries = businesses.map((business) => `<li><a href="${escapeHtml(businessUrl(business))}">${escapeHtml(business.nombre)}</a><span>${escapeHtml([business.categoria, business.especialidad, business.zona, business.departamento || business.departamento_region].filter(Boolean).join(' · '))}</span><p>${escapeHtml(business.descripcion)}</p>${searchKeywords(business) ? `<p class="keywords"><strong>También podés encontrarlo buscando:</strong> ${escapeHtml(searchKeywords(business))}</p>` : ''}</li>`).join('\n');
