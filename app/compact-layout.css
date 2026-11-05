@@ -422,3 +422,14 @@
  .homepage-redesign .site-header { padding:6px 14px; min-height:76px; }
  .homepage-redesign .header-join-note { max-width:clamp(145px,48vw,180px); font-size:11px; line-height:1.25; }
 }
+
+/* Keep the favorite action on the photo instead of adding a full card row. */
+@media (max-width:700px) {
+ .homepage-redesign .business-card { position:relative; }
+ .homepage-redesign .business-card .card-actions>.save-business {
+  position:absolute; top:10px; right:10px; z-index:2;
+  grid-column:auto; grid-row:auto; width:44px; height:44px; min-height:44px;
+  padding:0; border-radius:50%; box-shadow:0 2px 8px #102a4333;
+ }
+ .homepage-redesign .business-card .card-actions>.save-business span { display:none; }
+}
