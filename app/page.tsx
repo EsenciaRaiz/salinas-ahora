@@ -43,6 +43,7 @@ type Business = BusinessExtras & {
   abierto_de_noche: string;
   imagen_url?: string;
   imagen_descripcion?: string;
+  imagen_ilustrativa?: boolean;
   mapa_url?: string;
   texto_destacado?: string;
   orden?: string | number;
@@ -480,7 +481,7 @@ export default function Home() {
     const logo = driveImage(business.logo_url, 160);
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase() === 'editorial' ? 'card-editorial' : ''}`} key={business.id || business.nombre}>
 
-      <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} altText={business.imagen_descripcion} Icon={Icon} />
+      <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} altText={business.imagen_descripcion} illustrative={business.imagen_ilustrativa} Icon={Icon} />
       <div className="card-category"><span>{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>{featured && <span className="sponsored"><Star size={13} aria-hidden="true"/> Destacado</span>}</div>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{cardSummary(featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description)}</p>
@@ -515,6 +516,7 @@ export default function Home() {
         {!profile ? <div className="profile-empty"><h1>{!liveDataChecked ? 'Cargando ficha…' : dataStatus === 'error' ? 'No pudimos cargar la ficha' : 'No encontramos esta ficha'}</h1><p>{!liveDataChecked ? 'Un momento, por favor.' : dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
           <div className={`profile-card ${landscapeProfilePhoto ? 'profile-card-landscape' : ''}`}>
             <div className={`profile-gallery ${image?.endsWith('.svg') ? 'logo-gallery' : ''}`}>
+              {profile.imagen_ilustrativa && image && <span className="illustrative-image-label">Imagen ilustrativa</span>}
               {image ? <img className="profile-image" src={image} alt={profile.imagen_descripcion || `Imagen de ${profile.nombre}`} decoding="async" fetchPriority="high" width="1200" height="800" onLoad={(event) => setLandscapeProfilePhoto(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5)}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
               {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{businessImages(profile?.imagen_url, 160).map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt="" loading="lazy" decoding="async" width="160" height="110"/></button>)}</div>}
             </div>
