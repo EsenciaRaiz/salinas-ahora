@@ -11,6 +11,7 @@ import { freeRotationActive } from './rotation-policy';
 import { businessContact, whatsappContactUrl, type ContactIntent } from './contact-intent';
 import { BusinessFacts, LocalDiscoveries, Newsletter, MerchantTestimonials, type BusinessExtras, type Testimonial } from './business-features';
 import { coverageOf, servesDepartment, departments } from '../public/coverage.js';
+import curatedBusinesses from './curated-businesses.json';
 
 type Business = BusinessExtras & {
   id: string;
@@ -41,6 +42,7 @@ type Business = BusinessExtras & {
   abierto_ahora: string;
   abierto_de_noche: string;
   imagen_url?: string;
+  imagen_descripcion?: string;
   mapa_url?: string;
   texto_destacado?: string;
   orden?: string | number;
@@ -109,6 +111,10 @@ function recordContact(business: Business, action: ContactAction, intent?: Conta
 }
 
 const demonstrationIds = new Set(['SAL001', 'SAL002', 'SAL003', 'SAL004']);
+function withCuratedBusinesses(items: Business[]): Business[] {
+  const ids = new Set(items.map((business) => business.id));
+  return [...items, ...curatedBusinesses.filter((business) => !ids.has(business.id))];
+}
 
 const publicCacheKey = 'vitrina-public-data-v2';
 function readCachedData(): PublicData | null {
@@ -239,7 +245,7 @@ export default function Home() {
   const [locality, setLocality] = useState('');
   const [query, setQuery] = useState('');
   const [cachedData] = useState<PublicData | null>(() => readCachedData());
-  const [businesses, setBusinesses] = useState<Business[]>(() => cachedData?.negocios.filter((business) => !demonstrationIds.has(business.id)) || []);
+  const [businesses, setBusinesses] = useState<Business[]>(() => cachedData ? withCuratedBusinesses(cachedData.negocios.filter((business) => !demonstrationIds.has(business.id))) : []);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(() => cachedData?.publicidad || []);
   const [dataStatus, setDataStatus] = useState<'loading' | 'ready' | 'error'>(cachedData ? 'ready' : 'loading');
   const [liveDataChecked, setLiveDataChecked] = useState(false);
@@ -262,7 +268,7 @@ export default function Home() {
     let received = !!cachedData;
     const apply = (data: PublicData) => {
         if (!data.correcto || !Array.isArray(data.negocios)) throw new Error('Datos incompletos');
-        setBusinesses(data.negocios.filter((business) => !demonstrationIds.has(business.id)));
+        setBusinesses(withCuratedBusinesses(data.negocios.filter((business) => !demonstrationIds.has(business.id))));
         setAdvertisements(Array.isArray(data.publicidad) ? data.publicidad : []);
         setConfiguration(data.configuracion || {});
         setTestimonials(data.testimonios || []);
@@ -469,7 +475,7 @@ export default function Home() {
     const logo = driveImage(business.logo_url, 160);
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase() === 'editorial' ? 'card-editorial' : ''}`} key={business.id || business.nombre}>
 
-      <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} Icon={Icon} />
+      <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} altText={business.imagen_descripcion} Icon={Icon} />
       <div className="card-category"><span>{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>{featured && <span className="sponsored"><Star size={13} aria-hidden="true"/> Destacado</span>}</div>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{cardSummary(featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description)}</p>
@@ -504,7 +510,7 @@ export default function Home() {
         {!profile ? <div className="profile-empty"><h1>{!liveDataChecked ? 'Cargando ficha…' : dataStatus === 'error' ? 'No pudimos cargar la ficha' : 'No encontramos esta ficha'}</h1><p>{!liveDataChecked ? 'Un momento, por favor.' : dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
           <div className={`profile-card ${landscapeProfilePhoto ? 'profile-card-landscape' : ''}`}>
             <div className={`profile-gallery ${image?.endsWith('.svg') ? 'logo-gallery' : ''}`}>
-              {image ? <img className="profile-image" src={image} alt={`Imagen de ${profile.nombre}`} decoding="async" fetchPriority="high" width="1200" height="800" onLoad={(event) => setLandscapeProfilePhoto(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5)}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
+              {image ? <img className="profile-image" src={image} alt={profile.imagen_descripcion || `Imagen de ${profile.nombre}`} decoding="async" fetchPriority="high" width="1200" height="800" onLoad={(event) => setLandscapeProfilePhoto(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5)}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
               {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{businessImages(profile?.imagen_url, 160).map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt="" loading="lazy" decoding="async" width="160" height="110"/></button>)}</div>}
             </div>
             <div className="profile-content">
