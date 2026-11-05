@@ -28,6 +28,7 @@
     "mapa_url": "",
     "logo_url": "",
     "estilo_tarjeta": "Clásica",
-    "orden": ""
+    "orden": "",
+    "boton_texto": "Consultar"
   }
 ]
