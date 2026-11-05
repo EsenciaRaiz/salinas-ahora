@@ -29,6 +29,7 @@
     "logo_url": "",
     "estilo_tarjeta": "Clásica",
     "orden": "",
-    "boton_texto": "Consultar"
+    "boton_texto": "Consultar",
+    "imagen_ilustrativa": true
   }
 ]
