@@ -416,3 +416,9 @@
  .homepage-redesign .search-landing .discovery-shortcuts>:nth-child(n+4) { grid-column:span 3; }
  .homepage-redesign .search-landing .discovery-shortcuts :is(a,button) { min-height:44px; }
 }
+
+/* Make the free-listing promise readable beside the mobile join button. */
+@media (max-width:700px) {
+ .homepage-redesign .site-header { padding:6px 14px; min-height:76px; }
+ .homepage-redesign .header-join-note { max-width:clamp(145px,48vw,180px); font-size:11px; line-height:1.25; }
+}
