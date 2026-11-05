@@ -470,3 +470,9 @@
 
 /* Keep the favorite control clear of business wordmarks. */
 .homepage-redesign .business-card .business-photo-frame.logo-frame .business-photo { padding-right:64px; }
+
+/* Label conceptual imagery clearly without covering the favorite control. */
+.homepage-redesign .business-photo-frame .illustrative-image-label,
+.business-profile .profile-gallery .illustrative-image-label { position:absolute; z-index:1; left:10px; bottom:10px; display:inline-block; max-width:calc(100% - 70px); padding:5px 8px; border-radius:4px; background:rgba(9,35,50,.82); color:#fff; font:600 11px/1.2 Arial,sans-serif; letter-spacing:.01em; }
+.business-profile .profile-gallery { position:relative; }
+.business-profile .profile-gallery .illustrative-image-label { top:12px; bottom:auto; left:12px; }
