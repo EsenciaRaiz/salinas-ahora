@@ -561,8 +561,8 @@ export default function Home() {
         </form>
         <div className="discovery-shortcuts" aria-label="Accesos rápidos">
           <button type="button" aria-pressed={filter === 'ahora'} onClick={() => showPeriod('ahora')}><Clock3 size={16}/> Abiertos ahora</button>
-          <button type="button" onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Comercios y servicios</button>
-          <a href="/salidas/"><Sparkles size={16}/> Salidas y experiencias</a>
+          <button type="button" aria-label="Ver todos los comercios y servicios" onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Ver todos</button>
+          <a href="/salidas/" aria-label="Salidas y experiencias"><Sparkles size={16}/> Salidas</a>
           <button type="button" aria-pressed={filter === 'noche'} onClick={() => showPeriod('noche')}><MoonStar size={16}/> De noche</button>
           <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> Mis favoritos{saved.length ? ' (' + saved.length + ')' : ''}</button>
         </div>{saveConfirmation}
