@@ -391,6 +391,14 @@ export default function Home() {
   const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort(byDistance),[visible,visitorLocation]);
   const guideVisible=basicVisible;
   const rotateFreeBusinesses = freeRotationActive();
+  const [guideListView, setGuideListView] = useState(false);
+  const [isMobileGuide, setIsMobileGuide] = useState(() => window.matchMedia('(max-width: 700px)').matches);
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 700px)');
+    const update = () => setIsMobileGuide(mobile.matches);
+    mobile.addEventListener('change', update);
+    return () => mobile.removeEventListener('change', update);
+  }, []);
   const activeAdvertisements=useMemo(()=>advertisements.filter((ad)=>(ad.publicar === undefined || yes(ad.publicar)) && activeByDate({ fecha_inicio: ad.inicio || ad.fecha_inicio, fecha_fin: ad.fin || ad.fecha_fin })).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const adsAt=(placement:AdPlacement)=>activeAdvertisements.filter((ad)=>placementOf(ad)===placement);
   const apexAd=activeAdvertisements.find((ad)=>`${ad.id} ${ad.anunciante} ${ad.titulo}`.toLowerCase().includes('apexmind'));
@@ -582,7 +590,8 @@ export default function Home() {
 
         <div className={`guide-layout ${!guideVisible.length && visible.length ? 'only-featured-results' : ''}`}>
           <div className="guide-results">{guideVisible.length > 0 && <div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Explorá la guía</h2></div>}
-            {guideVisible.length > 0 && (rotateFreeBusinesses ? <TimedRotator items={guideVisible} label="Negocios de la guía" className="business-rotation" groupBusinesses renderItem={(business,index)=>renderBusinessCard(business,index,false)}/> : <div className="business-grid">{guideVisible.map((business,index)=>renderBusinessCard(business,index,false))}</div>)}
+            {guideVisible.length > 1 && rotateFreeBusinesses && isMobileGuide && <button type="button" className="guide-view-toggle" aria-pressed={guideListView} aria-controls="guide-display" onClick={() => setGuideListView(value => !value)}>{guideListView ? "Ver carrusel" : "Ver negocios en lista"}</button>}
+            {guideVisible.length > 0 && <div id="guide-display">{rotateFreeBusinesses && !(isMobileGuide && guideListView) ? <TimedRotator items={guideVisible} label="Negocios de la guía" className="business-rotation" groupBusinesses renderItem={(business,index)=>renderBusinessCard(business,index,false)}/> : <div className="business-grid">{guideVisible.map((business,index)=>renderBusinessCard(business,index,false))}</div>}</div>}
             {adsAt('between').length > 0 && <div className="between-ad-slot"><AdRotator ads={adsAt('between')} label="Publicidad entre resultados" renderAd={renderAdvertisement}/></div>}
             {visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : onlySaved && saved.length === 0 ? 'Todavía no guardaste negocios' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : onlySaved && saved.length === 0 ? 'Tocá el corazón de una ficha para tenerla a mano. Se guarda en este navegador.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}
           </div>
