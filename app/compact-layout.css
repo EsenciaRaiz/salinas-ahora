@@ -444,3 +444,9 @@
  }
  .homepage-redesign .business-card .card-actions>.save-business span { display:none; }
 }
+
+@media (max-width:360px) {
+ .homepage-redesign .search-landing .finder-form { grid-template-columns:minmax(0,2.5fr) minmax(0,5.5fr); }
+ .homepage-redesign .search-zone-filter summary { padding-inline:5px; gap:3px; font-size:11px; }
+ .homepage-redesign .search-zone-filter summary svg { width:14px; height:14px; }
+}
