@@ -467,3 +467,6 @@
  .homepage-redesign .hero-status { width:270px; bottom:84px; padding:16px 18px; border-radius:8px; box-shadow:0 14px 32px rgba(9,35,50,.17); }
  .homepage-redesign .hero-status strong { font-size:18px; }
 }
+
+/* Keep the favorite control clear of business wordmarks. */
+.homepage-redesign .business-card .business-photo-frame.logo-frame .business-photo { padding-right:64px; }
