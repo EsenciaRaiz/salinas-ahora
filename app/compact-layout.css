@@ -638,3 +638,15 @@
 .homepage-redesign .explore-card-action:hover{text-decoration:underline}
 .homepage-redesign .explore-result-copy .photo-credit{margin-top:9px;padding-top:7px;border-top:1px solid #e4e9e7;color:#62747a;font-size:9px;line-height:1.35}
 .homepage-redesign .explore-result-copy .photo-credit a{color:#526b72;text-decoration:underline;text-underline-offset:2px}
+
+/* Directory rotation and readable contact actions. */
+.homepage-redesign .business-card .card-actions>a{min-width:0;white-space:normal;overflow-wrap:break-word;line-height:1.15;gap:5px;text-align:center}
+.homepage-redesign .business-card .card-actions>.whatsapp-action span{min-width:0}
+.homepage-redesign .guide-carousel-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 3px;color:#405d6b;font-size:12px;font-weight:700}
+.homepage-redesign .guide-carousel-controls>div{display:flex;align-items:center;gap:6px}
+.homepage-redesign .guide-carousel-controls button,.homepage-redesign .guide-resume-selection{min-height:40px;padding:7px 13px;border:1px solid #bdcfd2;border-radius:7px;background:#fff;color:#0b5066;font:700 12px/1.2 Arial,sans-serif;cursor:pointer}
+.homepage-redesign .guide-carousel-controls button:first-child,.homepage-redesign .guide-carousel-controls button:last-child{min-width:40px;padding:7px;font-size:22px;line-height:1}
+.homepage-redesign .guide-carousel-controls button:hover,.homepage-redesign .guide-resume-selection:hover{background:#eaf4f4}
+.homepage-redesign .guide-carousel-controls button:focus-visible,.homepage-redesign .guide-resume-selection:focus-visible{outline:3px solid #0b6072;outline-offset:2px}
+.homepage-redesign .guide-resume-selection{margin:12px 0 3px}
+@media(max-width:600px){.homepage-redesign .guide-carousel-controls button,.homepage-redesign .guide-resume-selection{min-height:44px}}
