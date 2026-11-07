@@ -707,3 +707,21 @@
 .homepage-redesign .finder-heading{margin-bottom:3px}
 .homepage-redesign .section-kicker{margin-bottom:3px}
 @media(max-width:600px){.homepage-redesign .featured-section{margin:5px 0 7px;padding:0}.homepage-redesign .guide-layout{margin-top:7px}}
+
+/* Compact footer: clear destinations, business tools and legal links. */
+.homepage-redesign .footer-main:has(.social-links){grid-template-columns:auto minmax(0,1fr) auto;gap:8px 20px;padding:15px clamp(16px,4vw,60px) 12px}
+.homepage-redesign .footer-main>p{font-size:12px;line-height:1.4;max-width:460px}
+.homepage-redesign .footer-main .social-links{gap:7px}
+.homepage-redesign .footer-main .social-links a{width:34px;height:34px;border-radius:50%}
+.homepage-redesign .footer-navigation{grid-column:1/-1;display:grid;grid-template-columns:1.3fr .8fr 1.5fr;gap:10px 22px;padding-top:10px;border-top:1px solid rgba(255,255,255,.14)}
+.homepage-redesign .footer-link-group{display:block;min-width:0}
+.homepage-redesign .footer-link-group>strong{display:block;margin-bottom:6px;color:#8fc5cd;font:700 10px/1.2 Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.homepage-redesign .footer-link-group>div{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px}
+.homepage-redesign .footer-link-group a{color:#eef4f4;font:500 12px/1.35 Arial,sans-serif;text-decoration:none}
+.homepage-redesign .footer-link-group a:hover{text-decoration:underline;text-underline-offset:3px}
+.homepage-redesign .footer-link-group-legal a{color:#bfd0d8;font-size:11px}
+.homepage-redesign .footer-strip{gap:8px 18px;padding:7px clamp(16px,4vw,60px);font-size:11px}
+.homepage-redesign .footer-strip .footer-credit-brand img{width:90px;max-height:26px}
+@media(max-width:800px){.homepage-redesign .footer-navigation{grid-template-columns:repeat(2,minmax(0,1fr))}.homepage-redesign .footer-link-group-legal{grid-column:1/-1}}
+@media(max-width:700px){.homepage-redesign .footer-main:has(.social-links){grid-template-columns:minmax(0,1fr) auto;padding:14px 16px 11px;gap:7px 12px}.homepage-redesign .footer-main>p{grid-column:1/-1;grid-row:2}.homepage-redesign .footer-main .social-links{grid-column:2;grid-row:1;justify-self:end}.homepage-redesign .footer-navigation{grid-row:3;gap:12px;padding-top:9px}.homepage-redesign .footer-strip{padding:8px 16px}}
+@media(max-width:430px){.homepage-redesign .footer-navigation{grid-template-columns:1fr}.homepage-redesign .footer-link-group-legal{grid-column:auto}.homepage-redesign .footer-main>p{display:none}}
