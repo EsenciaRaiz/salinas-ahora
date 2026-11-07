@@ -246,8 +246,8 @@ export default function Home() {
   const [filter, setFilter] = useState<TimeFilter>('todos');
   const [category, setCategory] = useState('Todos');
   const [specialty, setSpecialty] = useState('');
-  const [department, setDepartment] = useState('');
-  const [locality, setLocality] = useState('');
+  const [department, setDepartment] = useState(() => { const selected = typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('departamento') || ''; return departments.includes(selected) ? selected : ''; });
+  const [locality, setLocality] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('localidad') || '');
   const [query, setQuery] = useState('');
   const [cachedData] = useState<PublicData | null>(() => readCachedData());
   const [businesses, setBusinesses] = useState<Business[]>(() => cachedData ? withCuratedBusinesses(cachedData.negocios.filter((business) => !demonstrationIds.has(business.id))) : []);
@@ -388,8 +388,8 @@ export default function Home() {
   const visible = businesses.filter((business) => (!onlySaved || saved.includes(business.id)) && matchingBusiness(business, { time: true, category: true, department: true, locality: true, specialty: true }));
   useEffect(() => { if (specialty && !availableSpecialties.includes(specialty)) setSpecialty(''); }, [specialty, availableSpecialties.join('|')]);
   useEffect(() => { if (category !== 'Todos' && !categories.includes(category)) setCategory('Todos'); }, [category, categories.join('|')]);
-  useEffect(() => { if (department && !availableDepartments.has(department)) setDepartment(''); }, [department, [...availableDepartments].join('|')]);
-  useEffect(() => { if (locality && !availableLocalities.some((item) => item.toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))) setLocality(''); }, [locality, availableLocalities.join('|')]);
+  
+  useEffect(() => { if (dataStatus === 'ready' && locality && !availableLocalities.some((item) => item.toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))) setLocality(''); }, [dataStatus, locality, availableLocalities.join('|')]);
 
   const byDistance = (a: Business, b: Business) => {
     if (!visitorLocation) return orderOf(a)-orderOf(b);
@@ -573,7 +573,7 @@ export default function Home() {
       <section className="search-landing" aria-label="Buscá en tu zona">        <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
           <label>¿Qué estás buscando?<input type="search" placeholder="Negocio, servicio o plan" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
           <details className="search-zone-filter"><summary><MapPin size={18} aria-hidden="true"/>{department ? [locality, department].filter(Boolean).join(' · ') : 'Zona · opcional'}</summary><div className="search-zone-options">
-          <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || availableLocalities.length === 0}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && availableLocalities.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           </div></details>
           <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
