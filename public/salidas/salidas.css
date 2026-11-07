@@ -19,7 +19,4 @@
 .invitation p{font-size:13px}
 @media(max-width:600px){.cover{grid-template-columns:1fr;gap:10px}.cover h1{font-size:31px}.cover img{height:120px}.quick-links{grid-template-columns:1fr;gap:7px}.quick-links a{min-height:58px}.quick-links strong{font-size:16px}}
 
-/* Show two clear routes until an approved hosted experience is published. */
-.quick-links{grid-template-columns:repeat(2,minmax(0,1fr))}
-.quick-links.has-hosted{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media(max-width:600px){.quick-links,.quick-links.has-hosted{grid-template-columns:1fr}}
+#empty-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 16px}
