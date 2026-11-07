@@ -138,7 +138,7 @@ function renderConnections() {
       eventStatus.textContent = 'Elegí una localidad para ver sus eventos; la agenda no filtra por departamento.';
       eventResults.replaceChildren();
     } else {
-      const matching = events.filter((event) => Number(event.fin) > Date.now() &&
+      const matching = events.filter((event) => Number.isFinite(Number(event.inicio)) && Number(event.fin) > Date.now() &&
         (!chosenLocality || normalize(event.localidad) === normalize(chosenLocality)))
         .sort((a, b) => Number(a.inicio) - Number(b.inicio));
       eventStatus.textContent = matching.length
