@@ -212,7 +212,144 @@ function distanceKm(a: Coordinates, b: Coordinates) {
   return 12742*Math.asin(Math.sqrt(arc));
 }
 
+type Language = 'es' | 'en' | 'pt';
+const translations: Record<string, { en: string; pt: string }> = {
+  'Compartí este negocio': { en: 'Share this business', pt: 'Compartilhe este negócio' },
+  'Elegí cómo compartir el enlace a esta ficha.': { en: 'Choose how to share this listing.', pt: 'Escolha como compartilhar esta ficha.' },
+  'Más opciones para compartir': { en: 'More sharing options', pt: 'Mais opções de compartilhamento' },
+  'Copiar enlace': { en: 'Copy link', pt: 'Copiar link' },
+  'Compartir por WhatsApp': { en: 'Share on WhatsApp', pt: 'Compartilhar pelo WhatsApp' },
+  'Cerrar': { en: 'Close', pt: 'Fechar' },
+  'Enlace de la ficha': { en: 'Listing link', pt: 'Link da ficha' },
+  'Cargando ficha…': { en: 'Loading listing…', pt: 'Carregando ficha…' },
+  'No pudimos cargar la ficha': { en: 'Could not load the listing', pt: 'Não foi possível carregar a ficha' },
+  'No encontramos esta ficha': { en: 'Listing not found', pt: 'Ficha não encontrada' },
+  'Un momento, por favor.': { en: 'One moment, please.', pt: 'Um momento, por favor.' },
+  'Probá de nuevo en unos minutos.': { en: 'Please try again in a few minutes.', pt: 'Tente novamente em alguns minutos.' },
+  'Puede que el negocio ya no esté publicado.': { en: 'This business may no longer be listed.', pt: 'Este negócio pode não estar mais publicado.' },
+  'Explorar negocios': { en: 'Explore businesses', pt: 'Explorar negócios' },
+  'Imagen ilustrativa': { en: 'Illustrative image', pt: 'Imagem ilustrativa' },
+  'Fotos del negocio': { en: 'Business photos', pt: 'Fotos do negócio' },
+  'Cargando la guía': { en: 'Loading the guide', pt: 'Carregando o guia' },
+  'No pudimos cargar la guía': { en: 'Could not load the guide', pt: 'Não foi possível carregar o guia' },
+  'Todavía no guardaste negocios': { en: 'No saved businesses yet', pt: 'Você ainda não salvou negócios' },
+  'Aún no hay negocios nocturnos': { en: 'No businesses open at night yet', pt: 'Ainda não há negócios com horário noturno' },
+  'No hay negocios abiertos ahora': { en: 'No businesses open now', pt: 'Nenhum negócio aberto agora' },
+  'No encontramos coincidencias': { en: 'No matches found', pt: 'Nenhum resultado encontrado' },
+  'Probá otro lugar, categoría u horario.': { en: 'Try another place, category or time.', pt: 'Tente outro lugar, categoria ou horário.' },
+  'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.': { en: 'No businesses with night hours have been listed yet. Try another time.', pt: 'Ainda não foram publicados negócios com horário noturno. Tente outro horário.' },
+  'Todos': { en: 'All', pt: 'Todos' },
+  'Tecnología': { en: 'Technology', pt: 'Tecnologia' },
+  'Belleza': { en: 'Beauty', pt: 'Beleza' },
+  'Servicios': { en: 'Services', pt: 'Serviços' },
+  'Salud': { en: 'Health', pt: 'Saúde' },
+  'Educación': { en: 'Education', pt: 'Educação' },
+  'Oficios': { en: 'Trades', pt: 'Ofícios' },
+  'Profesionales': { en: 'Professionals', pt: 'Profissionais' },
+  'Compras': { en: 'Shopping', pt: 'Compras' },
+  'Terapias y bienestar': { en: 'Therapies and wellness', pt: 'Terapias e bem-estar' },
+  'Gastronomía': { en: 'Food and drink', pt: 'Gastronomia' },
+  'Destacado': { en: 'Featured', pt: 'Destaque' },
+  'Abierto ahora': { en: 'Open now', pt: 'Aberto agora' },
+  'Cerrado hoy': { en: 'Closed today', pt: 'Fechado hoje' },
+  'Cerrado ahora': { en: 'Closed now', pt: 'Fechado agora' },
+  'Horario a consultar': { en: 'Ask for opening hours', pt: 'Consulte o horário' },
+  'Ver ficha': { en: 'View listing', pt: 'Ver ficha' },
+  'Llamar': { en: 'Call', pt: 'Ligar' },
+  'Sitio web': { en: 'Website', pt: 'Site' },
+  'Ver en el mapa': { en: 'View on map', pt: 'Ver no mapa' },
+  'Guardar negocio': { en: 'Save business', pt: 'Salvar negócio' },
+  'Guardado': { en: 'Saved', pt: 'Salvo' },
+  'Quitar de favoritos': { en: 'Remove from favorites', pt: 'Remover dos favoritos' },
+  'Compartir ficha': { en: 'Share listing', pt: 'Compartilhar ficha' },
+  'Volver a la guía': { en: 'Back to the guide', pt: 'Voltar ao guia' },
+  'Llamar al negocio': { en: 'Call business', pt: 'Ligar para o negócio' },
+  'Visitar sitio web': { en: 'Visit website', pt: 'Visitar site' },
+  'Ver todos los comercios y servicios': { en: 'See all businesses and services', pt: 'Ver todos os comércios e serviços' },
+  'Los datos de las fichas fueron proporcionados por los negocios en español.': { en: 'Listing details were provided by businesses in Spanish.', pt: 'Os detalhes das fichas foram fornecidos pelos negócios em espanhol.' },
+  'Explorá tu zona': { en: 'Explore your area', pt: 'Explore sua região' },
+  'Historias': { en: 'Stories', pt: 'Histórias' },
+  'Lugares': { en: 'Places', pt: 'Lugares' },
+  'Salidas': { en: 'Outings', pt: 'Passeios' },
+  'Eventos': { en: 'Events', pt: 'Eventos' },
+  'Publicar': { en: 'List your business', pt: 'Anunciar' },
+  'Sumá tu negocio': { en: 'Add your business', pt: 'Cadastre seu negócio' },
+  'Ficha básica gratis, sin mensualidad ni vencimiento': { en: 'Free basic listing, no monthly fee or expiry', pt: 'Cadastro básico grátis, sem mensalidade ou prazo de validade' },
+  'Uruguay · cerca de vos': { en: 'Uruguay · close to you', pt: 'Uruguai · perto de você' },
+  'Lo que necesitás, más cerca.': { en: 'What you need, closer.', pt: 'O que você precisa, mais perto.' },
+  'Comercios, servicios y planes con identidad local.': { en: 'Local businesses, services and things to do.', pt: 'Comércios, serviços e programas com identidade local.' },
+  'Edición nocturna': { en: 'Night edition', pt: 'Edição noturna' },
+  'Edición diurna': { en: 'Day edition', pt: 'Edição diurna' },
+  'Descubrí lo mejor de tu zona': { en: 'Discover the best of your area', pt: 'Descubra o melhor da sua região' },
+  'Ver negocios de noche': { en: 'See businesses open at night', pt: 'Ver negócios abertos à noite' },
+  'Ver abiertos ahora': { en: 'See open now', pt: 'Ver abertos agora' },
+  '¿Qué estás buscando?': { en: 'What are you looking for?', pt: 'O que você procura?' },
+  'Negocio, servicio o plan': { en: 'Business, service or activity', pt: 'Negócio, serviço ou passeio' },
+  'Zona · opcional': { en: 'Area · optional', pt: 'Região · opcional' },
+  '¿En qué departamento?': { en: 'Which department?', pt: 'Qual departamento?' },
+  'Todo Uruguay': { en: 'All Uruguay', pt: 'Todo o Uruguai' },
+  '¿En qué barrio?': { en: 'Which neighborhood?', pt: 'Qual bairro?' },
+  '¿En qué localidad?': { en: 'Which town?', pt: 'Qual localidade?' },
+  'Todos los barrios': { en: 'All neighborhoods', pt: 'Todos os bairros' },
+  'Todas las localidades': { en: 'All towns', pt: 'Todas as localidades' },
+  'Elegí un departamento': { en: 'Choose a department', pt: 'Escolha um departamento' },
+  '¿En qué horario?': { en: 'What time?', pt: 'Em qual horário?' },
+  'Cualquier horario': { en: 'Any time', pt: 'Qualquer horário' },
+  'Abiertos ahora': { en: 'Open now', pt: 'Abertos agora' },
+  'Hoy de mañana · 6 a 12': { en: 'This morning · 6 am to noon', pt: 'Hoje de manhã · 6h às 12h' },
+  'Hoy de tarde · 12 a 20': { en: 'This afternoon · noon to 8 pm', pt: 'Hoje à tarde · 12h às 20h' },
+  'Hoy de noche · 20 a 6': { en: 'Tonight · 8 pm to 6 am', pt: 'Hoje à noite · 20h às 6h' },
+  '¿Qué especialidad?': { en: 'Which specialty?', pt: 'Qual especialidade?' },
+  'Todas las especialidades': { en: 'All specialties', pt: 'Todas as especialidades' },
+  'Buscar': { en: 'Search', pt: 'Buscar' },
+  'EXPLORÁ URUGUAY': { en: 'EXPLORE URUGUAY', pt: 'EXPLORE O URUGUAI' },
+  'Elegí una localidad y descubrí qué hacer allí': { en: 'Choose a town and discover what to do there', pt: 'Escolha uma localidade e descubra o que fazer lá' },
+  'Paseos, negocios, dónde comer y servicios para tu viaje o tu día a día.': { en: 'Places to visit, businesses, food and services for your trip or daily life.', pt: 'Passeios, negócios, onde comer e serviços para sua viagem ou seu dia a dia.' },
+  'Ver la guía de esa localidad': { en: 'Explore this town', pt: 'Explorar esta localidade' },
+  'Ver todos': { en: 'See all', pt: 'Ver todos' },
+  'Lugares para visitar en Uruguay': { en: 'Places to visit in Uruguay', pt: 'Lugares para visitar no Uruguai' },
+  'Mis favoritos': { en: 'My favorites', pt: 'Meus favoritos' },
+  'De noche': { en: 'At night', pt: 'À noite' },
+  'GUÍA LOCAL DE URUGUAY': { en: 'URUGUAY LOCAL GUIDE', pt: 'GUIA LOCAL DO URUGUAI' },
+  'Negocios para tener a mano': { en: 'Businesses at your fingertips', pt: 'Negócios ao seu alcance' },
+  'Buscá por negocio, oficio, producto, servicio, lugar y horario.': { en: 'Search by business, trade, product, service, place or opening hours.', pt: 'Busque por negócio, profissão, produto, serviço, lugar ou horário.' },
+  'Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.': { en: 'Opening hours may change on holidays. “Open now” uses Uruguay time.', pt: 'Os horários podem mudar nos feriados. “Abertos agora” usa o horário do Uruguai.' },
+  'Buscar cerca de mí': { en: 'Search near me', pt: 'Buscar perto de mim' },
+  'Actualizar mi ubicación': { en: 'Update my location', pt: 'Atualizar minha localização' },
+  'Ver mapa': { en: 'View map', pt: 'Ver mapa' },
+  'Ocultar mapa': { en: 'Hide map', pt: 'Ocultar mapa' },
+  'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.': { en: 'Location is optional and only sorts this search.', pt: 'A localização é opcional e só organiza esta busca.' },
+  'DIRECTORIO LOCAL': { en: 'LOCAL DIRECTORY', pt: 'DIRETÓRIO LOCAL' },
+  'Explorá la guía': { en: 'Explore the guide', pt: 'Explore o guia' },
+  'Ver carrusel': { en: 'View carousel', pt: 'Ver carrossel' },
+  'Ver negocios en lista': { en: 'View businesses as a list', pt: 'Ver negócios em lista' },
+  'NEGOCIOS DESTACADOS': { en: 'FEATURED BUSINESSES', pt: 'NEGÓCIOS EM DESTAQUE' },
+  'Destacados': { en: 'Featured', pt: 'Destaques' },
+  'Cargando negocios…': { en: 'Loading businesses…', pt: 'Carregando negócios…' },
+  'negocio encontrado': { en: 'business found', pt: 'negócio encontrado' },
+  'negocios encontrados': { en: 'businesses found', pt: 'negócios encontrados' },
+  'Mis favoritos · Ver todos': { en: 'My favorites · See all', pt: 'Meus favoritos · Ver todos' },
+  'INSPIRACIÓN LOCAL': { en: 'LOCAL INSPIRATION', pt: 'INSPIRAÇÃO LOCAL' },
+  'Historias para descubrir. Planes para disfrutar.': { en: 'Stories to discover. Things to enjoy.', pt: 'Histórias para descobrir. Passeios para aproveitar.' },
+  'Lugares para visitar': { en: 'Places to visit', pt: 'Lugares para visitar' },
+  'Negocios con historia': { en: 'Businesses with a story', pt: 'Negócios com história' },
+  'Eventos · gratis y pagos': { en: 'Events · free and paid', pt: 'Eventos · grátis e pagos' },
+  'Salidas y visitas': { en: 'Outings and visits', pt: 'Passeios e visitas' },
+  'Elegí tu próximo plan': { en: 'Choose your next outing', pt: 'Escolha seu próximo passeio' },
+  'SUMATE A VITRINA CERCA': { en: 'JOIN VITRINA CERCA', pt: 'FAÇA PARTE DA VITRINA CERCA' },
+  'Tu próximo cliente puede estar cerca.': { en: 'Your next customer may be nearby.', pt: 'Seu próximo cliente pode estar perto.' },
+  'Dale a tu negocio un lugar en la guía de tu zona. La ficha básica es gratuita.': { en: 'Put your business in the local guide. A basic listing is free.', pt: 'Coloque seu negócio no guia da sua região. O cadastro básico é grátis.' },
+  'Conocé cómo publicar': { en: 'How to list your business', pt: 'Como cadastrar seu negócio' },
+};
+function translate(value: string, language: Language): string {
+  return language === 'es' ? value : translations[value]?.[language] || value;
+}
+
 export default function Home() {
+  const [language, setLanguage] = useState<Language>(() => { try { const stored=localStorage.getItem('vitrina-language'); return stored === 'en' || stored === 'pt' ? stored : 'es'; } catch { return 'es'; } });
+  const t=(value: string)=>translate(value,language);
+  const changeLanguage=(value: Language)=>{ setLanguage(value); try { localStorage.setItem('vitrina-language',value); } catch { /* Storage may be unavailable. */ } };
+  useEffect(() => { document.documentElement.lang=language === 'pt' ? 'pt-BR' : language === 'en' ? 'en' : 'es-UY'; }, [language]);
   const [saved, setSaved] = useState<string[]>(() => { try { const items: unknown = JSON.parse(localStorage.getItem('vitrina-favorites') || '[]'); return Array.isArray(items) ? items.filter((item): item is string => typeof item === 'string') : []; } catch { return []; } });
   const [onlySaved, setOnlySaved] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -241,7 +378,7 @@ export default function Home() {
     const timeout = window.setTimeout(() => setSaveMessage(''), 4500);
     return () => window.clearTimeout(timeout);
   }, [saveMessage, saved]);
-  const saveButton = (business: Business) => <button type="button" className={`save-business ${saved.includes(business.id) ? 'is-saved' : ''}`} aria-label={`${saved.includes(business.id) ? 'Quitar de favoritos' : 'Guardar negocio'}: ${business.nombre}`} aria-pressed={saved.includes(business.id)} onClick={() => toggleSaved(business.id)}><Heart size={17} aria-hidden="true"/><span>{saved.includes(business.id) ? 'Guardado' : 'Guardar negocio'}</span></button>;
+  const saveButton = (business: Business) => <button type="button" className={`save-business ${saved.includes(business.id) ? 'is-saved' : ''}`} aria-label={`${t(saved.includes(business.id) ? 'Quitar de favoritos' : 'Guardar negocio')}: ${business.nombre}`} aria-pressed={saved.includes(business.id)} onClick={() => toggleSaved(business.id)}><Heart size={17} aria-hidden="true"/><span>{t(saved.includes(business.id) ? 'Guardado' : 'Guardar negocio')}</span></button>;
   const saveConfirmation = <div className={`favorite-confirmation ${saveMessage ? 'is-visible' : ''}`} role="status" aria-live="polite" aria-atomic="true">{saveMessage}</div>;
   const [filter, setFilter] = useState<TimeFilter>('todos');
   const [category, setCategory] = useState('Todos');
@@ -481,22 +618,24 @@ export default function Home() {
     return <article className={`business-card ${style.color} ${featured ? 'featured-business' : ''} ${String(business.estilo_tarjeta || '').toLowerCase() === 'editorial' ? 'card-editorial' : ''}`} key={business.id || business.nombre}>
 
       <BusinessCardPhoto images={images} name={business.nombre} category={business.categoria} altText={business.imagen_descripcion} illustrative={business.imagen_ilustrativa} Icon={Icon} />
-      <div className="card-category"><span>{business.categoria}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>{featured && <span className="sponsored"><Star size={13} aria-hidden="true"/> Destacado</span>}</div>
+      <div className="card-category"><span>{t(business.categoria)}{business.especialidad ? ` · ${business.especialidad}` : ''}</span>{featured && <span className="sponsored"><Star size={13} aria-hidden="true"/> {t("Destacado")}</span>}</div>
       <h3>{logo && <img className="business-logo" src={logo} alt="" loading="lazy" width="36" height="36" />}{business.nombre}</h3>
       <p>{cardSummary(featured && business.texto_destacado ? business.texto_destacado : coverageOf(business).description)}</p>
-      <div className="hours"><span className={open ? 'open' : 'later'}>{open ? 'Abierto ahora' : closed ? 'Cerrado hoy' : known ? 'Cerrado ahora' : 'Horario a consultar'}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
+      <div className="hours"><span className={open ? 'open' : 'later'}>{t(open ? 'Abierto ahora' : closed ? 'Cerrado hoy' : known ? 'Cerrado ahora' : 'Horario a consultar')}</span>{known && <strong><Clock3 size={15} /> {hours}</strong>}</div>
       <div className="address"><MapPin size={15} /> {[business.zona, region].filter(Boolean).join(' · ') || 'Uruguay'}{coverageOf(business).label && <span className="coverage-label">{coverageOf(business).label}</span>}</div>
       <div className="card-actions">
-        <a className={`details ${!whatsapp && !phone && !site ? 'primary-action' : ''}`} href={businessUrl(business)}>Ver ficha <ArrowRight size={16} /></a>
+        <a className={`details ${!whatsapp && !phone && !site ? 'primary-action' : ''}`} href={businessUrl(business)}>{t("Ver ficha")} <ArrowRight size={16} /></a>
         {whatsapp.length >= 8 && <a className="details whatsapp-action primary-action" href={whatsappContactUrl(whatsapp,business)} onClick={() => recordContact(business,'whatsapp',contact.intent)} title="Se abre WhatsApp con un mensaje que podés completar y enviar." aria-label={`${business.boton_texto || contact.label} a ${business.nombre} por WhatsApp`} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="17" height="17"/> {business.boton_texto || contact.label}</a>}
-        {phone.length >= 8 && <a className={`details ${!whatsapp ? 'primary-action' : ''}`} href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> Llamar</a>}
-        {site && <a className={`details ${!whatsapp && !phone ? 'primary-action' : ''}`} href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">Sitio web <ArrowRight size={16} /></a>}
-        {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> Ver en el mapa</a>}
+        {phone.length >= 8 && <a className={`details ${!whatsapp ? 'primary-action' : ''}`} href={`tel:+${phone}`} onClick={() => recordContact(business,'telefono')}><Phone size={16}/> {t("Llamar")}</a>}
+        {site && <a className={`details ${!whatsapp && !phone ? 'primary-action' : ''}`} href={site} onClick={() => recordContact(business,'sitio')} target="_blank" rel="noreferrer">{t("Sitio web")} <ArrowRight size={16} /></a>}
+        {mapHref && <a className="map-link" href={mapHref} onClick={() => recordContact(business,'mapa')} target="_blank" rel="noreferrer"><MapPin size={15} /> {t("Ver en el mapa")}</a>}
         <BusinessSocials business={business}/>
         {saveButton(business)}
       </div>
     </article>;
   };
+
+  const languagePicker=<label className="language-picker" aria-label="Idioma / Language"><select value={language} onChange={(event)=>changeLanguage(event.target.value as Language)}><option value="es">Español</option><option value="en">English</option><option value="pt">Português</option></select></label>;
 
   if (profileId) {
     const region = profile?.departamento || profile?.departamento_region || '';
@@ -509,32 +648,32 @@ export default function Home() {
     const site = websiteUrl(profile?.sitio_web);
     const logo = driveImage(profile?.logo_url, 160);
     return <main className={isNight ? 'night-mode business-profile' : 'day-mode business-profile'}>
-      <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/#guia">Volver a la guía</a></header>
+      <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><div className="header-actions">{languagePicker}<a className="header-cta" href="/#guia">{t("Volver a la guía")}</a></div></header>
       {saveConfirmation}
       <section className="profile-wrap" aria-live="polite">
-        {!profile ? <div className="profile-empty"><h1>{!liveDataChecked ? 'Cargando ficha…' : dataStatus === 'error' ? 'No pudimos cargar la ficha' : 'No encontramos esta ficha'}</h1><p>{!liveDataChecked ? 'Un momento, por favor.' : dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : 'Puede que el negocio ya no esté publicado.'}</p><a href="/#guia">Explorar negocios <ArrowRight size={17}/></a></div> : <>
+        {!profile ? <div className="profile-empty"><h1>{!liveDataChecked ? t("Cargando ficha…") : dataStatus === 'error' ? t("No pudimos cargar la ficha") : t("No encontramos esta ficha")}</h1><p>{!liveDataChecked ? t("Un momento, por favor.") : dataStatus === 'error' ? t("Probá de nuevo en unos minutos.") : t("Puede que el negocio ya no esté publicado.")}</p><a href="/#guia">{t("Explorar negocios")} <ArrowRight size={17}/></a></div> : <>
           <div className={`profile-card ${landscapeProfilePhoto ? 'profile-card-landscape' : ''}`}>
             <div className={`profile-gallery ${image?.endsWith('.svg') ? 'logo-gallery' : ''}`}>
-              {profile.imagen_ilustrativa && image && <span className="illustrative-image-label">Imagen ilustrativa</span>}
+              {profile.imagen_ilustrativa && image && <span className="illustrative-image-label">{t("Imagen ilustrativa")}</span>}
               {image ? <img className="profile-image" src={image} alt={profile.imagen_descripcion || `Imagen de ${profile.nombre}`} decoding="async" fetchPriority="high" width="1200" height="800" onLoad={(event) => setLandscapeProfilePhoto(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight >= 1.5)}/> : <div className="profile-image profile-image-empty"><Store size={78}/></div>}
-              {images.length > 1 && <div className="profile-thumbnails" aria-label="Fotos del negocio">{businessImages(profile?.imagen_url, 160).map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt="" loading="lazy" decoding="async" width="160" height="110"/></button>)}</div>}
+              {images.length > 1 && <div className="profile-thumbnails" aria-label={t('Fotos del negocio')}>{businessImages(profile?.imagen_url, 160).map((photo,index)=><button type="button" className={index===selectedPhoto?'selected':''} key={photo} onClick={()=>setSelectedPhoto(index)} aria-label={`Ver foto ${index+1}`}><img src={photo} alt="" loading="lazy" decoding="async" width="160" height="110"/></button>)}</div>}
             </div>
             <div className="profile-content">
-              <span className="section-kicker">{profile.categoria}{profile.especialidad ? ` · ${profile.especialidad}` : ''}{featuredBusiness(profile) ? ' · Destacado' : ''}</span>
+              <span className="section-kicker">{t(profile.categoria)}{profile.especialidad ? ` · ${profile.especialidad}` : ''}{featuredBusiness(profile) ? ' · '+t('Destacado') : ''}</span>
               <h1>{logo && <img className="profile-logo" src={logo} alt="" width="56" height="56" />}{profile.nombre}</h1>
               <p className="profile-description">{coverageOf(profile).description}</p>{coverageOf(profile).label && <p className="profile-coverage">{coverageOf(profile).label}</p>}
-              <div className="profile-facts"><div><Clock3 size={18}/><span>{closedToday(profile,clock.day) ? 'Cerrado hoy' : hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? 'Abierto ahora' : 'Cerrado ahora'} · ${businessHours(profile)}` : 'Horario a consultar'}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
+              <div className="profile-facts"><div><Clock3 size={18}/><span>{closedToday(profile,clock.day) ? t('Cerrado hoy') : hasKnownHours(profile,clock.day) ? `${isOpenNow(profile,clock) ? t('Abierto ahora') : t('Cerrado ahora')} · ${businessHours(profile)}` : t('Horario a consultar')}</span></div><div><MapPin size={18}/><span>{[profile.zona,region].filter(Boolean).join(' · ') || 'Uruguay'}</span></div></div>
               <div className="profile-actions">
                 {whatsapp.length >= 8 && contact && <a href={whatsappContactUrl(whatsapp,profile)} onClick={() => recordContact(profile,'whatsapp',contact.intent,'ficha')} target="_blank" rel="noreferrer"><img src="/eventos/whatsapp.svg" alt="" width="20" height="20"/> {contact.label}</a>}
-                {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> Llamar al negocio</a>}
-                {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> Visitar sitio web</a>}
-                {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> Ver en el mapa</a>}
+                {phone.length >= 8 && <a className="profile-call" href={`tel:+${phone}`} onClick={() => recordContact(profile,'telefono')}><Phone size={19}/> {t('Llamar al negocio')}</a>}
+                {site && <a className="profile-site" href={site} onClick={() => recordContact(profile,'sitio')} target="_blank" rel="noreferrer"><ArrowRight size={19}/> {t('Visitar sitio web')}</a>}
+                {mapHref && <a href={mapHref} onClick={() => recordContact(profile,'mapa')} target="_blank" rel="noreferrer"><MapPin size={19}/> {t('Ver en el mapa')}</a>}
               </div>
               <div className="profile-utilities">
                 {saveButton(profile)}
-                <button type="button" className="share-business" aria-expanded={shareOpen} onClick={() => { setShareMessage(''); setShareOpen(open => !open); }}><Share2 size={17} aria-hidden="true"/> Compartir ficha</button>
+                <button type="button" className="share-business" aria-expanded={shareOpen} onClick={() => { setShareMessage(''); setShareOpen(open => !open); }}><Share2 size={17} aria-hidden="true"/> {t('Compartir ficha')}</button>
               </div>
-              {shareOpen && <section className="share-business-panel" aria-label="Compartir esta ficha"><h2>Compartí este negocio</h2><p>Elegí cómo compartir el enlace a esta ficha.</p><div className="share-options">{typeof navigator.share === 'function' && <button type="button" onClick={() => shareBusiness(profile)}>Más opciones para compartir</button>}<button type="button" onClick={() => copyBusinessLink(profile)}>Copiar enlace</button><a href={'https://wa.me/?text=' + encodeURIComponent('Conocé ' + profile.nombre + ' en Vitrina Cerca: ' + businessUrl(profile))} target="_blank" rel="noopener noreferrer">Compartir por WhatsApp</a><button type="button" onClick={() => setShareOpen(false)}>Cerrar</button></div><label>Enlace de la ficha<input readOnly value={businessUrl(profile)} onFocus={event => event.currentTarget.select()}/></label><p role="status">{shareMessage}</p></section>}
+              {shareOpen && <section className="share-business-panel" aria-label="Compartir esta ficha"><h2>{t("Compartí este negocio")}</h2><p>{t("Elegí cómo compartir el enlace a esta ficha.")}</p><div className="share-options">{typeof navigator.share === 'function' && <button type="button" onClick={() => shareBusiness(profile)}>{t("Más opciones para compartir")}</button>}<button type="button" onClick={() => copyBusinessLink(profile)}>{t("Copiar enlace")}</button><a href={'https://wa.me/?text=' + encodeURIComponent('Conocé ' + profile.nombre + ' en Vitrina Cerca: ' + businessUrl(profile))} target="_blank" rel="noopener noreferrer">{t("Compartir por WhatsApp")}</a><button type="button" onClick={() => setShareOpen(false)}>{t("Cerrar")}</button></div><label>{t("Enlace de la ficha")}<input readOnly value={businessUrl(profile)} onFocus={event => event.currentTarget.select()}/></label><p role="status">{shareMessage}</p></section>}
               <BusinessSocials business={profile}/>
               <BusinessFacts business={profile}/>
             </div>
@@ -546,7 +685,7 @@ export default function Home() {
   }
 
   if (showPlans) return <main className={isNight ? 'night-mode plans-page' : 'day-mode plans-page'}>
-    <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><a className="header-cta" href="/">Volver a la guía</a></header>
+    <header className="site-header"><a className="brand" href="/" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a><div className="header-actions">{languagePicker}<a className="header-cta" href="/">{t("Volver a la guía")}</a></div></header>
     <section className="pricing" id="publicar"><div className="pricing-intro"><span className="section-kicker">PARA NEGOCIOS Y SERVICIOS</span><h1>{String(configuration.TITULO_PLANES||'Mostrá tu negocio en Vitrina Cerca')}</h1><p>Tu ficha en el listado es gratuita. Si querés más visibilidad, podés elegir una publicidad paga.</p><a className="plans-direct" href={businessFormUrl}>Completar ficha para revisión <ArrowRight size={17}/></a></div><div className="plans three-plans"><article><span>FICHA EN LA GUÍA</span><h3>Gratis</h3><p><strong>Registrarte y aparecer en el listado no tiene costo ni fecha de vencimiento.</strong></p><p>{basicDetail}</p><p>Revisamos los datos antes de publicar. Podés solicitar correcciones.</p><a href={businessFormUrl}>Completar ficha gratis</a></article><article className="featured-plan"><span><Sparkles size={15}/> PUBLICIDAD DESTACADA</span><h3>{currency} {featuredPrice} <small>/ mes</small></h3><p>{featuredDetail} Es una opción publicitaria; tu ficha en el listado sigue siendo gratuita.</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20una%20publicación%20destacada`:`mailto:${email}?subject=Quiero destacar mi negocio`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Quiero destacar</a></article><article className="premium-plan"><span><Star size={15}/> PUBLICIDAD PREMIUM</span><h3>{currency} {premiumPrice} <small>/ mes</small></h3><p>{premiumDetail}</p><a href={whatsappPublicar?`https://wa.me/${whatsappPublicar}?text=Quiero%20publicidad%20premium`:`mailto:${email}?subject=Quiero publicidad premium`}>{whatsappPublicar && <img src="/eventos/whatsapp.svg" alt="" width="19" height="19"/>} Consultar premium</a></article></div><p className="pricing-note">La ficha en el listado es gratuita. La publicidad destacada y los espacios publicitarios son opcionales y pagos. Antes de contratar una publicidad, confirmamos con vos su ubicación, duración, precio y medio de pago; no hay cobro ni renovación automática.</p></section>
     <section className="merchant-example" aria-labelledby="example-title"><span className="section-kicker">ASÍ FUNCIONA</span><h2 id="example-title">Tu ficha, con información para elegirte</h2><p>Nombre y fotos de tu negocio, rubro, localidad, horarios y medios de contacto. Podés sumar menú o catálogo, precios orientativos, cobertura, entregas y una historia breve: esos datos también están incluidos en la ficha gratuita.</p><p>Los anuncios pagos agregan difusión o ubicaciones publicitarias; no son necesarios para recibir consultas desde tu ficha.</p>{businesses.filter((business)=>!featuredBusiness(business)).slice(0,1).map((business)=><p key={business.id}>Mirá un ejemplo real de la guía: <a href={businessUrl(business)}>{business.nombre}</a>.</p>)}</section><MerchantTestimonials testimonials={testimonials} businesses={businesses}/><section className="contact-benefits" aria-labelledby="contact-benefits-title"><span className="section-kicker">INCLUIDO EN TU FICHA GRATUITA</span><h2 id="contact-benefits-title">Que te encuentren y te consulten.</h2><p>Si publicás tu WhatsApp, tu ficha tendrá un botón acorde a tu actividad: pedir presupuesto, consultar un producto, disponibilidad, menú o un turno.</p><p>Quien te encuentra puede completar un mensaje y enviártelo directamente. Vos respondés y acordás los detalles con tu cliente; no necesitás aprender a usar otro sistema.</p><p className="contact-measurement">Los clics en los botones indican interés. No confirman mensajes enviados, presupuestos aceptados, reservas ni ventas.</p></section><section className="placement-guide" aria-labelledby="placement-title"><div className="placement-intro"><span className="section-kicker">ESPACIOS PUBLICITARIOS</span><h2 id="placement-title">Dónde puede verse un anuncio</h2><p>Estos dibujos muestran posibles ubicaciones. Son ejemplos: el diseño y el tamaño finales pueden variar según el dispositivo.</p><p className="placement-current">La ficha en el listado es gratuita. La disponibilidad, duración y precio de cada espacio publicitario se confirman antes de contratar.</p></div><div className="placement-examples">{[{key:'cover',title:'Portada',description:'En la entrada del sitio.'},{key:'side',title:'Lateral de la guía',description:'Junto a las fichas de negocios.'},{key:'between',title:'Entre resultados',description:'Intercalado entre fichas.'},{key:'stories',title:'Historias',description:'Junto a los relatos locales.'},{key:'footer',title:'Pie de página',description:'Al final del sitio.'}].map((place)=><article className="placement-example" key={place.key}><div className={`placement-preview placement-${place.key}`} aria-hidden="true"><span className="preview-top">VITRINA CERCA</span><span className="preview-main">{place.key==='stories'?'Historias locales':'Negocios y servicios'}</span><span className="preview-ad">Anuncio</span><span className="preview-bottom">Más contenido</span></div><div className="placement-caption"><h3>{place.title}</h3><p>{place.description}</p><span className="placement-planned">Consultar disponibilidad</span></div></article>)}</div><p className="placement-terms">Antes de contratar un anuncio, confirmaremos por escrito su ubicación, duración, contenido y precio. La ficha gratuita no reserva un espacio publicitario.</p></section>
       <footer><div className="footer-main"><a className="brand footer-brand" href="/"><span>VITRINA</span><strong>CERCA</strong></a><p>Encontrá comercios y servicios cerca de vos.</p><a className="footer-privacy" href="/privacidad/">Privacidad y correcciones</a><a className="footer-privacy" href="/terminos-de-uso/">Términos de uso</a><a className="footer-privacy" href="/autorizacion-de-publicacion/">Autorización de publicación</a><a className="footer-privacy" href="/reglas-de-publicacion/">Reglas de publicación</a></div></footer>
@@ -556,76 +695,77 @@ export default function Home() {
     <main className={`homepage-redesign ${isNight ? 'night-mode' : 'day-mode'}`}>
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a>
-        <nav aria-label="Navegación principal"><a href="#guia">Explorá tu zona</a><a href="#descubrir">Historias</a><a href="/lugares/">Lugares</a><a href="/salidas/">Salidas</a><a href="/eventos/">Eventos</a><a href="/?planes=1">Publicar</a></nav>
-        <div className="header-join">
-          <a className="header-cta" href={businessFormUrl} aria-label="Sumá tu negocio: abrir formulario">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
-          <span className="header-join-note">Ficha básica gratis, sin mensualidad ni vencimiento</span>
-        </div>
+        <nav aria-label="Navegación principal"><a href="#guia">{t("Explorá tu zona")}</a><a href="#descubrir">{t("Historias")}</a><a href="/lugares/">{t("Lugares")}</a><a href="/salidas/">{t("Salidas")}</a><a href="/eventos/">{t("Eventos")}</a><a href="/?planes=1">{t("Publicar")}</a></nav>
+        <div className="header-actions">{languagePicker}<div className="header-join">
+          <a className="header-cta" href={businessFormUrl} aria-label={t("Sumá tu negocio")}>{t("Sumá tu negocio")} <ArrowRight size={15} aria-hidden="true" /></a>
+          <span className="header-join-note">{t("Ficha básica gratis, sin mensualidad ni vencimiento")}</span>
+        </div></div>
       </header>
 
       <section className="hero" id="inicio">
         <img src="/salinas-atardecer.webp" alt="Comercios de una zona costera al atardecer" fetchPriority="high" decoding="async" width="1600" height="900" />
         <div className="hero-overlay" />
-        <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> Uruguay · cerca de vos</span><h1>{heroTitle}</h1><p>{heroText}</p></div>
-        <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {isNight ? 'Edición nocturna' : 'Edición diurna'}</span><strong>{isNight ? `${nightCount} ${nightCount === 1 ? 'lugar' : 'lugares'} con horario nocturno` : 'Descubrí lo mejor de tu zona'}</strong><small>{isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora'} <ArrowRight size={14} /></small></button>
+        <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> {t("Uruguay · cerca de vos")}</span><h1>{language === "es" ? heroTitle : t("Lo que necesitás, más cerca.")}</h1><p>{language === "es" ? heroText : t("Comercios, servicios y planes con identidad local.")}</p></div>
+        <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {t(isNight ? 'Edición nocturna' : 'Edición diurna')}</span><strong>{isNight ? language === 'en' ? `${nightCount} place${nightCount === 1 ? '' : 's'} open at night` : language === 'pt' ? `${nightCount} lugar${nightCount === 1 ? '' : 'es'} com horário noturno` : `${nightCount} ${nightCount === 1 ? 'lugar' : 'lugares'} con horario nocturno` : t('Descubrí lo mejor de tu zona')}</strong><small>{t(isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora')} <ArrowRight size={14} /></small></button>
       </section>
       <section className="search-landing" aria-label="Buscá en tu zona">        <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
-          <label>¿Qué estás buscando?<input type="search" placeholder="Negocio, servicio o plan" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-          <details className="search-zone-filter"><summary><MapPin size={18} aria-hidden="true"/>{department ? [locality, department].filter(Boolean).join(' · ') : 'Zona · opcional'}</summary><div className="search-zone-options">
-          <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-          <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || (availableLocalities.length === 0 && !locality)}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && [...new Set([locality, ...availableLocalities].filter(Boolean))].map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>{t("¿Qué estás buscando?")}<input type="search" placeholder={t("Negocio, servicio o plan")} value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <details className="search-zone-filter"><summary><MapPin size={18} aria-hidden="true"/>{department ? [locality, department].filter(Boolean).join(' · ') : t('Zona · opcional')}</summary><div className="search-zone-options">
+          <label>{t("¿En qué departamento?")}<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">{t("Todo Uruguay")}</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>{t(department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?')}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || (availableLocalities.length === 0 && !locality)}><option value="">{t(department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento')}</option>{department && [...new Set([locality, ...availableLocalities].filter(Boolean))].map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           </div></details>
-          <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
-          {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>¿Qué especialidad?<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">Todas las especialidades</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
+          <label>{t("¿En qué horario?")}<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">{t("Cualquier horario")}</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">{t("Abiertos ahora")}</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">{t("Hoy de mañana · 6 a 12")}</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">{t("Hoy de tarde · 12 a 20")}</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">{t("Hoy de noche · 20 a 6")}</option>}</select></label>
+          {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>{t("¿Qué especialidad?")}<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">{t("Todas las especialidades")}</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
           <button type="submit"><Search size={19} /> Buscar</button>
         </form>
-        <div className="destination-discovery"><div><span>EXPLORÁ URUGUAY</span><strong>Elegí una localidad y descubrí qué hacer allí</strong><p>Paseos, negocios, dónde comer y servicios para tu viaje o tu día a día.</p></div><a href={destinationUrl}>Ver la guía de esa localidad <ArrowRight size={16} aria-hidden="true"/></a></div>
+        <div className="destination-discovery"><div><span>{t("EXPLORÁ URUGUAY")}</span><strong>{t("Elegí una localidad y descubrí qué hacer allí")}</strong><p>{t("Paseos, negocios, dónde comer y servicios para tu viaje o tu día a día.")}</p></div><a href={destinationUrl}>{t("Ver la guía de esa localidad")} <ArrowRight size={16} aria-hidden="true"/></a></div>
         <div className="discovery-shortcuts" aria-label="Accesos rápidos">
           <button type="button" aria-pressed={filter === 'ahora'} onClick={() => showPeriod('ahora')}><Clock3 size={16}/> Abiertos ahora</button>
-          <button type="button" aria-label="Ver todos los comercios y servicios" onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Ver todos</button>
+          <button type="button" aria-label={t("Ver todos los comercios y servicios")} onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Ver todos</button>
           <a href="/lugares/" aria-label="Lugares para visitar en Uruguay"><MapPin size={16}/> Lugares</a>
            <a href="/salidas/" aria-label="Salidas y experiencias"><Sparkles size={16}/> Salidas</a>
           <button type="button" aria-pressed={filter === 'noche'} onClick={() => showPeriod('noche')}><MoonStar size={16}/> De noche</button>
-          <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> Mis favoritos{saved.length ? ' (' + saved.length + ')' : ''}</button>
+          <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> {t('Mis favoritos')}{saved.length ? ' (' + saved.length + ')' : ''}</button>
         </div>{saveConfirmation}
       </section>
       <section className="finder" id="guia" aria-labelledby="finder-title">
 
-        <div className="finder-heading"><div><span className="section-kicker">GUÍA LOCAL DE URUGUAY</span><h2 id="finder-title">Negocios para tener a mano</h2><p>Buscá por negocio, oficio, producto, servicio, lugar y horario.</p></div></div>
-        <p className="finder-note">Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.</p>
-        <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí'}</button><button type="button" aria-expanded={showMap} aria-controls="mapa-negocios" onClick={() => setShowMap((value) => !value)}><MapPin size={17}/> {showMap ? 'Ocultar mapa' : 'Ver mapa'}</button><span role="status">{locationMessage || 'La ubicación es opcional. Se usa solo para ordenar esta búsqueda.'}</span></div>
+        <div className="finder-heading"><div><span className="section-kicker">{t("GUÍA LOCAL DE URUGUAY")}</span><h2 id="finder-title">{t("Negocios para tener a mano")}</h2><p>{t("Buscá por negocio, oficio, producto, servicio, lugar y horario.")}</p></div></div>
+        <p className="finder-note">{t("Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.")}</p>
+        <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {t(visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí')}</button><button type="button" aria-expanded={showMap} aria-controls="mapa-negocios" onClick={() => setShowMap((value) => !value)}><MapPin size={17}/> {t(showMap ? 'Ocultar mapa' : 'Ver mapa')}</button><span role="status">{locationMessage || t('La ubicación es opcional. Se usa solo para ordenar esta búsqueda.')}</span></div>
         {showMap && <div id="mapa-negocios"><BusinessMap businesses={visible}/></div>}
         {showLocationHelp && <div className="location-help"><strong>¿Querés usar tu ubicación para ordenar los negocios cercanos?</strong><p>Podés buscar por departamento y localidad sin compartirla. Si elegís usarla, el navegador mostrará un permiso en inglés. Esta traducción quedará visible mientras decidís:</p><ul><li><b>Allow this time</b> = Permitir solo esta vez.</li><li><b>Allow while visiting the site</b> = Permitir mientras visitás la página.</li><li><b>Never allow</b> = No permitir.</li></ul><div><button type="button" onClick={locateVisitor} disabled={locationPromptPending}>{locationPromptPending ? 'Esperando tu elección…' : 'Usar mi ubicación'}</button><button type="button" onClick={() => setShowLocationHelp(false)}>Seguir sin ubicación</button></div></div>}
         {locationPromptPending && <div className="location-permission-guide" role="status"><strong>Ayuda para el permiso del navegador</strong><span>Para permitir solo esta vez, elegí <b>Allow this time</b>.</span><span>Para continuar sin ubicación, elegí <b>Never allow</b>.</span></div>}
-        <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => { setCategory(item); setSpecialty(''); }}>{item}</button>)}</div>
+        <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => { setCategory(item); setSpecialty(''); }}>{t(item)}</button>)}</div>
 
-        <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? 'Cargando negocios…' : `${visible.length} ${visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados'}`}{onlySaved && <button className="clear-saved-filter" type="button" onClick={() => setOnlySaved(false)}>Mis favoritos · Ver todos</button>}</div>
-        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">NEGOCIOS DESTACADOS</span><h2 id="featured-title">Destacados</h2></div><TimedRotator items={featuredVisible} label="Negocios destacados" className="business-rotation" groupBusinesses renderItem={(business,index)=>renderBusinessCard(business,index,true)}/></section>}
+        {language !== "es" && <p className="language-content-note">{t("Los datos de las fichas fueron proporcionados por los negocios en español.")}</p>}
+        <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? t('Cargando negocios…') : `${visible.length} ${t(visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados')}`}{onlySaved && <button className="clear-saved-filter" type="button" onClick={() => setOnlySaved(false)}>{t("Mis favoritos · Ver todos")}</button>}</div>
+        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">{t("NEGOCIOS DESTACADOS")}</span><h2 id="featured-title">{t("Destacados")}</h2></div><TimedRotator items={featuredVisible} label="Negocios destacados" className="business-rotation" groupBusinesses renderItem={(business,index)=>renderBusinessCard(business,index,true)}/></section>}
 
         <div className={`guide-layout ${!guideVisible.length && visible.length ? 'only-featured-results' : ''}`}>
-          <div className="guide-results">{guideVisible.length > 0 && <div className="guide-subheading"><span className="section-kicker">DIRECTORIO LOCAL</span><h2>Explorá la guía</h2></div>}
-            {guideVisible.length > 1 && rotateFreeBusinesses && isMobileGuide && <button type="button" className="guide-view-toggle" aria-pressed={guideListView} aria-controls="guide-display" onClick={() => setGuideListView(value => !value)}>{guideListView ? "Ver carrusel" : "Ver negocios en lista"}</button>}
+          <div className="guide-results">{guideVisible.length > 0 && <div className="guide-subheading"><span className="section-kicker">{t("DIRECTORIO LOCAL")}</span><h2>{t("Explorá la guía")}</h2></div>}
+            {guideVisible.length > 1 && rotateFreeBusinesses && isMobileGuide && <button type="button" className="guide-view-toggle" aria-pressed={guideListView} aria-controls="guide-display" onClick={() => setGuideListView(value => !value)}>{t(guideListView ? 'Ver carrusel' : 'Ver negocios en lista')}</button>}
             {guideVisible.length > 0 && <div id="guide-display">{rotateFreeBusinesses && !(isMobileGuide && guideListView) ? <TimedRotator items={guideVisible} label="Negocios de la guía" className="business-rotation" groupBusinesses renderItem={(business,index)=>renderBusinessCard(business,index,false)}/> : <div className="business-grid">{guideVisible.map((business,index)=>renderBusinessCard(business,index,false))}</div>}</div>}
             {adsAt('between').length > 0 && <div className="between-ad-slot"><AdRotator ads={adsAt('between')} label="Publicidad entre resultados" renderAd={renderAdvertisement}/></div>}
-            {visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? 'Cargando la guía' : dataStatus === 'error' ? 'No pudimos cargar la guía' : onlySaved && saved.length === 0 ? 'Todavía no guardaste negocios' : filter === 'noche' ? 'Aún no hay negocios nocturnos' : filter === 'ahora' ? 'No hay negocios abiertos ahora' : 'No encontramos coincidencias'}</h3><p>{dataStatus === 'error' ? 'Probá de nuevo en unos minutos.' : dataStatus === 'loading' ? 'Un momento, por favor.' : onlySaved && saved.length === 0 ? 'Tocá el corazón de una ficha para tenerla a mano. Se guarda en este navegador.' : filter === 'noche' ? 'Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.' : 'Probá otro lugar, categoría u horario.'}</p></div>}
+            {visible.length===0&&<div className="empty-state"><Search size={28}/><h3>{dataStatus === 'loading' ? t("Cargando la guía") : dataStatus === 'error' ? t("No pudimos cargar la guía") : onlySaved && saved.length === 0 ? t("Todavía no guardaste negocios") : filter === 'noche' ? t("Aún no hay negocios nocturnos") : filter === 'ahora' ? t("No hay negocios abiertos ahora") : t("No encontramos coincidencias")}</h3><p>{dataStatus === 'error' ? t("Probá de nuevo en unos minutos.") : dataStatus === 'loading' ? t("Un momento, por favor.") : onlySaved && saved.length === 0 ? 'Tocá el corazón de una ficha para tenerla a mano. Se guarda en este navegador.' : filter === 'noche' ? t("Todavía no se publicaron negocios con horario de noche. Podés elegir otro horario.") : t("Probá otro lugar, categoría u horario.")}</p></div>}
           </div>
 
           <aside className="ad-column" aria-label="Publicidad lateral">
             <AdRotator ads={sideAds} label="Publicidad lateral" renderAd={renderAdvertisement}/>
-            <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>Ver negocios de noche <ArrowRight size={15} /></span></button>
+            <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>{t("Ver negocios de noche")} <ArrowRight size={15} /></span></button>
           </aside>
         </div>
       </section>
 
       <section className="discovery-selection magazine-discovery" id="descubrir" aria-labelledby="discovery-title">
-        <div className="discovery-heading"><div><span className="section-kicker">INSPIRACIÓN LOCAL</span><h2 id="discovery-title">Historias para descubrir. Planes para disfrutar.</h2></div></div>
-        <nav className="magazine-nav" aria-label="Qué querés descubrir"><a href="/lugares/">Lugares para visitar</a><a href="#historias-negocios">Negocios con historia</a><a href="/eventos/">Eventos · gratis y pagos</a><a href="/salidas/">Salidas y visitas</a></nav>
+        <div className="discovery-heading"><div><span className="section-kicker">{t("INSPIRACIÓN LOCAL")}</span><h2 id="discovery-title">{t("Historias para descubrir. Planes para disfrutar.")}</h2></div></div>
+        <nav className="magazine-nav" aria-label="Qué querés descubrir"><a href="/lugares/">{t("Lugares para visitar")}</a><a href="#historias-negocios">{t("Negocios con historia")}</a><a href="/eventos/">{t("Eventos · gratis y pagos")}</a><a href="/salidas/">{t("Salidas y visitas")}</a></nav>
         <div className="magazine-heading"><h3 id="historias-lugares">Historias de nuestros lugares</h3><a href="/historias/">Todas las historias <ArrowRight size={16}/></a></div>
         <div className="magazine-stories">
           <a className="magazine-lead" href="/historias/arco-de-salinas/"><img src="/salinas-atardecer.webp" alt="Paisaje costero al atardecer, imagen ilustrativa" loading="lazy" width="640" height="420"/><div><span className="magazine-label">SALINAS · CANELONES</span><h3>Una bienvenida con historia</h3><p>Conocé el Arco de Salinas y su relación con el obelisco.</p><b>Leer historia <ArrowRight size={16}/></b></div></a>
           <div className="magazine-side"><a href="/historias/marindia/"><img src="/parque-pajaros-marindia.png" alt="Parque de los Pájaros de Marindia" loading="lazy" width="640" height="420"/><div><span className="magazine-label">MARINDIA · CANELONES</span><h3>Un lugar, muchas historias</h3><p>Sus raíces y el parque que construyeron los vecinos.</p><b>Descubrir Marindia <ArrowRight size={16}/></b></div></a></div>
         </div>
-        <div className="magazine-heading"><h3>Elegí tu próximo plan</h3></div>
+        <div className="magazine-heading"><h3>{t("Elegí tu próximo plan")}</h3></div>
         <div className="magazine-plans"><a href="/eventos/"><span className="magazine-label">EVENTOS · GRATIS Y PAGOS</span><h3>Qué pasa cerca</h3><p>Ferias, talleres y encuentros. Compartí cada evento con su enlace.</p><b>Explorar la agenda <ArrowRight size={16}/></b></a><a href="/salidas/"><span className="magazine-label">SALIDAS Y VISITAS</span><h3>Una escapada entre viñedos</h3><p>Conocé la propuesta de recorridos y almuerzos en bodegas de Canelones.</p><b>Descubrir las experiencias <ArrowRight size={16}/></b></a></div>
       </section>
       <LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))}/>
@@ -633,14 +773,14 @@ export default function Home() {
 
       {!!adsAt('stories').length && <section className="hero-ad-section" aria-label="Publicidad junto a historias"><AdRotator ads={adsAt('stories')} label="Publicidad junto a historias" renderAd={renderAdvertisement}/></section>}
       {yes(String(configuration.RESUMEN_SEMANAL_ACTIVO || '')) && <Newsletter action={submissionsEndpoint}/>}
-      <section className="merchant-invitation" aria-labelledby="merchant-title"><div><span className="section-kicker">SUMATE A VITRINA CERCA</span><h2 id="merchant-title">Tu próximo cliente puede estar cerca.</h2><p>Dale a tu negocio un lugar en la guía de tu zona. La ficha básica es gratuita.</p><a href="/?planes=1">Conocé cómo publicar <ArrowRight size={17}/></a></div></section>
+      <section className="merchant-invitation" aria-labelledby="merchant-title"><div><span className="section-kicker">{t("SUMATE A VITRINA CERCA")}</span><h2 id="merchant-title">{t("Tu próximo cliente puede estar cerca.")}</h2><p>{t("Dale a tu negocio un lugar en la guía de tu zona. La ficha básica es gratuita.")}</p><a href="/?planes=1">{t("Conocé cómo publicar")} <ArrowRight size={17}/></a></div></section>
       <footer>
         <div className="footer-ads" aria-label="Publicidad antes del pie de página"><AdRotator ads={adsAt('footer')} label="Publicidad antes del pie de página" renderAd={renderAdvertisement}/></div>
         <div className="footer-main">
           <a className="brand footer-brand" href="/" aria-label="Vitrina Cerca, inicio"><span>VITRINA</span><strong>CERCA</strong></a>
           <p>{footerText}</p>
           {socialLinks.length > 0 && <nav className="social-links" aria-label="Redes sociales de Vitrina Cerca">{socialLinks.map(({key,label,url,mark})=><a key={key} href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className={`social-${key}`}>{key==='instagram'?<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>:key==='facebook'?<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 22v-9h3l.5-4H14V7c0-1.2.4-2 2-2h2V1.5A24 24 0 0 0 15 1c-3 0-5 1.8-5 5v3H7v4h3v9z"/></svg>:key==='whatsapp'?<img src="/eventos/whatsapp.svg" alt="" width="22" height="22"/>:<span aria-hidden="true">{mark}</span>}</a>)}</nav>}
-          <nav className="footer-links" aria-label="Información de Vitrina Cerca"><a className="footer-publish" href="/?planes=1">Opciones para publicar <ArrowRight size={16}/></a><a href="/administrar/">Administrar mi negocio</a><a href="/directorio/">Directorio</a><a href="/lugares/">Lugares para visitar</a><a href="/salidas/">Salidas y experiencias</a><a href="/eventos/">Eventos</a><a href="/historias/">Historias</a><a href="/privacidad/">Privacidad y correcciones</a><a href="/terminos-de-uso/">Términos de uso</a><a href="/autorizacion-de-publicacion/">Autorización de publicación</a><a href="/reglas-de-publicacion/">Reglas de publicación</a></nav>
+          <nav className="footer-links" aria-label="Información de Vitrina Cerca"><a className="footer-publish" href="/?planes=1">Opciones para publicar <ArrowRight size={16}/></a><a href="/administrar/">Administrar mi negocio</a><a href="/directorio/">Directorio</a><a href="/lugares/">{t("Lugares para visitar")}</a><a href="/salidas/">Salidas y experiencias</a><a href="/eventos/">{t("Eventos")}</a><a href="/historias/">{t("Historias")}</a><a href="/privacidad/">Privacidad y correcciones</a><a href="/terminos-de-uso/">Términos de uso</a><a href="/autorizacion-de-publicacion/">Autorización de publicación</a><a href="/reglas-de-publicacion/">Reglas de publicación</a></nav>
         </div>
         <div className="footer-strip"><span>Apoyá lo local, hacemos un mejor Uruguay ♡</span><strong>Negocios reales · Comunidad que crece · Un Uruguay más cerca</strong><span>© {new Date().getFullYear()} Vitrina Cerca</span>{romansiMessageUrl && <a className="footer-credit-brand" href={romansiMessageUrl} target="_blank" rel="noopener noreferrer" aria-label="Consultar a ROMANSI por diseño y desarrollo web mediante WhatsApp"><img src="/romansi-logo.svg" alt="ROMANSI Estudio Digital" loading="lazy" width="150" height="54" /></a>}</div>
       </footer>
