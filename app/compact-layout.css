@@ -486,3 +486,18 @@
 .homepage-redesign .destination-discovery a{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;min-height:44px;padding:10px 15px;border-radius:8px;background:#102a43;color:#fff;font-size:13px;font-weight:700;text-align:center}
 .homepage-redesign .destination-discovery a:hover,.homepage-redesign .destination-discovery a:focus-visible{background:#0f5f78}
 @media(max-width:700px){.homepage-redesign .destination-discovery{align-items:stretch;flex-direction:column;gap:10px;padding:13px 14px}.homepage-redesign .destination-discovery p{font-size:12px}.homepage-redesign .destination-discovery a{width:100%}}
+
+/* Visitor language control. Keep it usable beside the main action on small screens. */
+.site-header .header-actions{grid-column:3;justify-self:end;display:flex;align-items:center;gap:10px}
+.language-picker{display:inline-flex;align-items:center;justify-content:center}
+.language-picker select{min-height:42px;padding:8px 25px 8px 10px;border:1px solid #b8c7ca;border-radius:8px;background:#fff;color:#102a43;font:700 13px var(--font-sans),Arial,sans-serif;cursor:pointer}
+.language-picker select:focus-visible{outline:3px solid #ef6a5b;outline-offset:2px}
+.homepage-redesign .language-content-note{margin:8px 0 12px;color:#425d6a;font-size:12px;line-height:1.4}
+@media(max-width:700px){
+  .homepage-redesign .site-header{grid-template-rows:auto auto}
+  .homepage-redesign .site-header .header-actions{display:contents}
+  .homepage-redesign .site-header .language-picker{grid-column:1;grid-row:2;justify-self:start;align-self:center}
+  .homepage-redesign .site-header .header-join{grid-column:2;grid-row:1 / 3}
+  .homepage-redesign .site-header .language-picker select{min-height:32px;padding:4px 24px 4px 7px;font-size:11px}
+}
+@media(max-width:700px){.business-profile .site-header .header-actions,.plans-page .site-header .header-actions{grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:3px}.business-profile .site-header .language-picker select,.plans-page .site-header .language-picker select{min-height:34px;font-size:11px}}
