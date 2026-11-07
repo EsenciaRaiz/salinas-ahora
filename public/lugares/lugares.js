@@ -76,6 +76,11 @@ function render() {
       escapeHtml(place.url) + '" target="_blank" rel="noopener noreferrer">Fuente oficial ↗</a></div></article>';
   }).join('');
 }
+document.querySelector('#filters').addEventListener('submit', (event) => {
+  event.preventDefault();
+  render();
+  count.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 department.addEventListener('change', () => { locality.value = ''; render(); });
 locality.addEventListener('input', render);
 type.addEventListener('change', render);
