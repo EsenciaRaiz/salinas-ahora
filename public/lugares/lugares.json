@@ -249,7 +249,8 @@
     "fuente": "Ministerio de Ambiente",
     "url": "https://www.ambiente.gub.uy/oan/snap/grutas-del-palacio/",
     "mapa": "Grutas del Palacio, Flores, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "ubicacion_visible": "Fuera de Trinidad"
   },
   {
     "id": "florida-prado-piedra-alta",
@@ -291,7 +292,8 @@
     "fuente": "Ministerio de Ambiente",
     "url": "https://www.ambiente.gub.uy/oan/snap/laguna-de-rocha/",
     "mapa": "Laguna de Rocha, Rocha, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "ubicacion_visible": "Fuera de Rocha"
   },
   {
     "id": "san-jose-plaza-33-orientales",
@@ -347,6 +349,7 @@
     "fuente": "Ministerio de Ambiente",
     "url": "https://www.ambiente.gub.uy/oan/snap/quebrada-de-los-cuervos-y-sierras-del-yerbal/",
     "mapa": "Quebrada de los Cuervos, Treinta y Tres, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "ubicacion_visible": "Fuera de Treinta y Tres"
   }
 ]
