@@ -436,6 +436,10 @@ export default function Home() {
   const premiumDetail=premiumDetailRaw && premiumDetailRaw !== 'Portada editorial, campaña visual y ubicación publicitaria preferente.' ? premiumDetailRaw : 'Propuesta visual personalizada y espacio publicitario en la ubicación acordada. La duración se confirma antes de contratar.';
   const heroTitle=String(configuration.HERO_TITULO && configuration.HERO_TITULO !== 'Tu zona, a mano.' ? configuration.HERO_TITULO : 'Lo que necesitás, más cerca.');
   const heroText='Comercios, servicios y planes con identidad local.';
+  const destinationParams=new URLSearchParams();
+  if(department) destinationParams.set('departamento',department);
+  if(locality) destinationParams.set('localidad',locality);
+  const destinationUrl='/lugares/'+(destinationParams.size ? '?'+destinationParams.toString() : '');
   const siteWhatsApp=String(configuration.WHATSAPP_PUBLICAR||'').replace(/\D/g,'');
   const whatsappPublicar=siteWhatsApp;
   const socialLinks=[{key:'instagram',label:'Instagram de Vitrina Cerca',url:String(configuration.INSTAGRAM_URL||'https://www.instagram.com/vitrinacerca/'),mark:'◎'},{key:'facebook',label:'Facebook de Vitrina Cerca',url:String(configuration.FACEBOOK_URL||'https://www.facebook.com/profile.php?id=61595227299132'),mark:'f'},{key:'tiktok',label:'TikTok',url:String(configuration.TIKTOK_URL||''),mark:'♪'},{key:'youtube',label:'YouTube',url:String(configuration.YOUTUBE_URL||''),mark:'▶'},{key:'linkedin',label:'LinkedIn',url:String(configuration.LINKEDIN_URL||''),mark:'in'},{key:'whatsapp',label:'WhatsApp',url:siteWhatsApp.length>=8?`https://wa.me/${siteWhatsApp}`:'',mark:''}].filter(({url})=>url.startsWith('https://'));
@@ -575,6 +579,7 @@ export default function Home() {
           {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>¿Qué especialidad?<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">Todas las especialidades</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
           <button type="submit"><Search size={19} /> Buscar</button>
         </form>
+        <div className="destination-discovery"><div><span>EXPLORÁ URUGUAY</span><strong>Elegí una localidad y descubrí qué hacer allí</strong><p>Paseos, negocios, dónde comer y servicios para tu viaje o tu día a día.</p></div><a href={destinationUrl}>Ver la guía de esa localidad <ArrowRight size={16} aria-hidden="true"/></a></div>
         <div className="discovery-shortcuts" aria-label="Accesos rápidos">
           <button type="button" aria-pressed={filter === 'ahora'} onClick={() => showPeriod('ahora')}><Clock3 size={16}/> Abiertos ahora</button>
           <button type="button" aria-label="Ver todos los comercios y servicios" onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Ver todos</button>

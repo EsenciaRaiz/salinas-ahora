@@ -476,3 +476,13 @@
 .business-profile .profile-gallery .illustrative-image-label { position:absolute; z-index:1; left:10px; bottom:10px; display:inline-block; max-width:calc(100% - 70px); padding:5px 8px; border-radius:4px; background:rgba(9,35,50,.82); color:#fff; font:600 11px/1.2 Arial,sans-serif; letter-spacing:.01em; }
 .business-profile .profile-gallery { position:relative; }
 .business-profile .profile-gallery .illustrative-image-label { top:12px; bottom:auto; left:12px; }
+
+/* Make the national destination guide visible directly from the home search. */
+.homepage-redesign .destination-discovery{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:14px 0 10px;padding:14px 18px;border:1px solid #d8e4df;border-radius:12px;background:#eef4ef;color:#102a43}
+.homepage-redesign .destination-discovery div{min-width:0}
+.homepage-redesign .destination-discovery span{display:block;margin-bottom:3px;color:#0f5f78;font-size:10px;font-weight:800;letter-spacing:.11em}
+.homepage-redesign .destination-discovery strong{display:block;font-family:var(--font-editorial),Georgia,serif;font-size:clamp(17px,1.7vw,23px);line-height:1.14}
+.homepage-redesign .destination-discovery p{margin:5px 0 0;font-size:12px;line-height:1.4}
+.homepage-redesign .destination-discovery a{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;min-height:44px;padding:10px 15px;border-radius:8px;background:#102a43;color:#fff;font-size:13px;font-weight:700;text-align:center}
+.homepage-redesign .destination-discovery a:hover,.homepage-redesign .destination-discovery a:focus-visible{background:#0f5f78}
+@media(max-width:700px){.homepage-redesign .destination-discovery{align-items:stretch;flex-direction:column;gap:10px;padding:13px 14px}.homepage-redesign .destination-discovery p{font-size:12px}.homepage-redesign .destination-discovery a{width:100%}}
