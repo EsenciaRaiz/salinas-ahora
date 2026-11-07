@@ -698,3 +698,12 @@
 .homepage-redesign .side-ad-slot .ad-vacancy small{margin-left:0}
 .homepage-redesign .footer-ads .ad-vacancy{min-height:54px}
 @media(max-width:700px){.homepage-redesign .ad-vacancy{min-height:56px;flex-wrap:wrap;gap:3px 9px;padding:9px 12px}.homepage-redesign .ad-vacancy span{width:100%}.homepage-redesign .ad-vacancy strong{font-size:15px}.homepage-redesign .ad-vacancy small{margin-left:auto}}
+
+/* Bring related homepage sections closer without shrinking card content or tap targets. */
+.homepage-redesign .featured-section{margin:5px 0 6px;padding:10px 12px}
+.homepage-redesign .featured-heading,.homepage-redesign .guide-subheading{margin-bottom:5px}
+.homepage-redesign .guide-carousel-controls{margin:6px 0 0;gap:6px}
+.homepage-redesign .guide-layout{margin-top:6px}
+.homepage-redesign .finder-heading{margin-bottom:3px}
+.homepage-redesign .section-kicker{margin-bottom:3px}
+@media(max-width:600px){.homepage-redesign .featured-section{margin:5px 0 7px;padding:0}.homepage-redesign .guide-layout{margin-top:7px}}
