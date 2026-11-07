@@ -521,3 +521,15 @@
 @media(max-width:1200px){.homepage-redesign .destination-showcase{margin-inline:clamp(16px,4vw,40px)}}
 @media(max-width:700px){.homepage-redesign .destination-showcase{margin-top:16px;margin-bottom:23px}.homepage-redesign .destination-showcase-heading{display:block}.homepage-redesign .destination-showcase-heading p{font-size:12px}.homepage-redesign .destination-showcase-heading>a{margin-top:6px}.homepage-redesign .destination-showcase-grid{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}.homepage-redesign .destination-showcase-card{flex:0 0 min(64vw,228px);scroll-snap-align:start}.homepage-redesign .destination-showcase-visual{height:108px}}
 @media(prefers-reduced-motion:reduce){.homepage-redesign .destination-showcase-card{transition:none}}
+
+/* Compact business-guide introduction: keep practical notes available on demand. */
+.homepage-redesign .finder-heading{margin-bottom:5px}
+.homepage-redesign .finder-heading h2{font-size:clamp(28px,3.2vw,38px);line-height:1.08;margin:0}
+.homepage-redesign .proximity{align-items:center;gap:8px;margin-bottom:8px}
+.homepage-redesign .guide-note{font-size:12px;color:#476174}
+.homepage-redesign .guide-note summary{display:inline-flex;align-items:center;min-height:44px;cursor:pointer;font-weight:700;text-decoration:underline;text-underline-offset:3px;list-style:none}
+.homepage-redesign .guide-note summary::-webkit-details-marker{display:none}
+.homepage-redesign .guide-note summary:focus-visible{outline:3px solid #0f5f78;outline-offset:2px}
+.homepage-redesign .guide-note[open]{flex-basis:100%;padding:5px 12px 9px;border:1px solid #d7e2de;border-radius:8px;background:#f5f8f5}
+.homepage-redesign .guide-note[open] p{margin:4px 0;font-size:12px;line-height:1.4}
+@media(max-width:700px){.homepage-redesign .finder-heading h2{font-size:29px}.homepage-redesign .guide-note{margin-left:2px}}
