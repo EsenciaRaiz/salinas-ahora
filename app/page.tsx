@@ -246,9 +246,9 @@ export default function Home() {
   const [filter, setFilter] = useState<TimeFilter>('todos');
   const [category, setCategory] = useState('Todos');
   const [specialty, setSpecialty] = useState('');
-  const [department, setDepartment] = useState('');
-  const [locality, setLocality] = useState('');
-  const [query, setQuery] = useState('');
+  const [department, setDepartment] = useState(() => { const selected = typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('departamento') || ''; return departments.includes(selected) ? selected : ''; });
+  const [locality, setLocality] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('localidad') || '');
+  const [query, setQuery] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('buscar') || '');
   const [cachedData] = useState<PublicData | null>(() => readCachedData());
   const [businesses, setBusinesses] = useState<Business[]>(() => cachedData ? withCuratedBusinesses(cachedData.negocios.filter((business) => !demonstrationIds.has(business.id))) : []);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(() => cachedData?.publicidad || []);
@@ -374,11 +374,6 @@ export default function Home() {
   const clock = useMemo(() => montevideoClock(), [clockTick]);
   const categories = ['Todos', ...Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, department: true, locality: true })).map((business) => business.categoria).filter(Boolean)))];
   const availableSpecialties = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true })).map((business) => String(business.especialidad || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
-  // Include both the business address and its declared service coverage.
-  const availableDepartments = new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true })).flatMap((business) => {
-    const region = String(business.departamento || business.departamento_region || '').trim();
-    return departments.filter((item) => item === region || servesDepartment(business, item));
-  }));
   const availableLocalities = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true })).filter((business) => (business.departamento || business.departamento_region) === department).map((business) => String(business.zona || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
   const availableTimes = new Set<TimeFilter>(['todos']);
   for (const business of businesses.filter((item) => matchingBusiness(item, { category: true, department: true, locality: true }))) {
@@ -388,8 +383,8 @@ export default function Home() {
   const visible = businesses.filter((business) => (!onlySaved || saved.includes(business.id)) && matchingBusiness(business, { time: true, category: true, department: true, locality: true, specialty: true }));
   useEffect(() => { if (specialty && !availableSpecialties.includes(specialty)) setSpecialty(''); }, [specialty, availableSpecialties.join('|')]);
   useEffect(() => { if (category !== 'Todos' && !categories.includes(category)) setCategory('Todos'); }, [category, categories.join('|')]);
-  useEffect(() => { if (department && !availableDepartments.has(department)) setDepartment(''); }, [department, [...availableDepartments].join('|')]);
-  useEffect(() => { if (locality && !availableLocalities.some((item) => item.toLocaleLowerCase('es-UY') === locality.toLocaleLowerCase('es-UY'))) setLocality(''); }, [locality, availableLocalities.join('|')]);
+  
+
 
   const byDistance = (a: Business, b: Business) => {
     if (!visitorLocation) return orderOf(a)-orderOf(b);
@@ -557,7 +552,7 @@ export default function Home() {
     <main className={`homepage-redesign ${isNight ? 'night-mode' : 'day-mode'}`}>
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a>
-        <nav aria-label="Navegación principal"><a href="#guia">Explorá tu zona</a><a href="#descubrir">Historias</a><a href="/salidas/">Salidas</a><a href="/eventos/">Eventos</a><a href="/?planes=1">Publicar</a></nav>
+        <nav aria-label="Navegación principal"><a href="#guia">Explorá tu zona</a><a href="#descubrir">Historias</a><a href="/lugares/">Lugares</a><a href="/salidas/">Salidas</a><a href="/eventos/">Eventos</a><a href="/?planes=1">Publicar</a></nav>
         <div className="header-join">
           <a className="header-cta" href={businessFormUrl} aria-label="Sumá tu negocio: abrir formulario">Sumá tu negocio <ArrowRight size={15} aria-hidden="true" /></a>
           <span className="header-join-note">Ficha básica gratis, sin mensualidad ni vencimiento</span>
@@ -573,8 +568,8 @@ export default function Home() {
       <section className="search-landing" aria-label="Buscá en tu zona">        <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
           <label>¿Qué estás buscando?<input type="search" placeholder="Negocio, servicio o plan" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
           <details className="search-zone-filter"><summary><MapPin size={18} aria-hidden="true"/>{department ? [locality, department].filter(Boolean).join(' · ') : 'Zona · opcional'}</summary><div className="search-zone-options">
-          <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.filter((item) => availableDepartments.has(item)).map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-          <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || availableLocalities.length === 0}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && availableLocalities.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>¿En qué departamento?<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">Todo Uruguay</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>{department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?'}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || (availableLocalities.length === 0 && !locality)}><option value="">{department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento'}</option>{department && [...new Set([locality, ...availableLocalities].filter(Boolean))].map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
           </div></details>
           <label>¿En qué horario?<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">Cualquier horario</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">Abiertos ahora</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">Hoy de mañana · 6 a 12</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">Hoy de tarde · 12 a 20</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">Hoy de noche · 20 a 6</option>}</select></label>
           {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>¿Qué especialidad?<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">Todas las especialidades</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
@@ -583,7 +578,8 @@ export default function Home() {
         <div className="discovery-shortcuts" aria-label="Accesos rápidos">
           <button type="button" aria-pressed={filter === 'ahora'} onClick={() => showPeriod('ahora')}><Clock3 size={16}/> Abiertos ahora</button>
           <button type="button" aria-label="Ver todos los comercios y servicios" onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Ver todos</button>
-          <a href="/salidas/" aria-label="Salidas y experiencias"><Sparkles size={16}/> Salidas</a>
+          <a href="/lugares/" aria-label="Lugares para visitar en Uruguay"><MapPin size={16}/> Lugares</a>
+           <a href="/salidas/" aria-label="Salidas y experiencias"><Sparkles size={16}/> Salidas</a>
           <button type="button" aria-pressed={filter === 'noche'} onClick={() => showPeriod('noche')}><MoonStar size={16}/> De noche</button>
           <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> Mis favoritos{saved.length ? ' (' + saved.length + ')' : ''}</button>
         </div>{saveConfirmation}
@@ -618,7 +614,7 @@ export default function Home() {
 
       <section className="discovery-selection magazine-discovery" id="descubrir" aria-labelledby="discovery-title">
         <div className="discovery-heading"><div><span className="section-kicker">INSPIRACIÓN LOCAL</span><h2 id="discovery-title">Historias para descubrir. Planes para disfrutar.</h2></div></div>
-        <nav className="magazine-nav" aria-label="Qué querés descubrir"><a href="#historias-lugares">Lugares y curiosidades</a><a href="#historias-negocios">Negocios con historia</a><a href="/eventos/">Eventos · gratis y pagos</a><a href="/salidas/">Salidas y visitas</a></nav>
+        <nav className="magazine-nav" aria-label="Qué querés descubrir"><a href="/lugares/">Lugares para visitar</a><a href="#historias-negocios">Negocios con historia</a><a href="/eventos/">Eventos · gratis y pagos</a><a href="/salidas/">Salidas y visitas</a></nav>
         <div className="magazine-heading"><h3 id="historias-lugares">Historias de nuestros lugares</h3><a href="/historias/">Todas las historias <ArrowRight size={16}/></a></div>
         <div className="magazine-stories">
           <a className="magazine-lead" href="/historias/arco-de-salinas/"><img src="/salinas-atardecer.webp" alt="Paisaje costero al atardecer, imagen ilustrativa" loading="lazy" width="640" height="420"/><div><span className="magazine-label">SALINAS · CANELONES</span><h3>Una bienvenida con historia</h3><p>Conocé el Arco de Salinas y su relación con el obelisco.</p><b>Leer historia <ArrowRight size={16}/></b></div></a>
@@ -639,7 +635,7 @@ export default function Home() {
           <a className="brand footer-brand" href="/" aria-label="Vitrina Cerca, inicio"><span>VITRINA</span><strong>CERCA</strong></a>
           <p>{footerText}</p>
           {socialLinks.length > 0 && <nav className="social-links" aria-label="Redes sociales de Vitrina Cerca">{socialLinks.map(({key,label,url,mark})=><a key={key} href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className={`social-${key}`}>{key==='instagram'?<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>:key==='facebook'?<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 22v-9h3l.5-4H14V7c0-1.2.4-2 2-2h2V1.5A24 24 0 0 0 15 1c-3 0-5 1.8-5 5v3H7v4h3v9z"/></svg>:key==='whatsapp'?<img src="/eventos/whatsapp.svg" alt="" width="22" height="22"/>:<span aria-hidden="true">{mark}</span>}</a>)}</nav>}
-          <nav className="footer-links" aria-label="Información de Vitrina Cerca"><a className="footer-publish" href="/?planes=1">Opciones para publicar <ArrowRight size={16}/></a><a href="/administrar/">Administrar mi negocio</a><a href="/directorio/">Directorio</a><a href="/salidas/">Salidas y experiencias</a><a href="/eventos/">Eventos</a><a href="/historias/">Historias</a><a href="/privacidad/">Privacidad y correcciones</a><a href="/terminos-de-uso/">Términos de uso</a><a href="/autorizacion-de-publicacion/">Autorización de publicación</a><a href="/reglas-de-publicacion/">Reglas de publicación</a></nav>
+          <nav className="footer-links" aria-label="Información de Vitrina Cerca"><a className="footer-publish" href="/?planes=1">Opciones para publicar <ArrowRight size={16}/></a><a href="/administrar/">Administrar mi negocio</a><a href="/directorio/">Directorio</a><a href="/lugares/">Lugares para visitar</a><a href="/salidas/">Salidas y experiencias</a><a href="/eventos/">Eventos</a><a href="/historias/">Historias</a><a href="/privacidad/">Privacidad y correcciones</a><a href="/terminos-de-uso/">Términos de uso</a><a href="/autorizacion-de-publicacion/">Autorización de publicación</a><a href="/reglas-de-publicacion/">Reglas de publicación</a></nav>
         </div>
         <div className="footer-strip"><span>Apoyá lo local, hacemos un mejor Uruguay ♡</span><strong>Negocios reales · Comunidad que crece · Un Uruguay más cerca</strong><span>© {new Date().getFullYear()} Vitrina Cerca</span>{romansiMessageUrl && <a className="footer-credit-brand" href={romansiMessageUrl} target="_blank" rel="noopener noreferrer" aria-label="Consultar a ROMANSI por diseño y desarrollo web mediante WhatsApp"><img src="/romansi-logo.svg" alt="ROMANSI Estudio Digital" loading="lazy" width="150" height="54" /></a>}</div>
       </footer>
