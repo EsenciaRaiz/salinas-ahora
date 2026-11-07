@@ -356,6 +356,10 @@ export default function Home() {
   const [onlySaved, setOnlySaved] = useState(false);
   const [searchSubmitted, setSearchSubmitted] = useState(false);
   const [guidePage, setGuidePage] = useState(0);
+  const [featuredPage, setFeaturedPage] = useState(0);
+  const [featuredPaused, setFeaturedPaused] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const [featuredHovered, setFeaturedHovered] = useState(false);
+  const [featuredFocused, setFeaturedFocused] = useState(false);
   const [guidePaused, setGuidePaused] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [guideHovered, setGuideHovered] = useState(false);
   const [guideFocused, setGuideFocused] = useState(false);
@@ -543,10 +547,14 @@ export default function Home() {
   const basicVisible=useMemo(()=>visible.filter((business)=>!featuredBusiness(business)).sort(byDistance),[visible,visitorLocation]);
   const guideVisible=basicVisible;
   const isBusinessSearch = searchSubmitted || !!query.trim() || !!department || !!locality.trim() || category !== 'Todos' || !!specialty || filter !== 'todos' || onlySaved || !!visitorLocation;
+  const featuredPageCount = Math.max(1, Math.ceil(featuredVisible.length / guidePageSize));
+  const safeFeaturedPage = Math.min(featuredPage, featuredPageCount - 1);
+  const displayedFeatured = isBusinessSearch ? featuredVisible : featuredVisible.slice(safeFeaturedPage * guidePageSize, (safeFeaturedPage + 1) * guidePageSize);
   const guidePageCount = Math.max(1, Math.ceil(guideVisible.length / guidePageSize));
   const safeGuidePage = Math.min(guidePage, guidePageCount - 1);
   const displayedGuide = isBusinessSearch ? guideVisible : guideVisible.slice(safeGuidePage * guidePageSize, (safeGuidePage + 1) * guidePageSize);
-  useEffect(() => { setGuidePage(0); }, [isBusinessSearch, guidePageSize, guideVisible.length]);
+  useEffect(() => { setGuidePage(0); setFeaturedPage(0); }, [isBusinessSearch, guidePageSize, guideVisible.length, featuredVisible.length]);
+  useEffect(() => { if (isBusinessSearch || exploreMode !== 'negocios' || featuredPaused || featuredHovered || featuredFocused || featuredPageCount < 2) return; const timer = window.setInterval(() => { if (!document.hidden) setFeaturedPage(page => (page + 1) % featuredPageCount); }, 8000); return () => window.clearInterval(timer); }, [isBusinessSearch, exploreMode, featuredPaused, featuredHovered, featuredFocused, featuredPageCount]);
   useEffect(() => { if (isBusinessSearch || exploreMode !== 'negocios' || guidePaused || guideHovered || guideFocused || guidePageCount < 2) return; const timer = window.setInterval(() => { if (!document.hidden) setGuidePage(page => (page + 1) % guidePageCount); }, 4000); return () => window.clearInterval(timer); }, [isBusinessSearch, exploreMode, guidePaused, guideHovered, guideFocused, guidePageCount]);
   const activeAdvertisements=useMemo(()=>advertisements.filter((ad)=>(ad.publicar === undefined || yes(ad.publicar)) && activeByDate({ fecha_inicio: ad.inicio || ad.fecha_inicio, fecha_fin: ad.fin || ad.fecha_fin })).sort((a,b)=>orderOf(a)-orderOf(b)),[advertisements]);
   const adsAt=(placement:AdPlacement)=>activeAdvertisements.filter((ad)=>placementOf(ad)===placement);
@@ -739,7 +747,7 @@ export default function Home() {
 
         {language !== "es" && <p className="language-content-note">{t("Los datos de las fichas fueron proporcionados por los negocios en español.")}</p>}
         <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? t('Cargando negocios…') : `${visible.length} ${t(visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados')}`}{onlySaved && <button className="clear-saved-filter" type="button" onClick={() => setOnlySaved(false)}>{t("Mis favoritos · Ver todos")}</button>}</div>
-        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title"><div className="featured-heading"><span className="section-kicker">{t("NEGOCIOS DESTACADOS")}</span><h2 id="featured-title">{t("Destacados")}</h2></div><div className="business-grid" aria-label="Negocios destacados">{featuredVisible.map((business,index)=>renderBusinessCard(business,index,true))}</div></section>}
+        {featuredVisible.length > 0 && <section className="featured-section" aria-labelledby="featured-title" onMouseEnter={() => setFeaturedHovered(true)} onMouseLeave={() => setFeaturedHovered(false)} onFocusCapture={() => setFeaturedFocused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFeaturedFocused(false); }}><div className="featured-heading"><span className="section-kicker">{t("NEGOCIOS DESTACADOS")}</span><h2 id="featured-title">{t("Destacados")}</h2></div><div className="business-grid" aria-label="Negocios destacados" aria-live="off">{displayedFeatured.map((business,index)=>renderBusinessCard(business,isBusinessSearch ? index : safeFeaturedPage * guidePageSize + index,true))}</div>{!isBusinessSearch && featuredPageCount > 1 && <div className="guide-carousel-controls"><span>{language === 'en' ? 'Featured' : language === 'pt' ? 'Destaques' : 'Destacados'} {safeFeaturedPage * guidePageSize + 1}–{Math.min((safeFeaturedPage + 1) * guidePageSize,featuredVisible.length)} / {featuredVisible.length}</span><div><button type="button" onClick={() => setFeaturedPage(page => (page - 1 + featuredPageCount) % featuredPageCount)} aria-label={language === 'en' ? 'Previous featured businesses' : language === 'pt' ? 'Destaques anteriores' : 'Destacados anteriores'}>‹</button><button type="button" onClick={() => setFeaturedPaused(value => !value)} aria-label={featuredPaused ? (language === 'en' ? 'Resume featured rotation' : language === 'pt' ? 'Retomar rotação dos destaques' : 'Reanudar rotación de destacados') : (language === 'en' ? 'Pause featured rotation' : language === 'pt' ? 'Pausar rotação dos destaques' : 'Pausar rotación de destacados')}>{featuredPaused ? (language === 'en' ? 'Resume' : language === 'pt' ? 'Retomar' : 'Reanudar') : (language === 'en' ? 'Pause' : 'Pausar')}</button><button type="button" onClick={() => setFeaturedPage(page => (page + 1) % featuredPageCount)} aria-label={language === 'en' ? 'Next featured businesses' : language === 'pt' ? 'Próximos destaques' : 'Siguientes destacados'}>›</button></div></div>}</section>}
 
         <div className={`guide-layout ${!guideVisible.length && visible.length ? 'only-featured-results' : ''}`}>
           <div className="guide-results">{guideVisible.length > 0 && <div className="guide-subheading"><span className="section-kicker">{t("DIRECTORIO LOCAL")}</span><h2>{t("Explorá la guía")}</h2></div>}
