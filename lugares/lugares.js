@@ -1,4 +1,3 @@
-import { servesDepartment, coverageOf } from '/coverage.js';
 const cards = document.querySelector('#cards');
 const department = document.querySelector('#department');
 const locality = document.querySelector('#locality');
@@ -6,13 +5,6 @@ const localityOptions = document.querySelector('#locality-options');
 const type = document.querySelector('#type');
 const count = document.querySelector('#count');
 const empty = document.querySelector('#empty');
-const serviceLink = document.querySelector('#service-link');
-const serviceTitle = document.querySelector('#service-title');
-const serviceStatus = document.querySelector('#service-status');
-const serviceResults = document.querySelector('#service-results');
-const eventStatus = document.querySelector('#event-status');
-const eventResults = document.querySelector('#event-results');
-const eventLink = document.querySelector('#event-link');
 const destinationActions = document.querySelector('#destination-actions');
 const destinationName = document.querySelector('#destination-name');
 const directionsLink = document.querySelector('#directions-link');
@@ -27,10 +19,10 @@ const copy = {
     title:'Lugares para visitar en Uruguay | Vitrina Cerca',
     description:'Plazas públicas, parques, miradores, historia y arquitectura en distintas localidades de Uruguay. Elegí departamento y tipo de paseo.',
     skip:'Ir a los lugares',navBusinesses:'Negocios y servicios',navEvents:'Eventos',navExperiences:'Experiencias',
-    heroEyebrow:'PASEOS Y LUGARES',heroTitle:'Qué visitar en Uruguay',
-    heroIntro:'Elegí una localidad para descubrir paseos, negocios, servicios y eventos cercanos.',
+    heroEyebrow:'PASEOS EN URUGUAY',heroTitle:'Encontrá tu próximo paseo',
+    heroIntro:'Elegí un destino y descubrí lugares reales para visitar.',
     heroPrimary:'Elegir destino ↓',heroSecondary:'Buscar negocios ↗',
-    exploreEyebrow:'PLANIFICÁ TU VISITA',exploreTitle:'Elegí dónde ir',
+    exploreEyebrow:'PLANIFICÁ TU VISITA',exploreTitle:'Elegí adónde ir',
     exploreIntro:'Plazas, patrimonio, costa y naturaleza en los 19 departamentos.',
     where:'Departamento',locality:'Localidad',interest:'Tipo de lugar',allDepartments:'Todos los departamentos',
     localityPlaceholder:'Escribí o elegí una localidad',allInterests:'Todos los intereses',
@@ -38,7 +30,7 @@ const copy = {
     directions:'Cómo llegar ↗',seeThings:'Qué hacer allí ↓',
     serviceEyebrow:'PARA RESOLVER LO QUE NECESITÁS',services:'Negocios y servicios',serviceLink:'Ver todos los negocios y servicios ↗',
     eventEyebrow:'PARA SUMAR A TU PLAN',events:'Próximos eventos',eventLink:'Ver la agenda de eventos ↗',
-    empty:'Todavía no publicamos lugares verificados para esta selección. Igual podés consultar cómo llegar y buscar negocios y servicios de esa zona.',
+    empty:'Todavía no publicamos paseos para esta selección. Probá otro destino o tipo de lugar.',
     nextEyebrow:'TODO EN UN MISMO LUGAR',nextTitle:'Después del paseo, seguí explorando.',
     nextIntro:'Encontrá comercios y servicios locales, eventos y experiencias desde Vitrina Cerca.',
     nextBusinesses:'Buscar negocios ↗',nextEvents:'Ver eventos ↗',
@@ -57,10 +49,10 @@ const copy = {
     title:'Places to visit in Uruguay | Vitrina Cerca',
     description:'Discover public squares, parks, viewpoints, history and architecture across Uruguay.',
     skip:'Skip to places',navBusinesses:'Businesses and services',navEvents:'Events',navExperiences:'Experiences',
-    heroEyebrow:'PLACES TO VISIT',heroTitle:'What to see in Uruguay',
-    heroIntro:'Choose a town to discover places, businesses, services and nearby events.',
+    heroEyebrow:'OUTINGS IN URUGUAY',heroTitle:'Find your next outing',
+    heroIntro:'Choose a destination and discover real places to visit.',
     heroPrimary:'Choose a destination ↓',heroSecondary:'Find businesses ↗',
-    exploreEyebrow:'PLAN YOUR VISIT',exploreTitle:'Choose where to go',
+    exploreEyebrow:'PLAN YOUR VISIT',exploreTitle:'Choose a destination',
     exploreIntro:'Squares, heritage, coast and nature across all 19 departments.',
     where:'Department',locality:'Town or city',interest:'Type of place',allDepartments:'All departments',
     localityPlaceholder:'Type or choose a town or city',allInterests:'All interests',
@@ -68,7 +60,7 @@ const copy = {
     directions:'Get directions ↗',seeThings:'Things to do here ↓',
     serviceEyebrow:'FOR EVERYDAY NEEDS',services:'Businesses and services',serviceLink:'See all businesses and services ↗',
     eventEyebrow:'ADD TO YOUR PLAN',events:'Upcoming events',eventLink:'See the event calendar ↗',
-    empty:'There are no verified places for this selection yet. You can still get directions and find businesses and services nearby.',
+    empty:'No outings published for this selection yet. Try another destination or type of place.',
     nextEyebrow:'EVERYTHING IN ONE PLACE',nextTitle:'Keep exploring after your outing.',
     nextIntro:'Find local businesses, services, events and experiences on Vitrina Cerca.',
     nextBusinesses:'Find businesses ↗',nextEvents:'See events ↗',
@@ -87,10 +79,10 @@ const copy = {
     title:'Lugares para visitar no Uruguai | Vitrina Cerca',
     description:'Descubra praças públicas, parques, mirantes, história e arquitetura em todo o Uruguai.',
     skip:'Ir para os lugares',navBusinesses:'Comércios e serviços',navEvents:'Eventos',navExperiences:'Experiências',
-    heroEyebrow:'PASSEIOS E LUGARES',heroTitle:'O que visitar no Uruguai',
-    heroIntro:'Escolha uma cidade para descobrir passeios, negócios, serviços e eventos próximos.',
+    heroEyebrow:'PASSEIOS NO URUGUAI',heroTitle:'Encontre seu próximo passeio',
+    heroIntro:'Escolha um destino e descubra lugares reais para visitar.',
     heroPrimary:'Escolher destino ↓',heroSecondary:'Buscar negócios ↗',
-    exploreEyebrow:'PLANEJE SUA VISITA',exploreTitle:'Escolha para onde ir',
+    exploreEyebrow:'PLANEJE SUA VISITA',exploreTitle:'Escolha um destino',
     exploreIntro:'Praças, patrimônio, litoral e natureza nos 19 departamentos.',
     where:'Departamento',locality:'Cidade ou localidade',interest:'Tipo de lugar',allDepartments:'Todos os departamentos',
     localityPlaceholder:'Digite ou escolha uma cidade',allInterests:'Todos os interesses',
@@ -98,7 +90,7 @@ const copy = {
     directions:'Como chegar ↗',seeThings:'O que fazer aqui ↓',
     serviceEyebrow:'PARA O QUE VOCÊ PRECISA',services:'Comércios e serviços',serviceLink:'Ver todos os comércios e serviços ↗',
     eventEyebrow:'PARA INCLUIR NO SEU ROTEIRO',events:'Próximos eventos',eventLink:'Ver a agenda de eventos ↗',
-    empty:'Ainda não publicamos lugares verificados para esta seleção. Você pode ver como chegar e buscar comércios e serviços próximos.',
+    empty:'Ainda não publicamos passeios para esta seleção. Tente outro destino ou tipo de lugar.',
     nextEyebrow:'TUDO EM UM SÓ LUGAR',nextTitle:'Depois do passeio, continue explorando.',
     nextIntro:'Encontre comércios e serviços locais, eventos e experiências na Vitrina Cerca.',
     nextBusinesses:'Buscar comércios ↗',nextEvents:'Ver eventos ↗',
@@ -125,14 +117,10 @@ const photoUrl = (file) => file ? 'https://commons.wikimedia.org/wiki/Special:Fi
 const staticText = {
   '.skip':'skip','.top nav a:nth-child(1)':'navBusinesses','.top nav a:nth-child(2)':'navEvents','.top nav a:nth-child(3)':'navExperiences',
   '.hero-copy .eyebrow':'heroEyebrow','.hero-copy h1':'heroTitle','.hero-copy p':'heroIntro',
-  '.hero-link':'heroPrimary','.hero-secondary':'heroSecondary',
-  '.section-head .eyebrow':'exploreEyebrow','#explore-title':'exploreTitle','.section-head p':'exploreIntro',
+  '#explore-title':'exploreTitle',
   '#destination-actions .eyebrow':'destinationEyebrow','#destination-actions p':'destinationIntro',
   '#directions-link':'directions','#see-things-link':'seeThings',
-  '.connected-panel:first-child .eyebrow':'serviceEyebrow','#service-link':'serviceLink',
-  '.connected-panel:last-child .eyebrow':'eventEyebrow','.connected-panel:last-child h3':'events','#event-link':'eventLink',
-  '#empty':'empty','.next .eyebrow':'nextEyebrow','.next h2':'nextTitle','.next p':'nextIntro',
-  '.next-links a:first-child':'nextBusinesses','.next-links a:last-child':'nextEvents',
+  '#empty':'empty',
   'footer p':'footer','footer a':'privacy'
 };
 function translateStatic() {
@@ -169,10 +157,6 @@ const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character
 let places = [];
 let placesLoaded = false;
 let placesLoadFailed = false;
-let businesses = null;
-let events = null;
-let businessLoadFailed = false;
-let eventLoadFailed = false;
 const requested = new URLSearchParams(location.search);
 department.replaceChildren(option('', t('allDepartments')), ...departments.map((item) => option(item, item)));
 if (departments.includes(requested.get('departamento'))) department.value = requested.get('departamento');
@@ -193,16 +177,6 @@ function render() {
     normalize(place.localidad) === normalize(chosenLocality) &&
     (!selectedDepartment || place.departamento === selectedDepartment));
   const destinationDepartment = selectedDepartment || matchedPlace?.departamento || '';
-  const params = new URLSearchParams();
-  if (destinationDepartment) params.set('departamento', destinationDepartment);
-  if (chosenLocality && destinationDepartment) params.set('localidad', chosenLocality);
-  else if (chosenLocality) params.set('buscar', chosenLocality);
-  serviceLink.href = '/' + (params.size ? '?' + params.toString() : '') + '#guia';
-  serviceTitle.textContent = chosenLocality
-    ? t('servicesIn') + chosenLocality
-    : selectedDepartment ? t('servicesIn') + selectedDepartment : t('services');
-  eventLink.href = '/eventos/' + (chosenLocality ? '?localidad=' + encodeURIComponent(chosenLocality) : '');
-
   destinationActions.hidden = !chosenLocality;
   if (chosenLocality) {
     destinationName.textContent = chosenLocality + (destinationDepartment ? ' · ' + destinationDepartment : '');
@@ -240,68 +214,9 @@ function render() {
       '" target="_blank" rel="noopener noreferrer">' + t('map') + '</a><a class="source" href="' +
       escapeHtml(place.url) + '" target="_blank" rel="noopener noreferrer">' + t('source') + '</a></div></div></article>';
   }).join('');
-  renderConnections();
-}
-const item = (href, heading, description) => {
-  const link = document.createElement('a');
-  link.className = 'connected-item';
-  link.href = href;
-  const title = document.createElement('strong');
-  title.textContent = heading;
-  const detail = document.createElement('span');
-  detail.textContent = description;
-  link.append(title, detail);
-  return link;
-};
-const eventKey = (event) => String(event.id || [event.titulo, event.inicio, event.localidad].join('|'));
-const eventDate = () => new Intl.DateTimeFormat(language === 'es' ? 'es-UY' : language === 'en' ? 'en-US' : 'pt-BR', { timeZone: 'America/Montevideo', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-function renderConnections() {
-  const selectedDepartment = department.value;
-  const chosenLocality = locality.value.trim();
-  if (businesses) {
-    const matching = businesses.filter((business) => {
-      const homeDepartment = String(business.departamento || business.departamento_region || '');
-      const homeLocality = String(business.zona || '');
-      if (!selectedDepartment && !chosenLocality) return true;
-      if (chosenLocality && normalize(homeLocality) === normalize(chosenLocality) &&
-          (!selectedDepartment || homeDepartment === selectedDepartment)) return true;
-      return !!selectedDepartment && (homeDepartment === selectedDepartment || servesDepartment(business, selectedDepartment))
-        && (!chosenLocality || servesDepartment(business, selectedDepartment));
-    });
-    serviceStatus.textContent = matching.length
-      ? matching.length + ' ' + (matching.length === 1 ? t('listingOne') : t('listingMany')) + t('inGuide')
-      : 'Todavía no hay fichas para esta selección. Podés consultar la guía completa.';
-    serviceResults.replaceChildren(...matching.slice(0, 3).map((business) => {
-      const coverage = coverageOf(business);
-      return item('/?negocio=' + encodeURIComponent(business.id),
-        business.nombre, [business.categoria, coverage.label || [business.zona, business.departamento || business.departamento_region].filter(Boolean).join(' · ')].filter(Boolean).join(' · '));
-    }));
-  } else {
-    serviceStatus.textContent = businessLoadFailed ? t('businessError') : t('businessLoading');
-  }
-  if (events) {
-    if (selectedDepartment && !chosenLocality) {
-      eventStatus.textContent = 'Elegí una localidad para ver sus eventos; la agenda no filtra por departamento.';
-      eventResults.replaceChildren();
-    } else {
-      const matching = events.filter((event) => Number.isFinite(Number(event.inicio)) && Number(event.fin) > Date.now() &&
-        (!chosenLocality || normalize(event.localidad) === normalize(chosenLocality)))
-        .sort((a, b) => Number(a.inicio) - Number(b.inicio));
-      eventStatus.textContent = matching.length
-        ? matching.length + ' ' + (matching.length === 1 ? t('eventOne') : t('eventMany'))
-        : 'Todavía no hay eventos próximos para esta selección.';
-      eventResults.replaceChildren(...matching.slice(0, 3).map((event) =>
-        item('/eventos/?evento=' + encodeURIComponent(eventKey(event)),
-          event.titulo, [event.localidad, eventDate().format(Number(event.inicio)),
-            event.entrada === 'Gratis' ? t('free') : t('paid')].join(' · '))));
-    }
-  } else {
-    eventStatus.textContent = eventLoadFailed ? t('eventError') : t('eventLoading');
-  }
 }
 translateStatic();
 count.textContent = t('placesLoading');
-renderConnections();
 languageSelect.addEventListener('change', () => {
   language = languageSelect.value;
   try { localStorage.setItem(languageKey, language); } catch {}
@@ -311,7 +226,6 @@ languageSelect.addEventListener('change', () => {
   for (const entry of type.options) if (entry.value) entry.textContent = typeLabel(entry.value);
   if (placesLoaded) render();
   else count.textContent = t(placesLoadFailed ? 'placesError' : 'placesLoading');
-  renderConnections();
 });
 document.querySelector('#filters').addEventListener('submit', (event) => {
   event.preventDefault();
@@ -334,12 +248,3 @@ fetch('/lugares/lugares.json')
   })
   .catch(() => { placesLoadFailed = true; count.textContent = t('placesError'); });
 
-fetch('/guide-data.json', { cache: 'no-store' })
-  .then((response) => { if (!response.ok) throw Error('No se pudo cargar la guía'); return response.json(); })
-  .then((data) => { businesses = data.correcto && Array.isArray(data.negocios) ? data.negocios : []; renderConnections(); })
-  .catch(() => { businessLoadFailed = true; renderConnections(); });
-fetch('https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxFdd8szCNZprb3WAy6gwb4fjH7KnaIdXJExqNe93yFsejiQ/exec?action=eventos',
-  { cache: 'no-store', signal: AbortSignal.timeout(15000) })
-  .then((response) => { if (!response.ok) throw Error('No se pudo cargar la agenda'); return response.json(); })
-  .then((data) => { events = data.correcto && Array.isArray(data.eventos) ? data.eventos : []; renderConnections(); })
-  .catch(() => { eventLoadFailed = true; renderConnections(); });
