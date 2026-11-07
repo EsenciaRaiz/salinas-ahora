@@ -11,7 +11,12 @@
     "fuente": "Intendencia de Montevideo",
     "url": "https://montevideo.gub.uy/tipo/area-tematica/turismo-y-tiempo-libre/turismo-para-la-ciudadania/caminatours-por-ciudad-vieja",
     "mapa": "Plaza Independencia, Montevideo, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Puerta de la Ciudadela y Palacio Salvo (Montevideo).jpg",
+    "foto_autor": "Ana Raquel S. Hernandes",
+    "foto_licencia": "CC BY-SA 2.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Puerta_de_la_Ciudadela_y_Palacio_Salvo_(Montevideo).jpg",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/2.0/"
   },
   {
     "id": "colonia-barrio-historico",
@@ -25,7 +30,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/colonia-encanto-historico-y-paisajes-del-plata/",
     "mapa": "Puerta de la Ciudadela, Colonia del Sacramento, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Colonia old city.jpg",
+    "foto_autor": "Fernando Martello",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Colonia_old_city.jpg",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
   {
     "id": "salto-centro-historico",
@@ -39,7 +49,12 @@
     "fuente": "Turismo Salto",
     "url": "https://www.turismo.salto.gub.uy/actividades/historico-y-cultural",
     "mapa": "Plaza Artigas, Salto, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Calle uruguay my visit to salto.jpg",
+    "foto_autor": "Nahura99",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Calle_uruguay_my_visit_to_salto.jpg"
   },
   {
     "id": "atlantida-el-aguila",
@@ -53,7 +68,12 @@
     "fuente": "Canelones Turismo",
     "url": "https://turismo.canelones.gub.uy/visita-canelones/que-hacer/circuitos/atlantida",
     "mapa": "El Águila, Villa Argentina, Canelones, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "El Águila - Atlantida.JPG",
+    "foto_autor": "Mverocai",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:El_%C3%81guila_-_Atlantida.JPG",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
   {
     "id": "fray-bentos-rambla",
@@ -67,7 +87,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/fray-bentos-2/",
     "mapa": "Barrio Anglo, Fray Bentos, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Muelle - Barrio Anglo 1.jpg",
+    "foto_autor": "Mx. Granger",
+    "foto_licencia": "CC0 1.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Muelle_-_Barrio_Anglo_1.jpg",
+    "foto_licencia_url": "https://creativecommons.org/publicdomain/zero/1.0/"
   },
   {
     "id": "punta-del-este-costa",
@@ -81,7 +106,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/wp-content/uploads/2023/02/circuito-pde-esp-ing.pdf",
     "mapa": "Puerto de Punta del Este, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Punta del este1.jpg",
+    "foto_autor": "Daniel Stonek",
+    "foto_licencia": "CC BY 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Punta_del_este1.jpg",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by/3.0/"
   },
   {
     "id": "salto-plaza-artigas",
@@ -95,7 +125,12 @@
     "fuente": "Turismo Salto",
     "url": "https://www.turismo.salto.gub.uy/sitios-de-interes/plaza-artigas",
     "mapa": "Plaza Artigas, Salto, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Plaza Artigas en Salto.JPG",
+    "foto_autor": "Lberretta88",
+    "foto_licencia": "CC BY-SA 4.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Plaza_Artigas_en_Salto.JPG",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/4.0/"
   },
   {
     "id": "bella-union-plaza-25-agosto",
@@ -109,7 +144,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/bella-union/",
     "mapa": "Plaza 25 de Agosto, Bella Unión, Artigas, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Plaza 25 de Agosto, Bella Unión 1.jpg",
+    "foto_autor": "Mx. Granger",
+    "foto_licencia": "CC0 1.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Plaza_25_de_Agosto%2C_Bella_Uni%C3%B3n_1.jpg",
+    "foto_licencia_url": "https://creativecommons.org/publicdomain/zero/1.0/"
   },
   {
     "id": "bella-union-parque-rivera",
@@ -123,7 +163,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/bella-union/",
     "mapa": "Parque General Rivera, Bella Unión, Artigas, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Parque Rivera, Bella Unión 1.jpg",
+    "foto_autor": "Mx. Granger",
+    "foto_licencia": "CC0 1.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Parque_Rivera%2C_Bella_Uni%C3%B3n_1.jpg",
+    "foto_licencia_url": "https://creativecommons.org/publicdomain/zero/1.0/"
   },
   {
     "id": "minas-plaza-libertad",
@@ -137,7 +182,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/7016/",
     "mapa": "Plaza Libertad, Minas, Lavalleja, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Monumento a Lavalleja en la Plaza Principal de Minas.JPG",
+    "foto_autor": "Galizbet",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Monumento_a_Lavalleja_en_la_Plaza_Principal_de_Minas.JPG",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
   {
     "id": "durazno-plaza-independencia",
@@ -151,7 +201,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/durazno-corazon-geografico-arte-y-pionerismo-historico/",
     "mapa": "Plaza Independencia, Durazno, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Monumento a Cristóbal Colón en plaza Independencia de la ciudad de Durazno 01.JPG",
+    "foto_autor": "Disman Anchieri",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Monumento_a_Crist%C3%B3bal_Col%C3%B3n_en_plaza_Independencia_de_la_ciudad_de_Durazno_01.JPG",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
   {
     "id": "rivera-plaza-internacional",
@@ -165,7 +220,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/places/rivera/",
     "mapa": "Plaza Internacional, Rivera, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Plaza Internacional.jpg",
+    "foto_autor": "Mx. Granger",
+    "foto_licencia": "CC0 1.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Plaza_Internacional.jpg",
+    "foto_licencia_url": "https://creativecommons.org/publicdomain/zero/1.0/"
   },
   {
     "id": "las-piedras-parque-artigas",
@@ -193,7 +253,12 @@
     "fuente": "Ministerio de Turismo",
     "url": "https://uruguaynatural.com/es/experiences/un-viaje-historico-y-cultural-por-montevideo/",
     "mapa": "Plaza Independencia, Montevideo, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Plaza de la Independencia Uruguay.jpg",
+    "foto_autor": "Marcelo Campi",
+    "foto_licencia": "CC BY-SA 2.0",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Plaza_de_la_Independencia_Uruguay.jpg"
   },
   {
     "id": "estacion-atlantida-iglesia-cristo-obrero",
@@ -207,7 +272,12 @@
     "fuente": "Canelones Turismo",
     "url": "https://turismo.canelones.gub.uy/visita-canelones/que-hacer/circuitos/atlantida",
     "mapa": "Iglesia Cristo Obrero, Estación Atlántida, Canelones, Uruguay",
-    "verificado_el": "2026-11-07"
+    "verificado_el": "2026-11-07",
+    "foto_archivo": "Iglesia Atlántida Dieste 1.jpg",
+    "foto_autor": "Nicolas Barriola",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Iglesia_Atlántida_Dieste_1.jpg"
   },
   {
     "id": "minas-cerro-artigas",
@@ -250,7 +320,12 @@
     "url": "https://www.ambiente.gub.uy/oan/snap/grutas-del-palacio/",
     "mapa": "Grutas del Palacio, Flores, Uruguay",
     "verificado_el": "2026-11-07",
-    "ubicacion_visible": "Fuera de Trinidad"
+    "ubicacion_visible": "Fuera de Trinidad",
+    "foto_archivo": "1. Grutas del palacio.JPG",
+    "foto_autor": "Catarosario",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:1._Grutas_del_palacio.JPG",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
   {
     "id": "florida-prado-piedra-alta",
@@ -293,7 +368,12 @@
     "url": "https://www.ambiente.gub.uy/oan/snap/laguna-de-rocha/",
     "mapa": "Laguna de Rocha, Rocha, Uruguay",
     "verificado_el": "2026-11-07",
-    "ubicacion_visible": "Fuera de Rocha"
+    "ubicacion_visible": "Fuera de Rocha",
+    "foto_archivo": "Laguna de Rocha Uruguay.JPG",
+    "foto_autor": "Guillermo Porley",
+    "foto_licencia": "CC BY-SA 3.0",
+    "foto_fuente": "https://commons.wikimedia.org/wiki/File:Laguna_de_Rocha_Uruguay.JPG",
+    "foto_licencia_url": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
   {
     "id": "san-jose-plaza-33-orientales",
