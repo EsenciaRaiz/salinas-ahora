@@ -502,3 +502,22 @@
 }
 @media(max-width:700px){.business-profile .site-header .header-actions,.plans-page .site-header .header-actions{grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:3px}.business-profile .site-header .language-picker select,.plans-page .site-header .language-picker select{min-height:34px;font-size:11px}}
 @media(max-width:900px) and (min-width:701px){.site-header .header-actions{grid-column:2;grid-row:1}}
+
+/* Four illustrated outings give the national guide a useful entrance from the homepage. */
+.homepage-redesign .destination-showcase{max-width:1160px;margin:22px auto 25px;padding:0 2px}
+.homepage-redesign .destination-showcase-heading{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:14px}
+.homepage-redesign .destination-showcase-heading h2{font-family:var(--font-editorial),Georgia,serif;font-weight:500;font-size:clamp(27px,3vw,37px);letter-spacing:-.04em;line-height:1.1;margin:4px 0}
+.homepage-redesign .destination-showcase-heading p{font-size:13px;line-height:1.45;color:#4b6272;margin:4px 0 0;max-width:740px}
+.homepage-redesign .destination-showcase-heading>a{display:inline-flex;align-items:center;gap:7px;flex:none;min-height:44px;padding:0 4px;color:#0b6072;font-size:13px;font-weight:800}
+.homepage-redesign .destination-showcase-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.homepage-redesign .destination-showcase-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #d9e3df;border-radius:12px;background:#fff;box-shadow:0 5px 16px #102a430a;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
+.homepage-redesign .destination-showcase-card:hover{transform:translateY(-2px);box-shadow:0 9px 22px #102a431c}
+.homepage-redesign .destination-showcase-card:focus-visible{outline:3px solid #0b6072;outline-offset:2px}
+.homepage-redesign .destination-showcase-visual{position:relative;height:112px;overflow:hidden;background:#dce9e6}
+.homepage-redesign .destination-showcase-visual img{display:block;width:100%;height:100%;object-fit:cover}
+.homepage-redesign .destination-showcase-visual small{position:absolute;top:7px;right:7px;padding:3px 5px;border-radius:3px;background:#fffdeee8;color:#29485b;font-size:8px;font-weight:800;letter-spacing:.05em}
+.homepage-redesign .destination-showcase-card>span{padding:10px 13px 0;color:#56707b;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.homepage-redesign .destination-showcase-card>strong{padding:4px 13px 13px;font-family:var(--font-editorial),Georgia,serif;font-size:20px;font-weight:600;line-height:1.15}
+@media(max-width:1200px){.homepage-redesign .destination-showcase{margin-inline:clamp(16px,4vw,40px)}}
+@media(max-width:700px){.homepage-redesign .destination-showcase{margin-top:16px;margin-bottom:23px}.homepage-redesign .destination-showcase-heading{display:block}.homepage-redesign .destination-showcase-heading p{font-size:12px}.homepage-redesign .destination-showcase-heading>a{margin-top:6px}.homepage-redesign .destination-showcase-grid{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}.homepage-redesign .destination-showcase-card{flex:0 0 min(64vw,228px);scroll-snap-align:start}.homepage-redesign .destination-showcase-visual{height:108px}}
+@media(prefers-reduced-motion:reduce){.homepage-redesign .destination-showcase-card{transition:none}}

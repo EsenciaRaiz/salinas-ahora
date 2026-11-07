@@ -46,12 +46,12 @@ const copy = {
     privacy:'Privacidad y correcciones',contentNote:'',
     servicesIn:'Negocios y servicios en ',placeOne:'lugar o paseo disponible',placeMany:'lugares y paseos disponibles',
     map:'Ver en mapa ↗',source:'Fuente oficial ↗',listingOne:'ficha disponible',listingMany:'fichas disponibles',
-    inGuide:' en la guía',noBusinesses:t('noBusinesses'),
+    inGuide:' en la guía',noBusinesses:'Todavía no hay fichas para esta selección. Podés consultar la guía completa.',
     businessError:'No pudimos cargar las fichas. Abrí la guía para ver los negocios.',businessLoading:'Buscando fichas de la guía…',
-    chooseLocality:t('chooseLocality'),
-    eventOne:'evento próximo',eventMany:'eventos próximos',noEvents:t('noEvents'),
+    chooseLocality:'Elegí una localidad para ver sus eventos; la agenda no filtra por departamento.',
+    eventOne:'evento próximo',eventMany:'eventos próximos',noEvents:'Todavía no hay eventos próximos para esta selección.',
     eventError:'No pudimos cargar la agenda. Abrila para consultar eventos.',eventLoading:'Buscando eventos próximos…',
-    free:'Gratis',paid:'Entrada paga',placesError:'No pudimos cargar los lugares. Volvé a intentar más tarde.',placesLoading:'Cargando lugares…'
+    illustration:'Ilustración editorial de',illustrationLabel:'ILUSTRACIÓN',details:'Ver recorrido y datos prácticos',free:'Gratis',paid:'Entrada paga',placesError:'No pudimos cargar los lugares. Volvé a intentar más tarde.',placesLoading:'Cargando lugares…'
   },
   en: {
     title:'Places to visit in Uruguay | Vitrina Cerca',
@@ -81,7 +81,7 @@ const copy = {
     chooseLocality:'Choose a town or city to see its events; the calendar cannot filter by department.',
     eventOne:'upcoming event',eventMany:'upcoming events',noEvents:'No upcoming events for this selection yet.',
     eventError:'Could not load the calendar. Open it to browse events.',eventLoading:'Loading upcoming events…',
-    free:'Free',paid:'Paid admission',placesError:'Could not load places. Please try again later.',placesLoading:'Loading places…'
+    illustration:'Editorial illustration of',illustrationLabel:'ILLUSTRATION',details:'Route and practical details',free:'Free',paid:'Paid admission',placesError:'Could not load places. Please try again later.',placesLoading:'Loading places…'
   },
   pt: {
     title:'Lugares para visitar no Uruguai | Vitrina Cerca',
@@ -111,7 +111,7 @@ const copy = {
     chooseLocality:'Escolha uma cidade para ver os eventos; a agenda não filtra por departamento.',
     eventOne:'próximo evento',eventMany:'próximos eventos',noEvents:'Ainda não há próximos eventos para esta seleção.',
     eventError:'Não foi possível carregar a agenda. Abra-a para consultar os eventos.',eventLoading:'Carregando próximos eventos…',
-    free:'Grátis',paid:'Entrada paga',placesError:'Não foi possível carregar os lugares. Tente novamente mais tarde.',placesLoading:'Carregando lugares…'
+    illustration:'Ilustração editorial de',illustrationLabel:'ILUSTRAÇÃO',details:'Ver roteiro e informações práticas',free:'Grátis',paid:'Entrada paga',placesError:'Não foi possível carregar os lugares. Tente novamente mais tarde.',placesLoading:'Carregando lugares…'
   }
 };
 const t = (key) => copy[language][key];
@@ -120,6 +120,8 @@ const typeNames = {
   pt: {'Arquitectura':'Arquitetura','Historia':'História','Costa':'Litoral','Plazas y parques':'Praças e parques','Miradores':'Mirantes','Naturaleza':'Natureza','Arte urbano':'Arte urbana'}
 };
 const typeLabel = (name) => typeNames[language]?.[name] || name;
+const sceneByType = {'Arquitectura':'arquitectura','Historia':'historia','Costa':'costa','Plazas y parques':'plazas','Miradores':'miradores','Naturaleza':'naturaleza','Arte urbano':'arte'};
+const sceneFor = (name) => '/lugares/escena-' + (sceneByType[name] || 'naturaleza') + '.svg';
 
 const staticText = {
   '.skip':'skip','.top nav a:nth-child(1)':'navBusinesses','.top nav a:nth-child(2)':'navEvents','.top nav a:nth-child(3)':'navExperiences',
@@ -221,14 +223,17 @@ function render() {
   empty.hidden = visible.length !== 0;
   cards.innerHTML = visible.map((place) => {
     const map = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(place.mapa);
-    return '<article class="card"><span class="card-meta">' +
-      escapeHtml(place.ubicacion_visible || place.localidad) + ' · ' + escapeHtml(place.departamento) + ' · ' +
-      escapeHtml(typeLabel(place.tipo)) + '</span><h3>' + escapeHtml(place.nombre) + '</h3><p>' +
-      escapeHtml(place.resumen) + '</p><p class="route">' + escapeHtml(place.recorrido) +
-      '</p><p class="note">' + escapeHtml(place.nota) +
-      '</p><div class="card-links"><a href="' + escapeHtml(map) +
+    return '<article class="card"><div class="card-visual"><img src="' + sceneFor(place.tipo) +
+      '" alt="' + escapeHtml(t('illustration') + ' ' + typeLabel(place.tipo).toLowerCase()) +
+      '" loading="lazy" decoding="async" width="640" height="360"><span>' +
+      escapeHtml(typeLabel(place.tipo)) + '</span></div><div class="card-body"><span class="card-meta">' +
+      escapeHtml(place.ubicacion_visible || place.localidad) + ' · ' + escapeHtml(place.departamento) +
+      '</span><h3>' + escapeHtml(place.nombre) + '</h3><p>' + escapeHtml(place.resumen) +
+      '</p><details><summary>' + t('details') + '</summary><p class="route">' +
+      escapeHtml(place.recorrido) + '</p><p class="note">' + escapeHtml(place.nota) +
+      '</p></details><div class="card-links"><a href="' + escapeHtml(map) +
       '" target="_blank" rel="noopener noreferrer">' + t('map') + '</a><a class="source" href="' +
-      escapeHtml(place.url) + '" target="_blank" rel="noopener noreferrer">' + t('source') + '</a></div></article>';
+      escapeHtml(place.url) + '" target="_blank" rel="noopener noreferrer">' + t('source') + '</a></div></div></article>';
   }).join('');
   renderConnections();
 }
