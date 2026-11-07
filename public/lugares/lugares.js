@@ -120,13 +120,12 @@ const typeNames = {
   pt: {'Arquitectura':'Arquitetura','Historia':'História','Costa':'Litoral','Plazas y parques':'Praças e parques','Miradores':'Mirantes','Naturaleza':'Natureza','Arte urbano':'Arte urbana'}
 };
 const typeLabel = (name) => typeNames[language]?.[name] || name;
-const sceneByType = {'Arquitectura':'arquitectura','Historia':'historia','Costa':'costa','Plazas y parques':'plazas','Miradores':'miradores','Naturaleza':'naturaleza','Arte urbano':'arte'};
-const sceneFor = (name) => '/lugares/escena-' + (sceneByType[name] || 'naturaleza') + '.svg';
+const photoUrl = (file) => file ? 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=960' : '';
 
 const staticText = {
   '.skip':'skip','.top nav a:nth-child(1)':'navBusinesses','.top nav a:nth-child(2)':'navEvents','.top nav a:nth-child(3)':'navExperiences',
   '.hero-copy .eyebrow':'heroEyebrow','.hero-copy h1':'heroTitle','.hero-copy p':'heroIntro',
-  '.hero-link':'heroBusinesses','.hero-secondary':'heroExplore','.art-caption':'artCaption',
+  '.hero-link':'heroBusinesses','.hero-secondary':'heroExplore',
   '.section-head .eyebrow':'exploreEyebrow','#explore-title':'exploreTitle','.section-head p':'exploreIntro',
   '#destination-actions .eyebrow':'destinationEyebrow','#destination-actions p':'destinationIntro',
   '#directions-link':'directions','#see-things-link':'seeThings',
@@ -223,15 +222,21 @@ function render() {
   empty.hidden = visible.length !== 0;
   cards.innerHTML = visible.map((place) => {
     const map = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(place.mapa);
-    return '<article class="card"><div class="card-visual"><img src="' + sceneFor(place.tipo) +
-      '" alt="' + escapeHtml(t('illustration') + ' ' + typeLabel(place.tipo).toLowerCase()) +
+    const photo = place.foto_archivo ? '<div class="card-visual"><img src="' + escapeHtml(photoUrl(place.foto_archivo)) +
+      '" alt="' + escapeHtml('Fotografía de ' + place.nombre + ', ' + place.localidad) +
       '" loading="lazy" decoding="async" width="640" height="360"><span>' +
-      escapeHtml(typeLabel(place.tipo)) + '</span></div><div class="card-body"><span class="card-meta">' +
+      escapeHtml(typeLabel(place.tipo)) + '</span></div>' :
+      '<div class="card-visual is-empty"><span>' + escapeHtml(typeLabel(place.tipo)) + '</span></div>';
+    const credit = place.foto_fuente ? '<div class="photo-credit"><a href="' + escapeHtml(place.foto_fuente) +
+      '" target="_blank" rel="noopener noreferrer">Foto: ' + escapeHtml(place.foto_autor) +
+      '</a> · <a href="' + escapeHtml(place.foto_licencia_url) +
+      '" target="_blank" rel="noopener noreferrer">' + escapeHtml(place.foto_licencia) + '</a></div>' : '';
+    return '<article class="card">' + photo + '<div class="card-body"><span class="card-meta">' +
       escapeHtml(place.ubicacion_visible || place.localidad) + ' · ' + escapeHtml(place.departamento) +
       '</span><h3>' + escapeHtml(place.nombre) + '</h3><p>' + escapeHtml(place.resumen) +
       '</p><details><summary>' + t('details') + '</summary><p class="route">' +
       escapeHtml(place.recorrido) + '</p><p class="note">' + escapeHtml(place.nota) +
-      '</p></details><div class="card-links"><a href="' + escapeHtml(map) +
+      '</p></details>' + credit + '<div class="card-links"><a href="' + escapeHtml(map) +
       '" target="_blank" rel="noopener noreferrer">' + t('map') + '</a><a class="source" href="' +
       escapeHtml(place.url) + '" target="_blank" rel="noopener noreferrer">' + t('source') + '</a></div></div></article>';
   }).join('');
