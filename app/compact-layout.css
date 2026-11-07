@@ -650,3 +650,27 @@
 .homepage-redesign .guide-carousel-controls button:focus-visible,.homepage-redesign .guide-resume-selection:focus-visible{outline:3px solid #0b6072;outline-offset:2px}
 .homepage-redesign .guide-resume-selection{margin:12px 0 3px}
 @media(max-width:600px){.homepage-redesign .guide-carousel-controls button,.homepage-redesign .guide-resume-selection{min-height:44px}}
+
+/* Advertising positions are presented as clear, text-first options. */
+.ad-options{max-width:1160px;margin:22px auto 28px;padding:24px;border:1px solid #d8e2de;border-radius:12px;background:#f0f2ec;color:#102a43}
+.ad-options-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:17px}
+.ad-options-heading h2{margin:5px 0 7px;font:500 clamp(27px,3vw,36px)/1.1 Georgia,serif;letter-spacing:-.035em}
+.ad-options-heading p{max-width:680px;margin:0;color:#486071;font-size:13px;line-height:1.45}
+.ad-options-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex:none}
+.ad-options-cta{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:10px 15px;border-radius:7px;background:#102a43;color:#fff;text-decoration:none;font-size:13px;font-weight:800;text-align:center}
+.ad-options-cta:hover{background:#0c5265}
+.ad-options-secondary{display:inline-flex;align-items:center;gap:5px;color:#0b6072;font-size:12px;font-weight:800;text-decoration:none}
+.ad-options-secondary:hover,.ad-option-card a:hover{text-decoration:underline}
+.ad-option-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.ad-option-card{display:flex;flex-direction:column;min-width:0;min-height:166px;padding:15px;border:1px solid #d7e0dd;border-top:3px solid #ef6a5b;border-radius:8px;background:#fff}
+.ad-option-card>span{color:#c95248;font-size:11px;font-weight:800;letter-spacing:.09em}
+.ad-option-card h3{margin:8px 0 6px;font:600 20px/1.12 Georgia,serif;letter-spacing:-.02em}
+.ad-option-card p{margin:0 0 13px;color:#4f6572;font-size:12px;line-height:1.4}
+.ad-option-card a{display:inline-flex;align-items:center;gap:4px;margin-top:auto;color:#0b6072;font-size:11px;font-weight:800;text-decoration:none}
+.ad-options-note{margin:12px 0 0;color:#526877;font-size:11px;line-height:1.4}
+.plans-ad-options{margin-top:0;margin-bottom:45px}
+.ad-options a:focus-visible{outline:3px solid #0b6072;outline-offset:3px}
+@media(max-width:1200px){.homepage-ad-options{margin-right:clamp(16px,4vw,40px);margin-left:clamp(16px,4vw,40px)}}
+@media(max-width:1050px){.ad-option-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.ad-options{padding:18px;margin-top:15px}.ad-options-heading{display:block}.ad-options-actions{align-items:flex-start;margin-top:14px}.ad-option-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ad-option-card{min-height:150px;padding:12px}.ad-option-card h3{font-size:18px}}
+@media(max-width:430px){.ad-option-grid{grid-template-columns:minmax(0,1fr)}.ad-option-card{min-height:0}}
