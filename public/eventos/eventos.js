@@ -2,6 +2,8 @@ const endpoint='https://script.google.com/macros/s/AKfycbybDC2YTJj8oqoclwREuMQxF
 const cards=document.querySelector('#cards'),status=document.querySelector('#status'),locality=document.querySelector('#localidad'),entry=document.querySelector('#entrada'),more=document.querySelector('#more');
 let events=[],limit=9,expiryTimer;
 const requestedEvent=new URLSearchParams(location.search).get('evento');
+const requestedLocality=new URLSearchParams(location.search).get('localidad')?.trim().slice(0,80)||'';
+if(requestedLocality&&!requestedEvent){const option=document.createElement('option');option.value=requestedLocality;option.textContent=requestedLocality;locality.append(option);locality.value=requestedLocality;}
 const eventKey=event=>String(event.id||[event.titulo,event.inicio,event.localidad].join('|'));
 const eventUrl=event=>'https://vitrinacerca.com/eventos/?evento='+encodeURIComponent(eventKey(event));
 const eventMessage=event=>'¡Mirá este evento que vi en Vitrina Cerca! 📍 '+event.titulo+' — '+event.localidad+'. Todos los detalles acá: ';
@@ -54,6 +56,7 @@ function render(){
   });
   status.textContent=visible.length?visible.length+' evento'+(visible.length===1?'':'s')+' próximo'+(visible.length===1?'':'s'):(events.some(event=>event.fin>Date.now())?'No hay eventos con estos filtros.':'Todavía no hay próximos eventos publicados. ¿Tenés uno para compartir?');
   if(requestedEvent&&!visible.length)status.textContent='Este evento ya terminó o no está disponible. Podés consultar el resto de la agenda.';
+  else if(!visible.length&&locality.value)status.textContent='Todavía no hay eventos próximos publicados en '+locality.value+'. Podés ver otras localidades o proponer uno.';
   more.hidden=visible.length<=limit;
   clearTimeout(expiryTimer);
   const nextEnd=Math.min(...events.filter(event=>event.fin>Date.now()).map(event=>event.fin));
@@ -62,6 +65,6 @@ function render(){
 if(requestedEvent){const all=element('a','Ver todos los eventos');all.href='/eventos/';all.className='all-events';status.before(all);document.querySelector('.filters').hidden=true;}
 for(const control of [locality,entry])control.addEventListener('change',()=>{limit=9;render()});more.addEventListener('click',()=>{limit+=9;render()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&events.length)render()});
-function showEvents(items){const selected=locality.value;events=items.filter(event=>Number.isFinite(event.inicio)&&Number.isFinite(event.fin)).sort((a,b)=>a.inicio-b.inicio);const all=element('option','Todas las localidades');all.value='';locality.replaceChildren(all);[...new Set(events.map(event=>event.localidad))].sort().forEach(value=>{const option=element('option',value);option.value=value;locality.append(option)});if([...locality.options].some(option=>option.value===selected))locality.value=selected;render()}
+function showEvents(items){const selected=locality.value;events=items.filter(event=>Number.isFinite(event.inicio)&&Number.isFinite(event.fin)).sort((a,b)=>a.inicio-b.inicio);const all=element('option','Todas las localidades');all.value='';locality.replaceChildren(all);[...new Set(events.map(event=>event.localidad))].sort().forEach(value=>{const option=element('option',value);option.value=value;locality.append(option)});if(selected&&!Array.from(locality.options).some(option=>option.value===selected)){const option=element('option',selected);option.value=selected;locality.append(option)}if(selected)locality.value=selected;render()}
 try{const cached=JSON.parse(sessionStorage.getItem('vitrina-eventos-v1')||'null');if(cached&&Date.now()-cached.saved<300000&&Array.isArray(cached.events))showEvents(cached.events)}catch{}
 try{const response=await fetch(endpoint+'?action=eventos',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error();const data=await response.json();if(!data.correcto||!Array.isArray(data.eventos))throw Error();showEvents(data.eventos);try{sessionStorage.setItem('vitrina-eventos-v1',JSON.stringify({saved:Date.now(),events:data.eventos}))}catch{}}catch{if(!events.length)status.textContent='No pudimos cargar la cartelera. Probá recargar esta página en unos minutos.'}
