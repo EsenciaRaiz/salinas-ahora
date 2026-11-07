@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Share2, Heart, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
+import { ArrowRight, CalendarDays, Share2, Heart, BriefcaseBusiness, Clock3, HeartPulse, MapPin, MoonStar, Phone, Search, ShoppingBag, Sparkles, Star, Store, Sun, Utensils } from 'lucide-react';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { hasKnownHours, hoursLabel, isOpenNow, montevideoClock, openInPeriod, type TimeFilter } from './schedule';
 import BusinessMap from './business-map';
@@ -8,7 +8,8 @@ import BusinessCardPhoto from './business-card-photo';
 import BusinessSocials from './business-socials';
 import TimedRotator from './timed-rotator';
 import { businessContact, whatsappContactUrl, type ContactIntent } from './contact-intent';
-import { BusinessFacts, LocalDiscoveries, Newsletter, MerchantTestimonials, type BusinessExtras, type Testimonial } from './business-features';
+import { BusinessFacts, Newsletter, MerchantTestimonials, type BusinessExtras, type Testimonial } from './business-features';
+import HomeExplore, { type ExploreMode } from './home-explore';
 import { coverageOf, servesDepartment, departments } from '../public/coverage.js';
 import curatedBusinesses from './curated-businesses.json';
 
@@ -381,6 +382,7 @@ export default function Home() {
   }, [saveMessage, saved]);
   const saveButton = (business: Business) => <button type="button" className={`save-business ${saved.includes(business.id) ? 'is-saved' : ''}`} aria-label={`${t(saved.includes(business.id) ? 'Quitar de favoritos' : 'Guardar negocio')}: ${business.nombre}`} aria-pressed={saved.includes(business.id)} onClick={() => toggleSaved(business.id)}><Heart size={17} aria-hidden="true"/><span>{t(saved.includes(business.id) ? 'Guardado' : 'Guardar negocio')}</span></button>;
   const saveConfirmation = <div className={`favorite-confirmation ${saveMessage ? 'is-visible' : ''}`} role="status" aria-live="polite" aria-atomic="true">{saveMessage}</div>;
+  const [exploreMode, setExploreMode] = useState<ExploreMode>('negocios');
   const [filter, setFilter] = useState<TimeFilter>('todos');
   const [category, setCategory] = useState('Todos');
   const [specialty, setSpecialty] = useState('');
@@ -512,7 +514,6 @@ export default function Home() {
   const clock = useMemo(() => montevideoClock(), [clockTick]);
   const categories = ['Todos', ...Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, department: true, locality: true })).map((business) => business.categoria).filter(Boolean)))];
   const availableSpecialties = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true, locality: true })).map((business) => String(business.especialidad || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
-  const availableLocalities = Array.from(new Set(businesses.filter((business) => matchingBusiness(business, { time: true, category: true, department: true })).filter((business) => (business.departamento || business.departamento_region) === department).map((business) => String(business.zona || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es-UY'));
   const availableTimes = new Set<TimeFilter>(['todos']);
   for (const business of businesses.filter((item) => matchingBusiness(item, { category: true, department: true, locality: true }))) {
     if (isOpenNow(business, clock)) availableTimes.add('ahora');
@@ -565,14 +566,6 @@ export default function Home() {
   const premiumDetail=premiumDetailRaw && premiumDetailRaw !== 'Portada editorial, campaña visual y ubicación publicitaria preferente.' ? premiumDetailRaw : 'Propuesta visual personalizada y espacio publicitario en la ubicación acordada. La duración se confirma antes de contratar.';
   const heroTitle=String(configuration.HERO_TITULO && configuration.HERO_TITULO !== 'Tu zona, a mano.' ? configuration.HERO_TITULO : 'Lo que necesitás, más cerca.');
   const heroText='Comercios, servicios y planes con identidad local.';
-  const destinationParams=new URLSearchParams();
-  if(department) destinationParams.set('departamento',department);
-  if(locality) destinationParams.set('localidad',locality);
-  const destinationUrl='/lugares/'+(destinationParams.size ? '?'+destinationParams.toString() : '');
-  const showcaseCopy={es:{eyebrow:'PASEOS EN TODO URUGUAY',title:'Lugares para descubrir',intro:'Plazas, costas, patrimonio y rincones para visitar. Elegí un destino y encontrá también negocios y servicios cerca.',all:'Explorar todos los lugares',illustration:'ILUSTRACIÓN'},en:{eyebrow:'OUTINGS ACROSS URUGUAY',title:'Places to discover',intro:'Squares, coastlines, heritage and places to visit. Choose a destination and find nearby businesses and services too.',all:'Explore all places',illustration:'ILLUSTRATION'},pt:{eyebrow:'PASSEIOS PELO URUGUAI',title:'Lugares para descobrir',intro:'Praças, litoral, patrimônio e lugares para visitar. Escolha um destino e encontre também comércios e serviços próximos.',all:'Explorar todos os lugares',illustration:'ILUSTRAÇÃO'}}[language];
-  const showcasePlaces=[{name:'Barrio Histórico',location:'Colonia del Sacramento · Colonia',department:'Colonia',locality:'Colonia del Sacramento',scene:'historia'},{name:'El Águila y la costa',location:'Villa Argentina · Canelones',department:'Canelones',locality:'Villa Argentina',scene:'arquitectura'},{name:'Plaza Artigas',location:'Salto · Salto',department:'Salto',locality:'Salto',scene:'plazas'},{name:'De Playa Mansa a Playa Brava',location:'Punta del Este · Maldonado',department:'Maldonado',locality:'Punta del Este',scene:'costa'}];
-  const hubCopy={es:{eyebrow:'PARA SEGUIR EXPLORANDO',title:'Historias y planes',illustration:'Ilustración',cards:[{label:'HISTORIA LOCAL',title:'El Arco de Salinas',place:'Salinas · Canelones'},{label:'HISTORIA LOCAL',title:'Marindia y su parque',place:'Marindia · Canelones'},{label:'EVENTOS',title:'Qué pasa cerca',place:'Agenda gratuita y paga'},{label:'SALIDAS',title:'Entre viñedos',place:'Experiencias en Canelones'}]},en:{eyebrow:'MORE TO EXPLORE',title:'Stories and plans',illustration:'Illustration',cards:[{label:'LOCAL STORY',title:'The Salinas arch',place:'Salinas · Canelones'},{label:'LOCAL STORY',title:'Marindia and its park',place:'Marindia · Canelones'},{label:'EVENTS',title:'What is happening nearby',place:'Free and paid events'},{label:'OUTINGS',title:'Among vineyards',place:'Experiences in Canelones'}]},pt:{eyebrow:'PARA CONTINUAR EXPLORANDO',title:'Histórias e passeios',illustration:'Ilustração',cards:[{label:'HISTÓRIA LOCAL',title:'O Arco de Salinas',place:'Salinas · Canelones'},{label:'HISTÓRIA LOCAL',title:'Marindia e seu parque',place:'Marindia · Canelones'},{label:'EVENTOS',title:'O que acontece por perto',place:'Eventos gratuitos e pagos'},{label:'PASSEIOS',title:'Entre vinhedos',place:'Experiências em Canelones'}]}}[language];
-  const hubLinks=[{href:'/historias/arco-de-salinas/',image:'/salinas-atardecer.webp',illustrative:true},{href:'/historias/marindia/',image:'/parque-pajaros-marindia.png',illustrative:false},{href:'/eventos/',image:'/eventos/cartelera-editorial-540.webp',illustrative:true},{href:'/salidas/',image:'/salidas/vinedos.svg',illustrative:true}];
   const siteWhatsApp=String(configuration.WHATSAPP_PUBLICAR||'').replace(/\D/g,'');
   const whatsappPublicar=siteWhatsApp;
   const socialLinks=[{key:'instagram',label:'Instagram de Vitrina Cerca',url:String(configuration.INSTAGRAM_URL||'https://www.instagram.com/vitrinacerca/'),mark:'◎'},{key:'facebook',label:'Facebook de Vitrina Cerca',url:String(configuration.FACEBOOK_URL||'https://www.facebook.com/profile.php?id=61595227299132'),mark:'f'},{key:'tiktok',label:'TikTok',url:String(configuration.TIKTOK_URL||''),mark:'♪'},{key:'youtube',label:'YouTube',url:String(configuration.YOUTUBE_URL||''),mark:'▶'},{key:'linkedin',label:'LinkedIn',url:String(configuration.LINKEDIN_URL||''),mark:'in'},{key:'whatsapp',label:'WhatsApp',url:siteWhatsApp.length>=8?`https://wa.me/${siteWhatsApp}`:'',mark:''}].filter(({url})=>url.startsWith('https://'));
@@ -587,6 +580,7 @@ export default function Home() {
     ), 100);
   };
   const showPeriod = (period: TimeFilter) => {
+    setExploreMode('negocios');
     setOnlySaved(false);
     setSpecialty('');
     setFilter(period);
@@ -594,7 +588,7 @@ export default function Home() {
     setDepartment('');
     setLocality('');
     setQuery('');
-    document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('explore-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
   const renderBusinessCard = (business: Business, index: number, featured = false) => {
     const style = businessStyle(business.categoria, index);
@@ -691,7 +685,7 @@ export default function Home() {
     <main className={`homepage-redesign ${isNight ? 'night-mode' : 'day-mode'}`}>
       <header className="site-header">
         <a className="brand" href="#inicio" aria-label="Vitrina Cerca, inicio"><span className="brand-symbol"><img src={isNight ? '/marca-noche.svg' : '/marca-dia.svg'} alt="" width="34" height="34"/></span><span>VITRINA</span><strong>CERCA</strong></a>
-        <nav aria-label="Navegación principal"><a href="#guia">{t("Explorá tu zona")}</a><a href="#descubrir">{t("Historias")}</a><a href="/lugares/">{t("Lugares")}</a><a href="/salidas/">{t("Salidas")}</a><a href="/eventos/">{t("Eventos")}</a><a href="/?planes=1">{t("Publicar")}</a></nav>
+        <nav aria-label="Navegación principal"><a href="#explorar">{t("Explorá tu zona")}</a><a href="/historias/">{t("Historias")}</a><a href="/?planes=1">{t("Publicar")}</a></nav>
         <div className="header-actions">{languagePicker}<div className="header-join">
           <a className="header-cta" href={businessFormUrl} aria-label={t("Sumá tu negocio")}>{t("Sumá tu negocio")} <ArrowRight size={15} aria-hidden="true" /></a>
           <span className="header-join-note">{t("Ficha básica gratis, sin mensualidad ni vencimiento")}</span>
@@ -704,34 +698,30 @@ export default function Home() {
         <div className="hero-copy"><span className="eyebrow"><MapPin size={15} /> {t("Uruguay · cerca de vos")}</span><h1>{language === "es" ? heroTitle : t("Lo que necesitás, más cerca.")}</h1><p>{language === "es" ? heroText : t("Comercios, servicios y planes con identidad local.")}</p></div>
         <button type="button" className={`hero-status ${isNight ? 'night' : 'day'}`} onClick={() => showPeriod(isNight ? 'noche' : 'ahora')}><span>{isNight ? <MoonStar size={18} /> : <Sun size={18} />} {t(isNight ? 'Edición nocturna' : 'Edición diurna')}</span><strong>{isNight ? language === 'en' ? `${nightCount} place${nightCount === 1 ? '' : 's'} open at night` : language === 'pt' ? `${nightCount} lugar${nightCount === 1 ? '' : 'es'} com horário noturno` : `${nightCount} ${nightCount === 1 ? 'lugar' : 'lugares'} con horario nocturno` : t('Descubrí lo mejor de tu zona')}</strong><small>{t(isNight ? 'Ver negocios de noche' : 'Ver abiertos ahora')} <ArrowRight size={14} /></small></button>
       </section>
-      <section className="search-landing" aria-label="Buscá en tu zona">        <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}>
-          <label>{t("¿Qué estás buscando?")}<input type="search" placeholder={t("Negocio, servicio o plan")} value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-          <details className="search-zone-filter"><summary><MapPin size={18} aria-hidden="true"/>{department ? [locality, department].filter(Boolean).join(' · ') : t('Zona · opcional')}</summary><div className="search-zone-options">
-          <label>{t("¿En qué departamento?")}<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">{t("Todo Uruguay")}</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-          <label>{t(department === 'Montevideo' ? '¿En qué barrio?' : '¿En qué localidad?')}<select value={locality} onChange={(event) => setLocality(event.target.value)} disabled={!department || (availableLocalities.length === 0 && !locality)}><option value="">{t(department ? department === 'Montevideo' ? 'Todos los barrios' : 'Todas las localidades' : 'Elegí un departamento')}</option>{department && [...new Set([locality, ...availableLocalities].filter(Boolean))].map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-          </div></details>
-          <label>{t("¿En qué horario?")}<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">{t("Cualquier horario")}</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">{t("Abiertos ahora")}</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">{t("Hoy de mañana · 6 a 12")}</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">{t("Hoy de tarde · 12 a 20")}</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">{t("Hoy de noche · 20 a 6")}</option>}</select></label>
-          {(category === 'Profesionales' || category === 'Oficios') && availableSpecialties.length > 0 && <label>{t("¿Qué especialidad?")}<select value={specialty} onChange={(event) => setSpecialty(event.target.value)}><option value="">{t("Todas las especialidades")}</option>{availableSpecialties.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>}
+      <section className="search-landing unified-search" aria-label="Explorá tu zona">
+        <form className="finder-form" onSubmit={(event) => { event.preventDefault(); document.getElementById('explore-results')?.scrollIntoView({ behavior: 'smooth' }); }}>
+          <label>{t("¿Qué estás buscando?")}<input type="search" placeholder={exploreMode === 'negocios' ? t("Negocio, servicio o plan") : language === 'en' ? 'Name or keyword' : language === 'pt' ? 'Nome ou palavra-chave' : 'Nombre o palabra clave'} value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <label>{language === 'en' ? 'Department' : language === 'pt' ? 'Departamento' : 'Departamento'}<select value={department} onChange={(event) => { setDepartment(event.target.value); setLocality(''); }}><option value="">{t("Todo Uruguay")}</option>{departments.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+          <label>{language === 'en' ? 'Town or city' : language === 'pt' ? 'Localidade' : 'Localidad'}<input type="text" placeholder={language === 'en' ? 'Optional' : language === 'pt' ? 'Opcional' : 'Opcional'} value={locality} onChange={(event) => setLocality(event.target.value.slice(0,80))} disabled={!department} autoComplete="address-level2"/></label>
+          {exploreMode === 'negocios' && <label>{t("¿En qué horario?")}<select value={filter} onChange={(event) => setFilter(event.target.value as TimeFilter)}><option value="todos">{t("Cualquier horario")}</option>{(availableTimes.has('ahora') || filter === 'ahora') && <option value="ahora">{t("Abiertos ahora")}</option>}{(availableTimes.has('manana') || filter === 'manana') && <option value="manana">{t("Hoy de mañana · 6 a 12")}</option>}{(availableTimes.has('tarde') || filter === 'tarde') && <option value="tarde">{t("Hoy de tarde · 12 a 20")}</option>}{(availableTimes.has('noche') || filter === 'noche') && <option value="noche">{t("Hoy de noche · 20 a 6")}</option>}</select></label>}
           <button type="submit"><Search size={19} /> {t("Buscar")}</button>
         </form>
-        <div className="discovery-shortcuts" aria-label="Accesos rápidos">
-          <button type="button" aria-pressed={filter === 'ahora'} onClick={() => showPeriod('ahora')}><Clock3 size={16}/> Abiertos ahora</button>
-          <button type="button" aria-label={t("Ver todos los comercios y servicios")} onClick={() => { setOnlySaved(false); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); document.getElementById('guia')?.scrollIntoView({ behavior: 'smooth' }); }}><Store size={16}/> Ver todos</button>
-          <a href="/lugares/" aria-label="Lugares para visitar en Uruguay"><MapPin size={16}/> Lugares</a>
-           <a href="/salidas/" aria-label="Salidas y experiencias"><Sparkles size={16}/> Salidas</a>
-          <button type="button" aria-pressed={filter === 'noche'} onClick={() => showPeriod('noche')}><MoonStar size={16}/> De noche</button>
-          <button type="button" aria-pressed={onlySaved} onClick={() => { setOnlySaved(!onlySaved); setQuery(''); setCategory('Todos'); setSpecialty(''); setFilter('todos'); setDepartment(''); setLocality(''); document.getElementById('listado')?.scrollIntoView({ behavior: 'smooth' }); }}><Heart size={16}/> {t('Mis favoritos')}{saved.length ? ' (' + saved.length + ')' : ''}</button>
+        <div className="explore-tabs" aria-label={language === 'en' ? 'Explore by type' : language === 'pt' ? 'Explorar por tipo' : 'Explorar por tipo'}>
+          <button type="button" aria-pressed={exploreMode === 'negocios'} className={exploreMode === 'negocios' ? 'selected' : ''} onClick={() => setExploreMode('negocios')}><Store size={19}/><span>{language === 'en' ? 'Businesses' : language === 'pt' ? 'Negócios' : 'Negocios'}<small>{language === 'en' ? 'Shops and services' : language === 'pt' ? 'Comércios e serviços' : 'Comercios y servicios'}</small></span></button>
+          <button type="button" aria-pressed={exploreMode === 'lugares'} className={exploreMode === 'lugares' ? 'selected' : ''} onClick={() => setExploreMode('lugares')}><MapPin size={19}/><span>{language === 'en' ? 'Places' : language === 'pt' ? 'Lugares' : 'Lugares'}<small>{language === 'en' ? 'Visit and explore' : language === 'pt' ? 'Visitar e conhecer' : 'Para visitar'}</small></span></button>
+          <button type="button" aria-pressed={exploreMode === 'salidas'} className={exploreMode === 'salidas' ? 'selected' : ''} onClick={() => setExploreMode('salidas')}><Sparkles size={19}/><span>{language === 'en' ? 'Outings' : language === 'pt' ? 'Passeios' : 'Salidas'}<small>{language === 'en' ? 'Ideas and experiences' : language === 'pt' ? 'Ideias e experiências' : 'Ideas y experiencias'}</small></span></button>
+          <button type="button" aria-pressed={exploreMode === 'eventos'} className={exploreMode === 'eventos' ? 'selected' : ''} onClick={() => setExploreMode('eventos')}><CalendarDays size={19}/><span>{language === 'en' ? 'Events' : language === 'pt' ? 'Eventos' : 'Eventos'}<small>{language === 'en' ? 'What is coming up' : language === 'pt' ? 'O que vai acontecer' : 'Qué hay esta semana'}</small></span></button>
         </div>{saveConfirmation}
       </section>
-      <section className="destination-showcase" aria-labelledby="destination-showcase-title"><div className="destination-showcase-heading"><div><span className="section-kicker">{showcaseCopy.eyebrow}</span><h2 id="destination-showcase-title">{showcaseCopy.title}</h2><p>{showcaseCopy.intro}</p></div><a href={destinationUrl}>{showcaseCopy.all} <ArrowRight size={16} aria-hidden="true"/></a></div><div className="destination-showcase-grid">{showcasePlaces.map((place)=><a className="destination-showcase-card" key={place.name} href={'/lugares/?'+new URLSearchParams({departamento:place.department,localidad:place.locality}).toString()}><div className="destination-showcase-visual"><img src={'/lugares/escena-'+place.scene+'.svg'} alt="" loading="lazy" decoding="async" width="640" height="360"/><small>{showcaseCopy.illustration}</small></div><span>{place.location}</span><strong>{place.name}</strong></a>)}</div></section>
-      <section className="finder" id="guia" aria-labelledby="finder-title">
+      <section className="finder unified-finder" id="explorar" aria-label="Resultados de Vitrina Cerca"><div id="explore-results" role="region" aria-label="Resultados" tabIndex={-1}>
+        {exploreMode === "negocios" ? <>
 
-        <div className="finder-heading"><h2 id="finder-title">{t("Negocios y servicios")}</h2></div>
+        <div className="finder-heading" id="guia"><h2 id="finder-title">{t("Negocios y servicios")}</h2></div>
         <div className="proximity"><button type="button" onClick={() => setShowLocationHelp((value) => !value)}><MapPin size={17}/> {t(visitorLocation ? 'Actualizar mi ubicación' : 'Buscar cerca de mí')}</button><button type="button" aria-expanded={showMap} aria-controls="mapa-negocios" onClick={() => setShowMap((value) => !value)}><MapPin size={17}/> {t(showMap ? 'Ocultar mapa' : 'Ver mapa')}</button><details className="guide-note"><summary>{t("Información útil")}</summary><p>{t("Los horarios publicados son habituales y pueden cambiar en feriados. «Abiertos ahora» se calcula con la hora de Uruguay.")}</p><p>{t("La ubicación es opcional. Se usa solo para ordenar esta búsqueda.")}</p></details>{locationMessage && <span role="status">{locationMessage}</span>}</div>
         {showMap && <div id="mapa-negocios"><BusinessMap businesses={visible}/></div>}
         {showLocationHelp && <div className="location-help"><strong>¿Querés usar tu ubicación para ordenar los negocios cercanos?</strong><p>Podés buscar por departamento y localidad sin compartirla. Si elegís usarla, el navegador mostrará un permiso en inglés. Esta traducción quedará visible mientras decidís:</p><ul><li><b>Allow this time</b> = Permitir solo esta vez.</li><li><b>Allow while visiting the site</b> = Permitir mientras visitás la página.</li><li><b>Never allow</b> = No permitir.</li></ul><div><button type="button" onClick={locateVisitor} disabled={locationPromptPending}>{locationPromptPending ? 'Esperando tu elección…' : 'Usar mi ubicación'}</button><button type="button" onClick={() => setShowLocationHelp(false)}>Seguir sin ubicación</button></div></div>}
         {locationPromptPending && <div className="location-permission-guide" role="status"><strong>Ayuda para el permiso del navegador</strong><span>Para permitir solo esta vez, elegí <b>Allow this time</b>.</span><span>Para continuar sin ubicación, elegí <b>Never allow</b>.</span></div>}
-        <div className="category-row" aria-label="Filtrar por categoría">{categories.map((item) => <button key={item} className={category === item ? 'selected' : ''} onClick={() => { setCategory(item); setSpecialty(''); }}>{t(item)}</button>)}</div>
+        <div className="business-toolbar" aria-label="Filtrar negocios"><label>{language === "en" ? "Category" : language === "pt" ? "Categoria" : "Rubro"}<select value={category} onChange={(event) => { setCategory(event.target.value); setSpecialty(""); }}>{categories.map((item) => <option key={item} value={item}>{t(item)}</option>)}</select></label><button type="button" aria-pressed={filter === "ahora"} onClick={() => { setFilter(filter === "ahora" ? "todos" : "ahora"); setOnlySaved(false); }}><Clock3 size={16}/> {t("Abiertos ahora")}</button><button type="button" aria-pressed={onlySaved} onClick={() => setOnlySaved(value => !value)}><Heart size={16}/> {t("Mis favoritos")}{saved.length ? ` + (${saved.length})` : ""}</button><button type="button" onClick={() => { setCategory("Todos"); setSpecialty(""); setFilter("todos"); setOnlySaved(false); setQuery(""); }}>{t("Ver todos")}</button></div>
 
         {language !== "es" && <p className="language-content-note">{t("Los datos de las fichas fueron proporcionados por los negocios en español.")}</p>}
         <div id="listado" className="result-count" aria-live="polite">{dataStatus === 'loading' ? t('Cargando negocios…') : `${visible.length} ${t(visible.length === 1 ? 'negocio encontrado' : 'negocios encontrados')}`}{onlySaved && <button className="clear-saved-filter" type="button" onClick={() => setOnlySaved(false)}>{t("Mis favoritos · Ver todos")}</button>}</div>
@@ -749,9 +739,9 @@ export default function Home() {
             <button type="button" className="night-note" onClick={() => showPeriod('noche')}><MoonStar size={24} /><strong>Tu zona de noche</strong><p>Descubrí los negocios con horario nocturno.</p><span>{t("Ver negocios de noche")} <ArrowRight size={15} /></span></button>
           </aside>
         </div>
-      </section>
+        </> : <HomeExplore mode={exploreMode} department={department} locality={locality} query={query} language={language}/>}
+      </div></section>
 
-      <section className="discovery-hub" id="descubrir" aria-labelledby="discovery-title"><div className="hub-heading"><span className="section-kicker">{hubCopy.eyebrow}</span><h2 id="discovery-title">{hubCopy.title}</h2></div><div className="hub-grid">{hubLinks.map((item,index)=><a className="hub-card" key={item.href} href={item.href}><div className="hub-visual"><img src={item.image} alt="" loading="lazy" decoding="async" width="640" height="420"/>{item.illustrative && <small>{hubCopy.illustration}</small>}</div><div className="hub-card-copy"><span>{hubCopy.cards[index].label} · {hubCopy.cards[index].place}</span><strong>{hubCopy.cards[index].title}</strong><ArrowRight size={17} aria-hidden="true"/></div></a>)}</div><LocalDiscoveries businesses={businesses.filter((business)=>activeByDate(business,false))} language={language}/></section>
       <section className="hero-ad-section" aria-label="Publicidad de portada"><AdRotator ads={coverAds} label="Publicidad de portada" renderAd={renderAdvertisement}/></section>
 
       {!!adsAt('stories').length && <section className="hero-ad-section" aria-label="Publicidad junto a historias"><AdRotator ads={adsAt('stories')} label="Publicidad junto a historias" renderAd={renderAdvertisement}/></section>}
