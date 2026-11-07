@@ -8,7 +8,9 @@ const empty = document.querySelector('#empty');
 const destinationActions = document.querySelector('#destination-actions');
 const destinationName = document.querySelector('#destination-name');
 const directionsLink = document.querySelector('#directions-link');
-const seeThingsLink = document.querySelector('#see-things-link');
+const businessLink = document.querySelector('#business-link');
+const businessSearch = document.querySelector('#business-search');
+const businessQuery = document.querySelector('#business-query');
 
 const languageSelect = document.querySelector('#language');
 const languageKey = 'vitrina-language';
@@ -26,7 +28,7 @@ const copy = {
     exploreIntro:'Plazas, patrimonio, costa y naturaleza en los 19 departamentos.',
     where:'Departamento',locality:'Localidad',interest:'Tipo de lugar',allDepartments:'Todos los departamentos',
     localityPlaceholder:'Escribí o elegí una localidad',allInterests:'Todos los intereses',
-    destinationEyebrow:'TU DESTINO',destinationIntro:'Elegí cómo llegar y explorá lo que ya encontramos allí.',
+    destinationEyebrow:'TU DESTINO',destinationIntro:'Explorá los paseos de esta localidad.',businessLink:'Negocios en la zona',businessSummary:'Buscar un negocio específico',businessLabel:'¿Qué necesitás?',businessPlaceholder:'Ej.: farmacia, restaurante, taxi',businessSubmit:'Buscar',
     directions:'Cómo llegar',seeThings:'Qué hacer allí',
     serviceEyebrow:'PARA RESOLVER LO QUE NECESITÁS',services:'Negocios y servicios',serviceLink:'Ver todos los negocios y servicios',
     eventEyebrow:'PARA SUMAR A TU PLAN',events:'Próximos eventos',eventLink:'Ver la agenda de eventos',
@@ -56,7 +58,7 @@ const copy = {
     exploreIntro:'Squares, heritage, coast and nature across all 19 departments.',
     where:'Department',locality:'Town or city',interest:'Type of place',allDepartments:'All departments',
     localityPlaceholder:'Type or choose a town or city',allInterests:'All interests',
-    destinationEyebrow:'YOUR DESTINATION',destinationIntro:'Get directions and explore what we have found here.',
+    destinationEyebrow:'YOUR DESTINATION',destinationIntro:'Explore outings in this town.',businessLink:'Businesses nearby',businessSummary:'Find a specific business',businessLabel:'What do you need?',businessPlaceholder:'E.g. pharmacy, restaurant, taxi',businessSubmit:'Search',
     directions:'Get directions',seeThings:'Things to do here',
     serviceEyebrow:'FOR EVERYDAY NEEDS',services:'Businesses and services',serviceLink:'See all businesses and services',
     eventEyebrow:'ADD TO YOUR PLAN',events:'Upcoming events',eventLink:'See the event calendar',
@@ -86,7 +88,7 @@ const copy = {
     exploreIntro:'Praças, patrimônio, litoral e natureza nos 19 departamentos.',
     where:'Departamento',locality:'Cidade ou localidade',interest:'Tipo de lugar',allDepartments:'Todos os departamentos',
     localityPlaceholder:'Digite ou escolha uma cidade',allInterests:'Todos os interesses',
-    destinationEyebrow:'SEU DESTINO',destinationIntro:'Veja como chegar e explore o que já encontramos aqui.',
+    destinationEyebrow:'SEU DESTINO',destinationIntro:'Explore os passeios desta cidade.',businessLink:'Comércios na região',businessSummary:'Buscar um comércio específico',businessLabel:'O que você precisa?',businessPlaceholder:'Ex.: farmácia, restaurante, táxi',businessSubmit:'Buscar',
     directions:'Como chegar',seeThings:'O que fazer aqui',
     serviceEyebrow:'PARA O QUE VOCÊ PRECISA',services:'Comércios e serviços',serviceLink:'Ver todos os comércios e serviços',
     eventEyebrow:'PARA INCLUIR NO SEU ROTEIRO',events:'Próximos eventos',eventLink:'Ver a agenda de eventos',
@@ -119,7 +121,7 @@ const staticText = {
   '.hero-copy .eyebrow':'heroEyebrow','.hero-copy h1':'heroTitle','.hero-copy p':'heroIntro',
   '#explore-title':'exploreTitle',
   '#destination-actions .eyebrow':'destinationEyebrow','#destination-actions p':'destinationIntro',
-  '#directions-link':'directions','#see-things-link':'seeThings',
+  '#directions-link':'directions','#business-link':'businessLink','#business-search summary':'businessSummary','#business-search label':'businessLabel','#business-search button':'businessSubmit',
   '#empty':'empty',
   'footer p':'footer','footer a':'privacy'
 };
@@ -136,6 +138,7 @@ function translateStatic() {
   document.querySelector('.filters label:nth-child(2)').firstChild.textContent = t('locality');
   document.querySelector('.filters label:nth-child(3)').firstChild.textContent = t('interest');
   locality.placeholder = t('localityPlaceholder');
+  businessQuery.placeholder = t('businessPlaceholder');
   const note = document.querySelector('#content-language-note');
   note.hidden = language === 'es';
   note.textContent = t('contentNote');
@@ -178,6 +181,7 @@ function render() {
     (!selectedDepartment || place.departamento === selectedDepartment));
   const destinationDepartment = selectedDepartment || matchedPlace?.departamento || '';
   destinationActions.hidden = !chosenLocality;
+  if (!chosenLocality) businessSearch.open = false;
   if (chosenLocality) {
     destinationName.textContent = chosenLocality + (destinationDepartment ? ' · ' + destinationDepartment : '');
     const destination = [chosenLocality,
@@ -185,6 +189,10 @@ function render() {
       'Uruguay'].filter(Boolean).join(', ');
     directionsLink.href = 'https://www.google.com/maps/dir/?api=1&destination='
       + encodeURIComponent(destination);
+    const params = new URLSearchParams();
+    if (destinationDepartment) params.set('departamento', destinationDepartment);
+    params.set('localidad', chosenLocality);
+    businessLink.href = '/?' + params.toString() + '#guia';
   }
 
   const visible = places.filter((place) =>
@@ -235,7 +243,13 @@ document.querySelector('#filters').addEventListener('submit', (event) => {
 department.addEventListener('change', () => { locality.value = ''; updateLocalityOptions(); render(); });
 locality.addEventListener('input', render);
 type.addEventListener('change', render);
-seeThingsLink.addEventListener('click', () => { type.value = ''; render(); });
+document.querySelector('#business-search-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const params = new URLSearchParams(businessLink.href.split('?')[1]?.split('#')[0] || '');
+  const query = businessQuery.value.trim();
+  if (query) params.set('buscar', query);
+  location.href = '/?' + params.toString() + '#guia';
+});
 fetch('/lugares/lugares.json')
   .then((response) => { if (!response.ok) throw Error('No se pudo cargar la guía'); return response.json(); })
   .then((data) => {
