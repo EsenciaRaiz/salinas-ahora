@@ -28,13 +28,16 @@ const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character
 let places = [];
 department.replaceChildren(option('', 'Todos los departamentos'), ...departments.map((item) => option(item, item)));
 
+function updateLocalityOptions() {
+  const matchingLocalities = unique(places
+    .filter((place) => !department.value || place.departamento === department.value)
+    .map((place) => place.localidad));
+  localityOptions.replaceChildren(...matchingLocalities.map((item) => option(item, item)));
+}
+
 function render() {
   const selectedDepartment = department.value;
   const chosenLocality = locality.value.trim();
-  const matchingLocalities = unique(places
-    .filter((place) => !selectedDepartment || place.departamento === selectedDepartment)
-    .map((place) => place.localidad));
-  localityOptions.replaceChildren(...matchingLocalities.map((item) => option(item, item)));
 
   const matchedPlace = places.find((place) =>
     normalize(place.localidad) === normalize(chosenLocality) &&
@@ -52,7 +55,9 @@ function render() {
   destinationActions.hidden = !chosenLocality;
   if (chosenLocality) {
     destinationName.textContent = chosenLocality + (destinationDepartment ? ' · ' + destinationDepartment : '');
-    const destination = [chosenLocality, destinationDepartment, 'Uruguay'].filter(Boolean).join(', ');
+    const destination = [chosenLocality,
+      normalize(chosenLocality) === normalize(destinationDepartment) ? '' : destinationDepartment,
+      'Uruguay'].filter(Boolean).join(', ');
     directionsLink.href = 'https://www.google.com/maps/dir/?api=1&destination='
       + encodeURIComponent(destination);
   }
@@ -81,7 +86,7 @@ document.querySelector('#filters').addEventListener('submit', (event) => {
   render();
   count.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
-department.addEventListener('change', () => { locality.value = ''; render(); });
+department.addEventListener('change', () => { locality.value = ''; updateLocalityOptions(); render(); });
 locality.addEventListener('input', render);
 type.addEventListener('change', render);
 seeThingsLink.addEventListener('click', () => { type.value = ''; render(); });
@@ -91,6 +96,7 @@ fetch('/lugares/lugares.json')
     places = Array.isArray(data) ? data : [];
     type.replaceChildren(option('', 'Todos los intereses'),
       ...unique(places.map((place) => place.tipo)).map((item) => option(item, item)));
+    updateLocalityOptions();
     render();
   })
   .catch(() => { count.textContent = 'No pudimos cargar los lugares. Volvé a intentar más tarde.'; });
