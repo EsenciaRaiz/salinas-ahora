@@ -72,7 +72,7 @@ function render() {
   cards.innerHTML = visible.map((place) => {
     const map = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(place.mapa);
     return '<article class="card"><span class="card-meta">' +
-      escapeHtml(place.localidad) + ' · ' + escapeHtml(place.departamento) + ' · ' +
+      escapeHtml(place.ubicacion_visible || place.localidad) + ' · ' + escapeHtml(place.departamento) + ' · ' +
       escapeHtml(place.tipo) + '</span><h3>' + escapeHtml(place.nombre) + '</h3><p>' +
       escapeHtml(place.resumen) + '</p><p class="route">' + escapeHtml(place.recorrido) +
       '</p><p class="note">' + escapeHtml(place.nota) +
