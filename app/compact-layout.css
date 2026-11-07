@@ -685,3 +685,16 @@
 .homepage-redesign .ad-option-card a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;width:100%;padding:7px 8px;border:1px solid #c8d6d9;border-radius:7px;background:#fff;color:#0b5066;font:700 11px/1.2 Arial,sans-serif;text-align:center;text-decoration:none}
 .homepage-redesign .ad-option-card a:hover{background:#edf4f3;text-decoration:none}
 @media(max-width:700px){.homepage-redesign .ad-options-actions{min-width:0;max-width:250px}}
+
+/* Real, compact inventory for the five advertised placements. */
+.homepage-redesign .ad-vacancy{display:flex;align-items:center;gap:10px;min-height:58px;padding:10px 16px;border:1px dashed #aac0c3;border-radius:8px;background:#f7faf8;color:#16394d;text-decoration:none;box-shadow:none}
+.homepage-redesign .ad-vacancy span{font:700 10px/1.3 Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#5d7782}
+.homepage-redesign .ad-vacancy strong{font:600 17px/1.2 Georgia,serif;color:#102a43}
+.homepage-redesign .ad-vacancy small{margin-left:auto;font:700 11px/1.3 Arial,sans-serif;color:#0b6072}
+.homepage-redesign .ad-vacancy:hover,.homepage-redesign .ad-vacancy:focus-visible{background:#edf5f4;border-color:#0b6072;text-decoration:none}
+.homepage-redesign .hero-ad-section>.ad-vacancy{grid-column:1/-1}
+.homepage-redesign .side-ad-slot{min-width:0}
+.homepage-redesign .side-ad-slot .ad-vacancy{min-height:94px;flex-wrap:wrap;align-content:center}
+.homepage-redesign .side-ad-slot .ad-vacancy small{margin-left:0}
+.homepage-redesign .footer-ads .ad-vacancy{min-height:54px}
+@media(max-width:700px){.homepage-redesign .ad-vacancy{min-height:56px;flex-wrap:wrap;gap:3px 9px;padding:9px 12px}.homepage-redesign .ad-vacancy span{width:100%}.homepage-redesign .ad-vacancy strong{font-size:15px}.homepage-redesign .ad-vacancy small{margin-left:auto}}
