@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   verification: {
     google: 'tIeiA1knpPluYMgEngNMk-H2CxSnB-Z3v9jZn7W_KM0',
   },
-  title: 'Vitrina Cerca | Comercios, servicios e historias locales',
-  description: 'Encontrá comercios, servicios, horarios e historias locales cerca de vos.',
+  title: 'Vitrina Cerca | Negocios, servicios y lugares de Uruguay',
+  description: 'Encontrá negocios y servicios cerca de vos, lugares para visitar y planes en todo Uruguay.',
   alternates: {
     canonical: '/',
   },
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
     locale: 'es_UY',
     url: siteUrl,
     siteName: 'Vitrina Cerca',
-    title: 'Vitrina Cerca | Comercios, servicios e historias locales',
-    description: 'Encontrá comercios, servicios, horarios e historias locales cerca de vos.',
+    title: 'Vitrina Cerca | Negocios, servicios y lugares de Uruguay',
+    description: 'Encontrá negocios y servicios cerca de vos, lugares para visitar y planes en todo Uruguay.',
   },
   twitter: {
     card: 'summary',
-    title: 'Vitrina Cerca | Comercios, servicios e historias locales',
-    description: 'Encontrá comercios, servicios, horarios e historias locales cerca de vos.',
+    title: 'Vitrina Cerca | Negocios, servicios y lugares de Uruguay',
+    description: 'Encontrá negocios y servicios cerca de vos, lugares para visitar y planes en todo Uruguay.',
   },
 };
 
@@ -50,14 +50,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     name: 'Vitrina Cerca',
     url: siteUrl,
     inLanguage: 'es-UY',
-    description: 'Guía local de comercios, horarios, servicios e historias cerca de vos.',
+    description: 'Guía de negocios, servicios, lugares para visitar y planes en todo Uruguay.',
     areaServed: {
-      '@type': 'City',
-      name: 'Salinas',
-      containedInPlace: {
-        '@type': 'AdministrativeArea',
-        name: 'Canelones, Uruguay',
-      },
+      '@type': 'Country',
+      name: 'Uruguay',
     },
   };
 
