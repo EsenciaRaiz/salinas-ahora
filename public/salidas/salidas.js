@@ -1,5 +1,6 @@
 const status = document.querySelector('#status'), cards = document.querySelector('#experience-cards');
 const languageSelect = document.querySelector('#language');
+const emptyActions = document.querySelector('#empty-actions');
 const messages = {
   "es": {
     "guide": "Explorar la guía",
@@ -126,6 +127,7 @@ function render() {
   document.title = tr('pageTitle');
   document.querySelector('meta[name="description"]').content = tr('pageDescription');
   languageSelect.value = language;
+  emptyActions.hidden = loading || loadError || experiences.length > 0;
   for (const element of document.querySelectorAll('[data-i18n]')) element.textContent = tr(element.dataset.i18n);
   status.hidden = experiences.length > 0;
   status.textContent = loading ? tr('loading') : loadError ? tr('error') : experiences.length ? '' : tr('empty');
