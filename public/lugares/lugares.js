@@ -51,7 +51,7 @@ const copy = {
     chooseLocality:'Elegí una localidad para ver sus eventos; la agenda no filtra por departamento.',
     eventOne:'evento próximo',eventMany:'eventos próximos',noEvents:'Todavía no hay eventos próximos para esta selección.',
     eventError:'No pudimos cargar la agenda. Abrila para consultar eventos.',eventLoading:'Buscando eventos próximos…',
-    illustration:'Ilustración editorial de',illustrationLabel:'ILUSTRACIÓN',details:'Ver recorrido y datos prácticos',free:'Gratis',paid:'Entrada paga',placesError:'No pudimos cargar los lugares. Volvé a intentar más tarde.',placesLoading:'Cargando lugares…'
+    details:'Ver recorrido y datos prácticos',free:'Gratis',paid:'Entrada paga',placesError:'No pudimos cargar los lugares. Volvé a intentar más tarde.',placesLoading:'Cargando lugares…'
   },
   en: {
     title:'Places to visit in Uruguay | Vitrina Cerca',
