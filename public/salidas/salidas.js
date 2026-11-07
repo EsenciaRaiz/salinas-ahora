@@ -1,24 +1,45 @@
 const status = document.querySelector('#status'), cards = document.querySelector('#experiences');
+const languageSelect = document.querySelector('#language');
+const messages = {
+  es: {guide:'Explorar la guía',language:'Idioma',kicker:'SALIDAS Y EXPERIENCIAS',title:'Una escapada entre viñedos',intro:'Conocer una bodega, pasear entre sus viñas y compartir un almuerzo. Un plan para descubrir los sabores y las historias de Canelones.',proposal:'Conocé la propuesta',caption:'El paisaje, la historia y el placer de compartir la mesa.',nextKicker:'PARA ELEGIR TU PRÓXIMO PLAN',experiences:'Recorridos y almuerzos en bodegas',loading:'Cargando propuestas…',invitationKicker:'¿TENÉS UNA PROPUESTA PARA COMPARTIR?',invitationTitle:'Tu bodega también puede estar acá',invitationText:'Sumá tu visita, restaurante o experiencia con una ficha básica gratuita, sin mensualidad ni vencimiento. Podés mostrar tus redes y recibir consultas directas.',invitationDetails:'Para preparar la propuesta necesitamos fotos autorizadas, qué incluye, precio por persona, duración, días, cómo reservar y opciones para familias y quienes no toman vino. Te mostramos el contenido antes de publicarlo.',submit:'Sumar mi propuesta gratis',events:'Agenda de eventos',stories:'Historias',privacy:'Privacidad y correcciones',footer:'La ficha básica es gratuita. Cada experiencia tiene el precio y las condiciones que informa su anfitrión.',available:'Ver propuestas',empty:'Estamos reuniendo propuestas de bodegas de Canelones. Las publicaremos con sus precios, recorridos y condiciones confirmados por cada anfitrión.',error:'No pudimos cargar las propuestas. Probá de nuevo en unos minutos.',includes:'Incluye',price:'Precio por persona',duration:'Duración',days:'Días y reserva',families:'Para familias',alcohol:'Sin alcohol',confirmed:'Información confirmada por el anfitrión',availability:'Consultar disponibilidad',directions:'Cómo llegar',pageTitle:'Salidas y experiencias | Vitrina Cerca',pageDescription:'Escapadas, visitas y propuestas gastronómicas para descubrir Uruguay.'},
+  en: {guide:'Explore the guide',language:'Language',kicker:'OUTINGS AND EXPERIENCES',title:'A getaway among vineyards',intro:'Visit a winery, walk among its vines and share a meal. Discover the flavours and stories of Canelones.',proposal:'Explore the experience',caption:'The landscape, its history and the pleasure of sharing a meal.',nextKicker:'CHOOSE YOUR NEXT PLAN',experiences:'Winery tours and lunches',loading:'Loading experiences…',invitationKicker:'HAVE AN EXPERIENCE TO SHARE?',invitationTitle:'Your winery can be here too',invitationText:'Add your visit, restaurant or experience with a free basic listing, with no monthly fee or expiration. Share your social profiles and receive enquiries directly.',invitationDetails:'To prepare your listing, we need approved photos, what is included, price per person, duration, available days, how to book, and options for families and people who do not drink wine. We will show you the content before publishing it.',submit:'Add my experience for free',events:'Events calendar',stories:'Stories',privacy:'Privacy and corrections',footer:'The basic listing is free. Each host sets the price and conditions for their experience.',available:'View experiences',empty:'We are gathering winery experiences in Canelones. We will publish them once each host has confirmed prices, tours and conditions.',error:'We could not load the experiences. Please try again in a few minutes.',includes:'Includes',price:'Price per person',duration:'Duration',days:'Days and booking',families:'For families',alcohol:'Alcohol-free options',confirmed:'Information confirmed by the host',availability:'Check availability',directions:'Directions',pageTitle:'Outings and experiences | Vitrina Cerca',pageDescription:'Getaways, visits and food experiences to discover Uruguay.'},
+  pt: {guide:'Explorar o guia',language:'Idioma',kicker:'PASSEIOS E EXPERIÊNCIAS',title:'Um passeio entre vinhedos',intro:'Visite uma vinícola, passeie entre as videiras e compartilhe um almoço. Descubra os sabores e as histórias de Canelones.',proposal:'Conheça a proposta',caption:'A paisagem, a história e o prazer de compartilhar a mesa.',nextKicker:'ESCOLHA SEU PRÓXIMO PASSEIO',experiences:'Visitas e almoços em vinícolas',loading:'Carregando propostas…',invitationKicker:'TEM UMA PROPOSTA PARA COMPARTILHAR?',invitationTitle:'Sua vinícola também pode estar aqui',invitationText:'Adicione sua visita, restaurante ou experiência com um anúncio básico gratuito, sem mensalidade nem prazo de validade. Mostre suas redes sociais e receba consultas diretamente.',invitationDetails:'Para preparar a proposta, precisamos de fotos autorizadas, o que está incluído, preço por pessoa, duração, dias, como reservar e opções para famílias e para quem não bebe vinho. Mostraremos o conteúdo antes de publicá-lo.',submit:'Adicionar minha proposta grátis',events:'Agenda de eventos',stories:'Histórias',privacy:'Privacidade e correções',footer:'O anúncio básico é gratuito. Cada experiência tem o preço e as condições informados pelo anfitrião.',available:'Ver propostas',empty:'Estamos reunindo propostas de vinícolas de Canelones. Vamos publicá-las com preços, passeios e condições confirmados por cada anfitrião.',error:'Não foi possível carregar as propostas. Tente novamente em alguns minutos.',includes:'Inclui',price:'Preço por pessoa',duration:'Duração',days:'Dias e reserva',families:'Para famílias',alcohol:'Sem álcool',confirmed:'Informações confirmadas pelo anfitrião',availability:'Consultar disponibilidade',directions:'Como chegar',pageTitle:'Passeios e experiências | Vitrina Cerca',pageDescription:'Passeios, visitas e experiências gastronômicas para descobrir o Uruguai.'}
+};
+let language = 'es', experiences = [], loadError = false, loading = true;
+try { const saved = localStorage.getItem('vitrina-language'); if (saved in messages) language = saved; } catch {}
+const tr = key => messages[language][key];
 const https = value => { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; } catch { return ''; } };
 const text = (tag, value, parent) => { const node = document.createElement(tag); node.textContent = value; parent.append(node); return node; };
-try {
-  const response = await fetch('/salidas/experiencias.json');
-  if (!response.ok) throw new Error('No disponible');
-  const data = await response.json();
-  const experiences = (Array.isArray(data.experiencias) ? data.experiencias : []).filter(item => item.aprobada === true && item.fotos_autorizadas === true && item.nombre && item.descripcion && item.confirmado_el && https(item.foto) && https(item.consulta_url) && https(item.mapa_url) && item.precio && item.duracion && item.dias && item.incluye && item.familias && item.sin_alcohol);
+function render() {
+  document.documentElement.lang = language === 'es' ? 'es-UY' : language === 'pt' ? 'pt-BR' : 'en';
+  document.title = tr('pageTitle');
+  document.querySelector('meta[name="description"]').content = tr('pageDescription');
+  languageSelect.value = language;
+  for (const element of document.querySelectorAll('[data-i18n]')) element.textContent = tr(element.dataset.i18n);
   status.hidden = experiences.length > 0;
-  if (experiences.length) document.querySelector('.cover .button').textContent = 'Ver propuestas';
-  status.textContent = 'Estamos reuniendo propuestas de bodegas de Canelones. Las publicaremos con sus precios, recorridos y condiciones confirmados por cada anfitrión.';
+  status.textContent = loading ? tr('loading') : loadError ? tr('error') : experiences.length ? '' : tr('empty');
+  if (experiences.length) document.querySelector('.cover .button').textContent = tr('available');
+  cards.replaceChildren();
   for (const item of experiences) {
     const card = document.createElement('article'); card.className = 'card';
     const photo = document.createElement('img'); photo.src = https(item.foto); photo.alt = item.nombre; photo.loading = 'lazy'; photo.width = 640; photo.height = 360; card.append(photo);
     const content = document.createElement('div'); content.className = 'card-content'; card.append(content);
     text('small', item.localidad || 'Canelones', content); text('h3', item.nombre, content); text('p', item.descripcion, content);
     const facts = document.createElement('dl'); content.append(facts);
-    for (const [label, value] of [['Incluye', item.incluye], ['Precio por persona', item.precio], ['Duración', item.duracion], ['Días y reserva', item.dias], ['Para familias', item.familias], ['Sin alcohol', item.sin_alcohol]]) { text('dt', label, facts); text('dd', value, facts); }
-    text('p', `Información confirmada por el anfitrión: ${item.confirmado_el}`, content);
+    for (const [label, value] of [[tr('includes'), item.incluye], [tr('price'), item.precio], [tr('duration'), item.duracion], [tr('days'), item.dias], [tr('families'), item.familias], [tr('alcohol'), item.sin_alcohol]]) { text('dt', label, facts); text('dd', value, facts); }
+    text('p', tr('confirmed') + ': ' + item.confirmado_el, content);
     const actions = document.createElement('div'); actions.className = 'actions'; content.append(actions);
-    for (const [label, url, style] of [['Consultar disponibilidad', item.consulta_url, 'button'], ['Cómo llegar', item.mapa_url, 'button secondary']]) { const link = text('a', label, actions); link.href = https(url); link.className = style; link.target = '_blank'; link.rel = 'noopener noreferrer'; }
+    for (const [label, url, style] of [[tr('availability'), item.consulta_url, 'button'], [tr('directions'), item.mapa_url, 'button secondary']]) { const link = text('a', label, actions); link.href = https(url); link.className = style; link.target = '_blank'; link.rel = 'noopener noreferrer'; }
     cards.append(card);
   }
-} catch { status.textContent = 'No pudimos cargar las propuestas. Probá de nuevo en unos minutos.'; }
+}
+languageSelect.addEventListener('change', () => { language = languageSelect.value in messages ? languageSelect.value : 'es'; try { localStorage.setItem('vitrina-language', language); } catch {} render(); });
+render();
+try {
+  const response = await fetch('/salidas/experiencias.json');
+  if (!response.ok) throw new Error('No disponible');
+  const data = await response.json();
+  experiences = (Array.isArray(data.experiencias) ? data.experiencias : []).filter(item => item.aprobada === true && item.fotos_autorizadas === true && item.nombre && item.descripcion && item.confirmado_el && https(item.foto) && https(item.consulta_url) && https(item.mapa_url) && item.precio && item.duracion && item.dias && item.incluye && item.familias && item.sin_alcohol);
+} catch { loadError = true; }
+loading = false;
+render();
