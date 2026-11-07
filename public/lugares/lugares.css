@@ -2,3 +2,18 @@
 
 .destination-actions{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:18px;padding:20px 22px;border-radius:13px;background:#183e52;color:#fff}.destination-actions[hidden]{display:none}.destination-actions .eyebrow{color:#f1a394}.destination-actions strong{display:block;margin:5px 0 3px;font-family:Georgia,serif;font-size:27px;font-weight:400}.destination-actions p{margin:0;color:#dce8e9;font-size:13px;line-height:1.4}.destination-links{display:flex;gap:9px;flex-wrap:wrap}.destination-links a{display:inline-block;padding:12px 15px;border-radius:7px;background:#f7f5f0;color:#123247;text-decoration:none;font-size:13px;font-weight:800}.destination-links a:first-child{background:#f07a69}.destination-links a:hover{text-decoration:underline}@media(max-width:760px){.destination-actions{display:block;padding:19px}.destination-links{margin-top:16px}.destination-links a{flex:1;text-align:center}}
 .destination-links a,.service-callout a{min-height:44px;display:inline-flex;align-items:center;justify-content:center}.top nav a{min-height:44px;display:inline-flex;align-items:center}
+
+.connected-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0 24px}
+.connected-panel{min-width:0;padding:21px 22px;background:#fff;border:1px solid #d9e3e2;border-radius:14px;box-shadow:0 8px 24px #102a430b}
+.connected-panel:first-child{border-top:4px solid #0b6072}
+.connected-panel:last-child{border-top:4px solid #ed7768}
+.connected-panel h3{font:400 26px/1.15 Georgia,serif;letter-spacing:-.035em;margin:8px 0 7px}
+.connected-panel>p{font-size:13px;color:#51616a;line-height:1.45;margin:0 0 13px}
+.connected-list{display:grid;gap:7px}
+.connected-item{display:grid;gap:3px;padding:10px 12px;border-radius:8px;background:#f5f7f5;text-decoration:none}
+.connected-item strong{font-size:14px}
+.connected-item span{font-size:12px;color:#5b6870;line-height:1.35}
+.connected-item:hover,.connected-item:focus-visible{background:#e8f1ef;outline:2px solid #0b6072;outline-offset:1px}
+.connected-panel>a:last-child{display:inline-flex;align-items:center;min-height:44px;margin-top:11px;color:#0b6072;font-size:13px;font-weight:800;text-decoration:none}
+.connected-panel>a:last-child:hover{text-decoration:underline}
+@media(max-width:760px){.connected-results{grid-template-columns:1fr;gap:10px}.connected-panel{padding:18px}.connected-panel h3{font-size:24px}}
