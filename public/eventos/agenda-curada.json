@@ -1,0 +1,51 @@
+{
+  "updated_at": "2026-11-07",
+  "events": [
+    {
+      "id": "editorial-salto-270-2026",
+      "titulo": "Fiesta por los 270 años de Salto",
+      "localidad": "Salto",
+      "lugar": "Plaza Treinta y Tres",
+      "direccion": "Salto, Uruguay",
+      "inicio": "2026-11-07T20:00:00-03:00",
+      "fin": "2026-11-09T00:00:00-03:00",
+      "horario_texto": "7 y 8 de noviembre · desde las 20:00",
+      "entrada": "Gratis",
+      "descripcion": "Dos noches de música con bandas locales y cierres anunciados por la Intendencia de Salto. Confirmá el programa antes de ir.",
+      "organizador": "Intendencia de Salto",
+      "enlace": "https://www.salto.gub.uy/eventos/fiesta-por-los-270-anos-de-salto",
+      "fuente": "Agenda oficial de Salto"
+    },
+    {
+      "id": "editorial-san-felipe-2026",
+      "titulo": "Carrera San Felipe y Santiago 2026",
+      "localidad": "Montevideo",
+      "lugar": "Rambla de Montevideo",
+      "direccion": "Montevideo, Uruguay",
+      "inicio": "2026-11-14T19:00:00-03:00",
+      "fin": "2026-11-15T00:00:00-03:00",
+      "horario_texto": "14 de noviembre · largada a las 19:00",
+      "entrada": "Paga",
+      "precio": "Inscripción general: $1.100; consultar disponibilidad y condiciones",
+      "descripcion": "Carrera de 10 kilómetros por la rambla. La Intendencia informa inscripción general paga y algunas condiciones especiales; verificá cupos y recorrido en su página.",
+      "organizador": "Intendencia de Montevideo",
+      "enlace": "https://montevideo.gub.uy/tipo/area-tematica/educacion-fisica-y-deporte/san-felipe-y-santiago",
+      "fuente": "Intendencia de Montevideo"
+    },
+    {
+      "id": "editorial-noche-templos-2026",
+      "titulo": "La Noche de los Templos",
+      "localidad": "Montevideo",
+      "lugar": "Diversos templos de Montevideo",
+      "direccion": "Montevideo, Uruguay",
+      "inicio": "2026-11-21T18:00:00-03:00",
+      "fin": "2026-11-21T22:00:00-03:00",
+      "horario_texto": "21 de noviembre · 18:00 a 22:00",
+      "entrada": "Gratis",
+      "descripcion": "Jornada de puertas abiertas para descubrir la historia y la arquitectura de distintos templos. Consultá el recorrido y las condiciones antes de asistir.",
+      "organizador": "La Noche de los Templos",
+      "enlace": "https://www.descubrimontevideo.uy/montevideo-espiritual-y-religioso-agenda-de-actividades-2026",
+      "fuente": "Descubrí Montevideo"
+    }
+  ]
+}
