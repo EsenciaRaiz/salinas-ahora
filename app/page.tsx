@@ -248,7 +248,7 @@ export default function Home() {
   const [specialty, setSpecialty] = useState('');
   const [department, setDepartment] = useState(() => { const selected = typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('departamento') || ''; return departments.includes(selected) ? selected : ''; });
   const [locality, setLocality] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('localidad') || '');
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('buscar') || '');
   const [cachedData] = useState<PublicData | null>(() => readCachedData());
   const [businesses, setBusinesses] = useState<Business[]>(() => cachedData ? withCuratedBusinesses(cachedData.negocios.filter((business) => !demonstrationIds.has(business.id))) : []);
   const [advertisements, setAdvertisements] = useState<Advertisement[]>(() => cachedData?.publicidad || []);
