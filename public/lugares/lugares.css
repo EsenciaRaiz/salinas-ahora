@@ -24,3 +24,22 @@
 .language-control select:focus-visible{outline:3px solid #0b6072;outline-offset:2px}
 .content-language-note{margin:10px 0 0;color:#51616a;font-size:12px;line-height:1.45}
 @media(max-width:760px){.top{display:grid;grid-template-columns:1fr auto;gap:5px 12px}.top nav{grid-column:1/-1;grid-row:2;overflow-x:auto;flex-wrap:nowrap;gap:15px}.top nav a{white-space:nowrap}.language-control{grid-column:2;grid-row:1}.language-control select{max-width:126px}}
+
+/* Editorial illustrations identify each outing category without implying a location photograph. */
+.card{padding:0;min-height:0;overflow:hidden}
+.card:before{display:none}
+.card-visual{position:relative;height:142px;overflow:hidden;background:#dce9e6}
+.card-visual img{display:block;width:100%;height:100%;object-fit:cover}
+.card-visual span{position:absolute;left:12px;bottom:11px;max-width:calc(100% - 24px);padding:5px 8px;border-radius:5px;background:#102d42e8;color:#fff;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.card-body{display:flex;flex:1;flex-direction:column;min-width:0;padding:16px 17px 18px}
+.card h3{font-size:clamp(21px,2vw,25px);margin:9px 0 8px}
+.card p{font-size:13px;line-height:1.45;margin:0 0 10px}
+.card details{margin:1px 0 10px}
+.card summary{cursor:pointer;color:#0b6072;font-size:12px;font-weight:800;line-height:1.3;min-height:30px}
+.card details[open] summary{margin-bottom:8px}
+.card .note{font-size:11px}
+.card-links{gap:8px 12px;padding-top:9px}
+.card-links a{font-size:12px;min-height:28px;display:inline-flex;align-items:center}
+@media(min-width:1100px){.cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}}
+@media(max-width:760px){.card-visual{height:170px}.card-body{padding:17px 19px}.card h3{font-size:25px}}
+.card-visual small{position:absolute;right:10px;top:10px;padding:4px 6px;border-radius:4px;background:#fffdeecf;color:#29485b;font-size:9px;font-weight:800;letter-spacing:.06em}
