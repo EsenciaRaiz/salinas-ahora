@@ -1,11 +1,14 @@
 const status = document.querySelector('#status'), cards = document.querySelector('#experience-cards');
 const languageSelect = document.querySelector('#language');
+const hostedLink = document.querySelector('.quick-links a[href="#experiencias"]');
+const hostedSection = document.querySelector('#experiencias');
+const quickLinks = document.querySelector('.quick-links');
 const messages = {
   "es": {
     "guide": "Explorar la guía",
     "kicker": "SALIDAS Y EXPERIENCIAS",
     "title": "Ideas para salir y recorrer Uruguay",
-    "intro": "Descubrí paseos por tu cuenta, eventos y experiencias organizadas. Elegí el plan que mejor vaya con vos.",
+    "intro": "Descubrí paseos por tu cuenta y eventos en todo Uruguay. Elegí el plan que mejor vaya con vos.",
     "proposal": "Explorar paseos",
     "placesTitle": "Paseos por tu cuenta",
     "placesIntro": "Plazas, costa, patrimonio y naturaleza",
@@ -37,13 +40,13 @@ const messages = {
     "availability": "Consultar disponibilidad",
     "directions": "Cómo llegar",
     "pageTitle": "Salidas y experiencias | Vitrina Cerca",
-    "pageDescription": "Paseos por cuenta propia, eventos y experiencias con anfitriones para recorrer Uruguay."
+    "pageDescription": "Paseos por cuenta propia y eventos para recorrer Uruguay."
   },
   "en": {
     "guide": "Explore the guide",
     "kicker": "OUTINGS AND EXPERIENCES",
     "title": "Ideas for exploring Uruguay",
-    "intro": "Discover self-guided outings, events and hosted experiences. Choose the plan that suits you.",
+    "intro": "Discover self-guided outings and events across Uruguay. Choose the plan that suits you.",
     "proposal": "Explore places",
     "placesTitle": "Explore on your own",
     "placesIntro": "Squares, coast, heritage and nature",
@@ -75,13 +78,13 @@ const messages = {
     "availability": "Check availability",
     "directions": "Directions",
     "pageTitle": "Outings and experiences | Vitrina Cerca",
-    "pageDescription": "Self-guided outings, events and hosted experiences across Uruguay."
+    "pageDescription": "Self-guided outings and events across Uruguay."
   },
   "pt": {
     "guide": "Explorar o guia",
     "kicker": "PASSEIOS E EXPERIÊNCIAS",
     "title": "Ideias para explorar o Uruguai",
-    "intro": "Descubra passeios por conta própria, eventos e experiências organizadas. Escolha o plano ideal para você.",
+    "intro": "Descubra passeios por conta própria e eventos no Uruguai. Escolha o plano ideal para você.",
     "proposal": "Explorar passeios",
     "placesTitle": "Passeios por conta própria",
     "placesIntro": "Praças, litoral, patrimônio e natureza",
@@ -113,7 +116,7 @@ const messages = {
     "availability": "Consultar disponibilidade",
     "directions": "Como chegar",
     "pageTitle": "Passeios e experiências | Vitrina Cerca",
-    "pageDescription": "Passeios por conta própria, eventos e experiências com anfitriões no Uruguai."
+    "pageDescription": "Passeios por conta própria e eventos no Uruguai."
   }
 };
 let language = 'es', experiences = [], loadError = false, loading = true;
@@ -126,6 +129,10 @@ function render() {
   document.title = tr('pageTitle');
   document.querySelector('meta[name="description"]').content = tr('pageDescription');
   languageSelect.value = language;
+  const hasHostedExperiences = experiences.length > 0;
+  hostedLink.hidden = !hasHostedExperiences;
+  hostedSection.hidden = !hasHostedExperiences;
+  quickLinks.classList.toggle('has-hosted', hasHostedExperiences);
   for (const element of document.querySelectorAll('[data-i18n]')) element.textContent = tr(element.dataset.i18n);
   status.hidden = experiences.length > 0;
   status.textContent = loading ? tr('loading') : loadError ? tr('error') : experiences.length ? '' : tr('empty');
