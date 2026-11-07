@@ -580,7 +580,7 @@
 .homepage-redesign .business-card .card-actions>a{min-height:40px;padding:6px 5px;font-size:11px}
 .homepage-redesign .business-card .card-actions>.save-business{top:8px;right:8px}
 .homepage-redesign .guide-layout{margin-top:12px}
-@media(max-width:1099px){.homepage-redesign .business-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:949px){.homepage-redesign .business-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:820px){.homepage-redesign .business-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.homepage-redesign .business-grid{grid-template-columns:minmax(0,1fr)}.homepage-redesign .featured-section{padding:0;margin:10px 0 16px}.homepage-redesign .business-card .card-actions>a{min-height:44px}}
 
