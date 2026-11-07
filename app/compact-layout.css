@@ -674,3 +674,14 @@
 @media(max-width:1050px){.ad-option-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.ad-options{padding:18px;margin-top:15px}.ad-options-heading{display:block}.ad-options-actions{align-items:flex-start;margin-top:14px}.ad-option-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ad-option-card{min-height:150px;padding:12px}.ad-option-card h3{font-size:18px}}
 @media(max-width:430px){.ad-option-grid{grid-template-columns:minmax(0,1fr)}.ad-option-card{min-height:0}}
+
+/* Uniform actions across the homepage; labels carry the meaning without arrows. */
+.homepage-redesign :is(.ad-options-cta,.newsletter-signup button,.merchant-invitation a){display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border:1px solid #102a43;border-radius:8px;background:#102a43;color:#fff;font:700 13px/1.25 Arial,sans-serif;text-decoration:none;box-shadow:none}
+.homepage-redesign :is(.ad-options-cta,.newsletter-signup button,.merchant-invitation a):hover{background:#0c5265;border-color:#0c5265;text-decoration:none}
+.homepage-redesign .ad-options-actions{min-width:190px;align-items:stretch}
+.homepage-redesign .ad-options-actions a{width:100%}
+.homepage-redesign .ad-options-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 13px;border:1px solid #bfd0d2;border-radius:8px;background:#fff;color:#0b5066;font:700 12px/1.25 Arial,sans-serif;text-decoration:none;text-align:center}
+.homepage-redesign .ad-options-secondary:hover{background:#edf4f3;text-decoration:none}
+.homepage-redesign .ad-option-card a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;width:100%;padding:7px 8px;border:1px solid #c8d6d9;border-radius:7px;background:#fff;color:#0b5066;font:700 11px/1.2 Arial,sans-serif;text-align:center;text-decoration:none}
+.homepage-redesign .ad-option-card a:hover{background:#edf4f3;text-decoration:none}
+@media(max-width:700px){.homepage-redesign .ad-options-actions{min-width:0;max-width:250px}}
