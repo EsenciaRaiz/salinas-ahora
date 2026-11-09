@@ -20,3 +20,5 @@
 .nav-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.language-control{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700}.language-control select{min-height:40px;padding:5px 10px;border:1px solid #9db5bc;border-radius:7px;background:#fff;color:#102a43;font:inherit}.language-control select:focus-visible{outline:2px solid #0f5f78;outline-offset:2px}@media(max-width:700px){.nav-actions{width:100%;justify-content:space-between}.language-control select{min-height:44px}}
 
 .card summary .event-thumb{display:block;width:calc(100% + 40px);height:190px;margin:-19px -20px 8px;object-fit:contain;background:#f0efeb}.card summary:has(.event-thumb){padding-top:19px}@media(max-width:550px){.card summary .event-thumb{height:220px}}
+
+#language-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
