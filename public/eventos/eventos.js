@@ -43,7 +43,9 @@ function render(){
     detail.append(summary);detail.addEventListener('toggle',()=>{summary.querySelector('.more-label').textContent=detail.open?tr('less'):tr('more')});
     const imageUrl=eventImageUrl(event.imagen_url);
     if(imageUrl){const poster=document.createElement('a'),image=document.createElement('img');poster.href=imageUrl;poster.target='_blank';poster.rel='noopener noreferrer';poster.className='poster-link';poster.setAttribute('aria-label',tr('posterView')+event.titulo);image.alt=tr('poster')+event.titulo;image.loading='lazy';image.decoding='async';image.width=640;image.height=420;image.referrerPolicy='no-referrer';poster.append(image);body.append(poster);detail.addEventListener('toggle',()=>{if(detail.open&&!image.src)image.src=imageUrl},{once:true})}
-    body.append(element('p',eventDate().format(event.inicio)+' — '+eventDate().format(event.fin),'details'),element('p',[event.lugar,event.direccion].filter(Boolean).join(' · '),'details'),element('p',event.descripcion,'description'),element('p',tr('organizer')+event.organizador,'details'));
+    const endTime=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Montevideo',hour:'2-digit',minute:'2-digit',hour12:false}).format(event.fin);
+    const schedule=eventDate().format(event.inicio)+(endTime==='23:59'?'':' — '+eventDate().format(event.fin));
+    body.append(element('p',schedule,'details'),element('p',[event.lugar,event.direccion].filter(Boolean).join(' · '),'details'),element('p',event.descripcion,'description'),element('p',tr('organizer')+event.organizador,'details'));
     const links=element('div','','links'),url=safeUrl(event.enlace);
     if(url){const link=element('a',tr('book'));link.href=url;link.target='_blank';link.rel='noopener noreferrer';links.append(link)}
     const phone=String(event.telefono||'').replace(/\D/g,'');if(phone.length>=8&&phone.length<=15){const link=element('a',tr('call'));link.href='tel:+'+phone;links.append(link)}
