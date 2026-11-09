@@ -22,3 +22,5 @@
 .card summary .event-thumb{display:block;width:calc(100% + 40px);height:190px;margin:-19px -20px 8px;object-fit:contain;background:#f0efeb}.card summary:has(.event-thumb){padding-top:19px}@media(max-width:550px){.card summary .event-thumb{height:220px}}
 
 #language-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.cards:has(> .card:only-child){grid-template-columns:minmax(0,1fr);max-width:560px;margin-inline:auto}.cards:has(> .card:only-child) .card summary .event-thumb{height:230px}.card .poster-link{display:inline-block;margin-top:6px;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
