@@ -1,0 +1,17 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');let active='owner@test.invalid',rows=[],created=0;
+const sheet={getLastRow:()=>rows.length+1,getRange:(r,c,h,w)=>({getValues:()=>r===1?[Array.from(ctx.ESC_TEST_HEADERS)]:rows.slice(r-2,r-2+h).map(x=>x.slice(c-1,c-1+w)),setValues:value=>{rows[r-2]=value[0]}})};
+const book={getId:()=> 'book',getSheetByName:()=>sheet};
+const ctx=vm.createContext({console,Session:{getActiveUser:()=>({getEmail:()=>active})},SpreadsheetApp:{getActiveSpreadsheet:()=>book},DriveApp:{getFileById:()=>({getOwner:()=>({getEmail:()=> 'owner@test.invalid'})})},LockService:{getScriptLock:()=>({waitLock(){},releaseLock(){}})},Utilities:{getUuid:()=> 'new-id-'+(++created)},respuestaJson_:s=>JSON.parse(s)});
+vm.runInContext(fs.readFileSync('backend/escapadas.gs','utf8')+'\nthis.ESC_TEST_HEADERS=ESC_HEADERS_;',ctx);
+const p={TITULO:'Cabaña de prueba',TIPO:'Alojamiento',DESCRIPCION:'Una descripción',PAIS:'Uruguay',REGION:'Canelones',LOCALIDAD:'Salinas',WHATSAPP:'59899123456',ESTADO:'Borrador',VERSION:0};
+active='intruder@test.invalid';assert.throws(()=>ctx.escLoad(),/exclusivo/);assert.throws(()=>ctx.escSave(p,[]),/exclusivo/);active='';assert.throws(()=>ctx.escLoad(),/exclusivo/);active='owner@test.invalid';
+assert.throws(()=>ctx.escSave({...p,ESTADO:'Publicada'},[]),/foto/);assert.equal(rows.length,0);
+const draft=ctx.escSave(p,[]);assert.equal(draft.ESTADO,'Borrador');assert.equal(ctx.escPublic_().escapadas.length,0);
+assert.throws(()=>ctx.escSave({...draft,VERSION:0},[]),/otra ventana/);
+assert.throws(()=>ctx.escValidate_({...p,ENLACE:'javascript:alert(1)'}),/https/);
+assert.throws(()=>ctx.escValidate_({...p,PRECIO:'-2'}),/precio/);
+assert.throws(()=>ctx.escValidate_({...p,PRECIO:'1200',MONEDA:'UYU'}),/moneda/);
+assert.throws(()=>ctx.escValidate_({...p,WHATSAPP:'123'}),/WhatsApp/);
+rows[0][16]='https://example.test/photo.jpg';const published=ctx.escSave({...draft,ESTADO:'Publicada',DESTACADO:true},[]);assert.equal(published.VERSION,2);assert.equal(ctx.escPublic_().escapadas.length,1);
+ctx.escSave({...published,ESTADO:'Pausada'},[]);assert.equal(ctx.escPublic_().escapadas.length,0);assert.equal(rows.length,1);
+console.log('Escapadas: acceso, validación, fotos obligatorias, versiones, borradores, publicación y pausa verificados.');
